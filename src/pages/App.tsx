@@ -22,7 +22,7 @@
  * 
  * Routes:
  * - Public: Home, Catalog, EscortList, EscortProfile, Pricing
- * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy
+ * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy, KVKK
  * - Auth: ClientLogin, ClientRegister, EscortLogin, EscortRegister
  * - User: MyFavorites, Messages, MyAppointments
  * - Escort: EscortDashboard, EscortMarket
@@ -62,6 +62,8 @@ const EscortProfile = lazy(() => import("@/pages/EscortProfile").then(m => ({ de
 const TermsOfService = lazy(() => import("@/pages/TermsOfService").then(m => ({ default: m.default })));
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy").then(m => ({ default: m.default })));
 const CookiePolicy = lazy(() => import("@/pages/CookiePolicy").then(m => ({ default: m.default })));
+const KVKK = lazy(() => import("@/pages/KVKK").then(m => ({ default: m.default })));
+
 
 // Authentication
 const EscortLogin = lazy(() => import("@/pages/EscortLogin").then(m => ({ default: m.default })));
@@ -258,6 +260,10 @@ function AppRouter() {
 
       <Route path="/cookies">
         {() => <Suspense fallback={<RouteLoading />}><CookiePolicy /></Suspense>}
+      </Route>
+
+      <Route path="/kvkk">
+        {() => <Suspense fallback={<RouteLoading />}><KVKK /></Suspense>}
       </Route>
 
       {/* 404 */}
