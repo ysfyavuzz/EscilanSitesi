@@ -82,6 +82,9 @@ interface UploadedFile {
 
 type VerificationStep = 1 | 2 | 3;
 
+// Constants
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function VerificationCenter() {
   const [currentStep, setCurrentStep] = useState<VerificationStep>(1);
   const [documentFile, setDocumentFile] = useState<UploadedFile | null>(null);
@@ -114,7 +117,7 @@ export default function VerificationCenter() {
     }
 
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > MAX_FILE_SIZE) {
       toast.error('Dosya boyutu 5MB\'dan küçük olmalıdır');
       return;
     }
@@ -157,6 +160,7 @@ export default function VerificationCenter() {
     setIsSubmitting(true);
 
     try {
+      // TODO: Replace with actual API endpoint for verification submission
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
 

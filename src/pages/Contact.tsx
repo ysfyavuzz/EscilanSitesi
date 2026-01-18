@@ -125,6 +125,7 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
+      // TODO: Replace with actual API endpoint for contact form submission
       // Simulate API call - replace with actual API endpoint
       await new Promise((resolve) => setTimeout(resolve, 2000));
 

@@ -634,7 +634,13 @@ export const shimmer: Variants = {
  */
 export const prefersReducedMotion = () => {
   if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) {
+    // Fallback for browsers that don't support matchMedia
+    return false;
+  }
 };
 
 /**
