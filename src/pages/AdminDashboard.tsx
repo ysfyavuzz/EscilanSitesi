@@ -158,7 +158,7 @@ export default function AdminDashboard() {
                   Admin Paneli
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Hoş geldiniz, {user.name}
+                  Hoş geldiniz, {user.name || user.email}
                 </p>
               </div>
             </div>
