@@ -2,24 +2,26 @@
  * Payment Router Module (paymentRouter.ts)
  * 
  * Handles payment-related tRPC procedures for credit purchases and VIP membership management.
- * Integrates with payment providers (currently using mock implementations for Iyzico/PayTR API).
+ * Integrates with Iyzico payment gateway for secure payment processing.
  * All procedures require authentication.
  * 
  * @module lib/paymentRouter
  * @category Library - API
  * 
  * Features:
- * - Initiate payment for credit packages
+ * - Initiate payment for credit packages via Iyzico
  * - Purchase VIP membership plans (monthly, quarterly, yearly)
  * - Balance/credit queries for authenticated users
  * - Transaction logging and history tracking
+ * - Payment verification and callback handling
  * 
  * Protected Procedures:
  * - All procedures require user authentication via protectedProcedure
  * 
  * Environment Variables:
- * - IYZICO_API_KEY: Iyzico payment API key (when implemented)
- * - PAYTR_MERCHANT_KEY: PayTR merchant key (when implemented)
+ * - IYZICO_API_KEY: Iyzico payment API key
+ * - IYZICO_SECRET_KEY: Iyzico secret key
+ * - IYZICO_BASE_URL: Iyzico API base URL (sandbox or production)
  * 
  * @example
  * ```typescript
@@ -29,78 +31,145 @@
  * const paymentMutation = trpc.payments.initiatePurchase.useMutation();
  * paymentMutation.mutate({
  *   packageId: 'credits-100',
- *   amount: 500,
+ *   amount: 50000, // 500 TL in kuruş
  * });
  * 
  * // Get current balance
  * const { data: balance } = trpc.payments.getBalance.useQuery();
  * ```
- * 
- * @todo Implement Iyzico API integration
- * @todo Implement PayTR API integration
- * @todo Add payment webhook handling
- * @todo Implement transaction verification
  */
 
 import { z } from "zod";
 import { protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
+import { createIyzicoClient, mockPayment } from "./payment/iyzico";
+import { convertToSmallestUnit } from "./payment/utils";
 
 export const paymentRouter = router({
   // Kredi paketi satın alma başlat
   initiatePurchase: protectedProcedure
     .input(z.object({
       packageId: z.string(),
-      amount: z.number(),
+      amount: z.number(), // Amount in smallest unit (kuruş)
+      description: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      // TODO: İyzico/PayTR API çağrısı burada yapılacak
-      // Şimdilik demo için başarılı dönüyoruz
-      
-      const paymentId = `PAY-${Date.now()}`;
-      
-      // İşlemi veritabanına kaydet
-      await db.createCreditTransaction({
-        userId: ctx.user.id,
-        transactionType: 'purchase',
-        amount: input.amount,
-        balanceBefore: 0, // Gerçek bakiye db'den alınmalı
-        balanceAfter: input.amount,
-        description: `${input.packageId} paketi satın alımı`,
-        paymentMethod: 'credit_card',
-        paymentId: paymentId,
-      });
+      try {
+        // Check if Iyzico credentials are configured
+        const hasIyzicoCredentials = process.env.IYZICO_API_KEY && process.env.IYZICO_SECRET_KEY;
+        
+        let paymentResponse;
+        
+        if (hasIyzicoCredentials) {
+          // Use real Iyzico integration
+          const iyzicoClient = createIyzicoClient();
+          paymentResponse = await iyzicoClient.initiatePayment({
+            amount: input.amount,
+            currency: 'TRY',
+            description: input.description || `${input.packageId} paketi satın alımı`,
+            userId: ctx.user.id,
+            packageId: input.packageId,
+            callbackUrl: `${process.env.VITE_APP_URL}/payment/callback`,
+          });
+        } else {
+          // Use mock payment for development
+          paymentResponse = await mockPayment({
+            amount: input.amount,
+            description: input.description || `${input.packageId} paketi satın alımı`,
+            userId: ctx.user.id,
+            packageId: input.packageId,
+          });
+        }
 
-      return {
-        success: true,
-        paymentId: paymentId,
-        checkoutUrl: 'https://sandbox-checkout.iyzipay.com/auth?token=demo-token', // Örnek checkout URL
-      };
+        if (!paymentResponse.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: paymentResponse.errorMessage || 'Payment initialization failed',
+          });
+        }
+
+        // Note: Transaction will be created after successful payment via webhook
+        // This prevents creating transactions for abandoned payments
+
+        return {
+          success: true,
+          paymentId: paymentResponse.paymentId,
+          checkoutUrl: paymentResponse.checkoutUrl,
+          token: paymentResponse.token,
+        };
+      } catch (error: any) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message || 'Payment initialization failed',
+        });
+      }
     }),
 
   // VIP Üyelik satın alma
   purchaseVip: protectedProcedure
     .input(z.object({
       plan: z.enum(['monthly', 'quarterly', 'yearly']),
-      price: z.number(),
+      price: z.number(), // Price in TL (will be converted to kuruş)
     }))
     .mutation(async ({ ctx, input }) => {
-      const profile = await db.getEscortProfileByUserId(ctx.user.id);
-      if (!profile) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Escort profili bulunamadı' });
+      try {
+        const profile = await db.getEscortProfileByUserId(ctx.user.id);
+        if (!profile) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Escort profili bulunamadı' });
+        }
+
+        // Convert price to smallest unit (kuruş)
+        const amountInKurus = convertToSmallestUnit(input.price);
+
+        // Check if Iyzico credentials are configured
+        const hasIyzicoCredentials = process.env.IYZICO_API_KEY && process.env.IYZICO_SECRET_KEY;
+        
+        let paymentResponse;
+        
+        if (hasIyzicoCredentials) {
+          // Use real Iyzico integration
+          const iyzicoClient = createIyzicoClient();
+          paymentResponse = await iyzicoClient.initiatePayment({
+            amount: amountInKurus,
+            currency: 'TRY',
+            description: `VIP Üyelik - ${input.plan}`,
+            userId: ctx.user.id,
+            packageId: `vip-${input.plan}`,
+            callbackUrl: `${process.env.VITE_APP_URL}/payment/callback`,
+          });
+        } else {
+          // Use mock payment for development
+          paymentResponse = await mockPayment({
+            amount: amountInKurus,
+            description: `VIP Üyelik - ${input.plan}`,
+            userId: ctx.user.id,
+            packageId: `vip-${input.plan}`,
+          });
+        }
+
+        if (!paymentResponse.success) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: paymentResponse.errorMessage || 'Payment initialization failed',
+          });
+        }
+
+        // VIP activation will happen after successful payment via webhook
+
+        return {
+          success: true,
+          message: 'Ödeme sayfasına yönlendiriliyorsunuz...',
+          paymentId: paymentResponse.paymentId,
+          checkoutUrl: paymentResponse.checkoutUrl,
+          token: paymentResponse.token,
+        };
+      } catch (error: any) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message || 'VIP membership purchase failed',
+        });
       }
-
-      // Ödeme simülasyonu
-      const paymentId = `VIP-${Date.now()}`;
-      
-      await db.activateVip(profile.id, input.plan);
-
-      return {
-        success: true,
-        message: 'VIP üyeliğiniz başarıyla aktif edildi.',
-        paymentId: paymentId,
-      };
     }),
 
   // Bakiye sorgulama
