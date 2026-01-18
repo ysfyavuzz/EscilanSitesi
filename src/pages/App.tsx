@@ -21,11 +21,12 @@
  * - Loading states during route transitions
  * 
  * Routes:
- * - Public: Home, Catalog, EscortList, EscortProfile, Pricing
+ * - Public: Home, Catalog, EscortList, EscortProfile, Pricing, Contact, Blog
  * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy, KVKK
  * - Auth: ClientLogin, ClientRegister, EscortLogin, EscortRegister
  * - User: MyFavorites, Messages, MyAppointments
- * - Escort: EscortDashboard, EscortMarket
+ * - Escort: EscortDashboard, EscortMarket, VerificationCenter
+ * - Payment: PaymentResult
  * - Admin: AdminDashboard, AdminApprovals
  * - Utilities: SEO, NotFound
  * 
@@ -87,6 +88,12 @@ const AdminApprovals = lazy(() => import("@/pages/AdminApprovals").then(m => ({ 
 // Other
 const Pricing = lazy(() => import("@/pages/Pricing").then(m => ({ default: m.default })));
 const SEO = lazy(() => import("@/pages/SEO").then(m => ({ default: m.default })));
+
+// New Pages - High-End Features
+const Contact = lazy(() => import("@/pages/Contact").then(m => ({ default: m.default })));
+const PaymentResult = lazy(() => import("@/pages/PaymentResult").then(m => ({ default: m.default })));
+const VerificationCenter = lazy(() => import("@/pages/VerificationCenter").then(m => ({ default: m.default })));
+const Blog = lazy(() => import("@/pages/Blog").then(m => ({ default: m.default })));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LOADING FALLBACK COMPONENT
@@ -266,6 +273,23 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><KVKK /></Suspense>}
       </Route>
 
+      {/* New Pages - High-End Features */}
+      <Route path="/contact">
+        {() => <Suspense fallback={<RouteLoading />}><Contact /></Suspense>}
+      </Route>
+
+      <Route path="/payment-result">
+        {() => <Suspense fallback={<RouteLoading />}><PaymentResult /></Suspense>}
+      </Route>
+
+      <Route path="/verification">
+        {() => <Suspense fallback={<RouteLoading />}><VerificationCenter /></Suspense>}
+      </Route>
+
+      <Route path="/blog">
+        {() => <Suspense fallback={<RouteLoading />}><Blog /></Suspense>}
+      </Route>
+
       {/* 404 */}
       <Route path="/404">
         {() => {
@@ -286,10 +310,11 @@ function AppRouter() {
             '/login', '/login-client', '/login-escort',
             '/register-escort', '/register-client',
             '/pricing', '/vip', '/seo',
-            '/terms', '/privacy', '/cookies',
+            '/terms', '/privacy', '/cookies', '/kvkk',
             '/favorites', '/messages', '/appointments',
             '/escort/dashboard', '/escort/market',
             '/admin/dashboard', '/admin/approvals',
+            '/contact', '/payment-result', '/verification', '/blog',
             '/404'
           ];
 
