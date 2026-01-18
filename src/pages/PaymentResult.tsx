@@ -101,7 +101,7 @@ export default function PaymentResult() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   // Parse query parameters
-  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const searchParams = new URLSearchParams(window.location.search);
   const status = searchParams.get('status') || 'success'; // Default to success for demo
   const orderId = searchParams.get('orderId') || `ORD-${Date.now()}`;
   const amount = searchParams.get('amount') || '149.00';
