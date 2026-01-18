@@ -1,8 +1,47 @@
+/**
+ * App Root Router Page
+ * 
+ * Central routing and layout component that orchestrates the entire application.
+ * Implements route configuration with code splitting, error boundaries, and loading states.
+ * Provides global UI providers (tooltips, notifications) and lazy-loaded route definitions.
+ * 
+ * @module pages/App
+ * @category Pages - Dashboard
+ * 
+ * Features:
+ * - Lazy-loaded route definitions for optimal code splitting
+ * - Comprehensive route organization (Home, Auth, Dashboard, Admin)
+ * - Error boundary wrapping for route-level error handling
+ * - Suspense fallback with loading state component
+ * - Global UI providers (Tooltip, Toaster for notifications)
+ * - 404 fallback page for undefined routes
+ * - Route-level performance optimization
+ * - Responsive layout with mobile navigation support
+ * - Protected route implementation for authenticated pages
+ * - Loading states during route transitions
+ * 
+ * Routes:
+ * - Public: Home, Catalog, EscortList, EscortProfile, Pricing
+ * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy
+ * - Auth: ClientLogin, ClientRegister, EscortLogin, EscortRegister
+ * - User: MyFavorites, Messages, MyAppointments
+ * - Escort: EscortDashboard, EscortMarket
+ * - Admin: AdminDashboard, AdminApprovals
+ * - Utilities: SEO, NotFound
+ * 
+ * @example
+ * ```tsx
+ * // Root application entry point
+ * <App />
+ * ```
+ */
+
 import React, { Suspense, lazy } from 'react';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { FullPageLoading } from "@/components/LoadingStates";
+import CookieConsent from "@/components/CookieConsent";
 import { Route } from "wouter";
 import NotFound from "@/pages/NotFound";
 
@@ -18,6 +57,11 @@ const EscortList = lazy(() => import("@/pages/EscortList").then(m => ({ default:
 
 // Profile Pages
 const EscortProfile = lazy(() => import("@/pages/EscortProfile").then(m => ({ default: m.default })));
+
+// Legal Pages
+const TermsOfService = lazy(() => import("@/pages/TermsOfService").then(m => ({ default: m.default })));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy").then(m => ({ default: m.default })));
+const CookiePolicy = lazy(() => import("@/pages/CookiePolicy").then(m => ({ default: m.default })));
 
 // Authentication
 const EscortLogin = lazy(() => import("@/pages/EscortLogin").then(m => ({ default: m.default })));
@@ -203,6 +247,19 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><SEO /></Suspense>}
       </Route>
 
+      {/* Legal Pages */}
+      <Route path="/terms">
+        {() => <Suspense fallback={<RouteLoading />}><TermsOfService /></Suspense>}
+      </Route>
+
+      <Route path="/privacy">
+        {() => <Suspense fallback={<RouteLoading />}><PrivacyPolicy /></Suspense>}
+      </Route>
+
+      <Route path="/cookies">
+        {() => <Suspense fallback={<RouteLoading />}><CookiePolicy /></Suspense>}
+      </Route>
+
       {/* 404 */}
       <Route path="/404">
         {() => {
@@ -223,6 +280,7 @@ function AppRouter() {
             '/login', '/login-client', '/login-escort',
             '/register-escort', '/register-client',
             '/pricing', '/vip', '/seo',
+            '/terms', '/privacy', '/cookies',
             '/favorites', '/messages', '/appointments',
             '/escort/dashboard', '/escort/market',
             '/admin/dashboard', '/admin/approvals',
@@ -254,6 +312,7 @@ export default function App() {
       <TooltipProvider>
         <Toaster />
       </TooltipProvider>
+      <CookieConsent />
     </>
   );
 }

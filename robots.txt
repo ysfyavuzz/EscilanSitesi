@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /masseuse/dashboard/
+Disallow: /escort/dashboard/
 Disallow: /messages/
 Disallow: /favorites/
 Disallow: /appointments/
