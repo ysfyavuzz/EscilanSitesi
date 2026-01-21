@@ -26,7 +26,7 @@ export function UserManagement() {
 
   // Combine customers and escorts for display
   const allUsers = React.useMemo(() => {
-    const users: Array<{ type: 'customer' | 'escort'; data: any }> = [];
+    const users: Array<{ type: 'customer' | 'escort'; data: Customer | EscortProfile }> = [];
     
     if (userType === 'all' || userType === 'customers') {
       mockCustomers.forEach(customer => {

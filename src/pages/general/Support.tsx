@@ -17,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { 
   MessageCircle, Mail, Phone, Clock, HelpCircle, 
-  Send, MapPin, Facebook, Twitter, Instagram
+  Send, MapPin, Facebook, Twitter, Instagram, CheckCircle
 } from 'lucide-react';
 import { SEO } from '@/pages/SEO';
 
@@ -28,12 +28,19 @@ export default function Support() {
     subject: '',
     message: '',
   });
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    // TODO: Replace with actual API call
     console.log('Support request:', formData);
-    alert('Destek talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+    setIsSubmitted(true);
+    
+    // Reset form after 3 seconds
+    setTimeout(() => {
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setIsSubmitted(false);
+    }, 3000);
   };
 
   const contactMethods = [
@@ -196,12 +203,20 @@ export default function Support() {
                     />
                   </div>
 
+                  {isSubmitted && (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Destek talebiniz alındı. En kısa sürede size dönüş yapacağız.</span>
+                    </div>
+                  )}
+
                   <Button 
                     type="submit"
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+                    disabled={isSubmitted}
+                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 disabled:opacity-50"
                   >
                     <Send className="w-4 h-4 mr-2" />
-                    Gönder
+                    {isSubmitted ? 'Gönderildi' : 'Gönder'}
                   </Button>
                 </form>
               </CardContent>
