@@ -215,7 +215,7 @@ export default function Wallet() {
   const istatistikler = React.useMemo(() => {
     const yuklemeler = islemler.filter(i => i.tur === 'yukleme');
     const harcamalar = islemler.filter(i => i.tur === 'harcama');
-    const puanKazanmalar = islemler.filter(i => i.tur === 'puan_kazanma' || i.puan && i.puan > 0);
+    const puanKazanmalar = islemler.filter(i => i.tur === 'puan_kazanma' || (i.puan !== undefined && i.puan > 0));
 
     const toplamYukleme = yuklemeler.reduce((toplam, i) => toplam + i.tutar, 0);
     const toplamHarcama = Math.abs(harcamalar.reduce((toplam, i) => toplam + i.tutar, 0));
