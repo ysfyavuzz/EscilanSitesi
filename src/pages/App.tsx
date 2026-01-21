@@ -47,6 +47,7 @@ import RoleSelector from "@/components/RoleSelector";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { NotificationToast, NotificationCenter } from "@/components/Notifications";
 import { FloatingNavigation } from "@/components/FloatingNavigation";
+import { Header } from "@/components/Header";
 import { Route } from "wouter";
 import NotFound from "@/pages/NotFound";
 
@@ -68,6 +69,7 @@ const TermsOfService = lazy(() => import("@/pages/TermsOfService").then(m => ({ 
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy").then(m => ({ default: m.default })));
 const CookiePolicy = lazy(() => import("@/pages/CookiePolicy").then(m => ({ default: m.default })));
 const KVKK = lazy(() => import("@/pages/KVKK").then(m => ({ default: m.default })));
+const Safety = lazy(() => import("@/pages/Safety").then(m => ({ default: m.default })));
 
 
 // Authentication
@@ -273,6 +275,15 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
       </Route>
 
+      {/* Generic Register Routes - Redirects to ClientRegister */}
+      <Route path="/register">
+        {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
+      </Route>
+
+      <Route path="/signup">
+        {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
+      </Route>
+
       {/* User Dashboard Routes */}
       <Route path="/favorites">
         {() => <Suspense fallback={<RouteLoading />}><MyFavorites /></Suspense>}
@@ -328,6 +339,10 @@ function AppRouter() {
 
       <Route path="/kvkk">
         {() => <Suspense fallback={<RouteLoading />}><KVKK /></Suspense>}
+      </Route>
+
+      <Route path="/safety">
+        {() => <Suspense fallback={<RouteLoading />}><Safety /></Suspense>}
       </Route>
 
       {/* New Pages - High-End Features */}
@@ -418,8 +433,8 @@ function AppRouter() {
           const validPaths = [
             '/', '/catalog', '/escorts', '/guest-catalog',
             '/login', '/login-client', '/login-escort',
-            '/register-escort', '/register-client',
-            '/pricing', '/vip', '/seo',
+            '/register-escort', '/register-client', '/register', '/signup',
+            '/pricing', '/vip', '/seo', '/safety',
             '/terms', '/privacy', '/cookies', '/kvkk',
             '/favorites', '/messages', '/appointments', '/dashboard',
             '/escort/dashboard', '/escort/market',
@@ -438,7 +453,7 @@ function AppRouter() {
 
           // Also check for dynamic paths that start with these prefixes
           const isValidPath = validPaths.includes(path) ||
-                            path.startsWith('/escort/');
+            path.startsWith('/escort/');
 
           if (isValidPath) return null;
 
@@ -457,6 +472,7 @@ function AppRouter() {
 export default function App() {
   return (
     <NotificationProvider>
+      <Header />
       <AppRouter />
       <FloatingNavigation />
       <TooltipProvider>

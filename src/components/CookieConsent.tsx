@@ -70,7 +70,7 @@ export default function CookieConsent() {
   // Load preferences from localStorage on mount
   useEffect(() => {
     const savedPreferences = localStorage.getItem('cookieConsent');
-    
+
     if (savedPreferences) {
       try {
         const parsed = JSON.parse(savedPreferences);
@@ -95,7 +95,7 @@ export default function CookieConsent() {
     setPreferences(withTimestamp);
     setShowBanner(false);
     setShowSettings(false);
-    
+
     // Trigger custom event for other components to listen
     window.dispatchEvent(
       new CustomEvent('cookieConsentUpdated', { detail: withTimestamp })
@@ -132,7 +132,7 @@ export default function CookieConsent() {
   // Toggle individual preference
   const togglePreference = (type: keyof Omit<CookiePreferences, 'timestamp'>) => {
     if (type === 'essential') return; // Can't disable essential
-    
+
     setPreferences(prev => ({
       ...prev,
       [type]: !prev[type]
@@ -160,7 +160,7 @@ export default function CookieConsent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6"
+            className="fixed bottom-24 left-0 right-0 z-50 p-4 md:p-6"
           >
             <Card className="border-white/20 bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-xl shadow-2xl max-w-4xl mx-auto">
               <CardContent className="p-6">
@@ -173,9 +173,9 @@ export default function CookieConsent() {
                     <div className="min-w-0 flex-1">
                       <h3 className="font-bold text-white mb-1">Çerez Kullanımı</h3>
                       <p className="text-sm text-gray-300">
-                        Web sitesi deneyiminizi iyileştirmek için çerezler kullanıyoruz. 
-                        <a 
-                          href="/cookies" 
+                        Web sitesi deneyiminizi iyileştirmek için çerezler kullanıyoruz.
+                        <a
+                          href="/cookies"
                           className="text-amber-400 hover:text-amber-300 underline ml-1 inline-flex items-center gap-1"
                         >
                           Daha Fazla Bilgi
@@ -263,7 +263,7 @@ export default function CookieConsent() {
                 <CardContent className="p-6 space-y-6">
                   {/* Description */}
                   <p className="text-sm text-gray-300">
-                    Platform'un doğru şekilde çalışması için gerekli olan çerezler her zaman etkindir. 
+                    Platform'un doğru şekilde çalışması için gerekli olan çerezler her zaman etkindir.
                     Diğer çerez türlerini seçerek deneyiminizi kişiselleştirebilirsiniz.
                   </p>
 
@@ -306,7 +306,7 @@ export default function CookieConsent() {
                             Analiz Çerezleri
                           </h4>
                           <p className="text-xs text-gray-400">
-                            Platform'un performansını iyileştirmek ve kullanımı analiz etmek için kullanılır. 
+                            Platform'un performansını iyileştirmek ve kullanımı analiz etmek için kullanılır.
                             Google Analytics, Sentry vb.
                           </p>
                         </div>
@@ -360,7 +360,7 @@ export default function CookieConsent() {
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex gap-2">
                     <AlertCircle className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
                     <p className="text-xs text-blue-100">
-                      Tercihleri istediğiniz zaman değiştirebilirsiniz. 
+                      Tercihleri istediğiniz zaman değiştirebilirsiniz.
                       <a href="/privacy" className="underline hover:text-blue-50 ml-1">
                         Gizlilik Politikasını Oku
                       </a>

@@ -49,6 +49,7 @@ import { AdBanner } from "@/components/AdBanner";
 import { SEO } from "@/pages/SEO";
 import { VipPremiumCard } from "@/components/VipPremiumCard";
 import { StandardCard } from "@/components/StandardCard";
+import Footer from "@/components/Footer";
 import { mockEscorts, mockAds } from "@/mockData";
 import {
   Search, MapPin, Star, Shield, Heart, Sparkles,
@@ -79,7 +80,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30">
-      <SEO 
+      <SEO
         title="Marmara Escort İlanları | İstanbul, Bursa, Kocaeli VIP Escort"
         description="Marmara bölgesinin en seçkin escort ilan platformu. İstanbul, Bursa ve Kocaeli'de onaylı, VIP ve güvenilir escort profilleri ile tanışın."
         keywords="istanbul escort, bursa escort, kocaeli escort, marmara escort, vip escort istanbul, onaylı escort ilanları, şişli escort, beşiktaş escort, kadıköy escort"
@@ -100,12 +101,12 @@ export default function Home() {
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 Türkiye'nin En Seçkin Platformu
               </Badge>
-              
+
               <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
                 KALİTE <br />
                 <span className="text-gradient">AYRICALIKTIR</span>
               </h1>
-              
+
               <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
                 En seçkin escort ilanları, doğrulanmış profiller ve premium hizmet anlayışı ile tanışın.
               </p>
@@ -222,9 +223,9 @@ export default function Home() {
             </div>
 
             {/* Horizontal Ad between content */}
-            <AdBanner 
-              type="horizontal" 
-              title={mockAds[0].title} 
+            <AdBanner
+              type="horizontal"
+              title={mockAds[0].title}
               description={mockAds[0].description}
               imageUrl={mockAds[0].imageUrl}
               link={mockAds[0].link}
@@ -237,7 +238,7 @@ export default function Home() {
                 <StandardCard key={`more-${idx}`} escort={escort} />
               ))}
             </div>
-            
+
             <div className="text-center pt-12">
               <Button size="lg" variant="outline" className="px-12 py-8 text-xl font-bold border-2 hover:bg-primary hover:text-white transition-all">
                 DAHA FAZLA YÜKLE
@@ -248,14 +249,14 @@ export default function Home() {
           {/* Right Sidebar - Ads & Stats */}
           <aside className="lg:col-span-3 space-y-8">
             <div className="sticky top-24 space-y-8">
-              <AdBanner 
-                type="vertical" 
-                title={mockAds[1].title} 
+              <AdBanner
+                type="vertical"
+                title={mockAds[1].title}
                 description={mockAds[1].description}
                 imageUrl={mockAds[1].imageUrl}
                 link={mockAds[1].link}
               />
-              
+
               <Card className="glass p-6">
                 <h4 className="font-bold mb-4 flex items-center gap-2">
                   <Zap className="w-4 h-4 text-primary" />
@@ -277,9 +278,9 @@ export default function Home() {
                 </div>
               </Card>
 
-              <AdBanner 
-                type="native" 
-                title="GÜVENLİ ÖDEME" 
+              <AdBanner
+                type="native"
+                title="GÜVENLİ ÖDEME"
                 description="Tüm işlemleriniz uçtan uca şifreli ve anonimdir."
               />
             </div>
@@ -288,44 +289,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/40 border-t border-white/5 py-20 mt-20">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="md:col-span-2">
-              <h2 className="text-3xl font-black mb-6 tracking-tighter">ESCORT PLATFORM</h2>
-              <p className="text-muted-foreground max-w-md leading-relaxed">
-                Türkiye'nin en güvenilir ve seçkin escort ilan platformu. Profesyonel hizmet, doğrulanmış profiller ve gizlilik odaklı yaklaşım.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6">HIZLI MENÜ</h4>
-              <ul className="space-y-4 text-sm text-muted-foreground">
-                <li><Link href="/escorts" className="hover:text-primary transition-colors">Tüm İlanlar</Link></li>
-                <li><Link href="/vip" className="hover:text-primary transition-colors">VIP Paketler</Link></li>
-                <li><Link href="/register" className="hover:text-primary transition-colors">İlan Ver</Link></li>
-                <li><Link href="/contact" className="hover:text-primary transition-colors">İletişim</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6">YASAL</h4>
-              <ul className="space-y-4 text-sm text-muted-foreground">
-                <li><Link href="/terms" className="hover:text-primary transition-colors">Kullanım Koşulları</Link></li>
-                <li><Link href="/privacy" className="hover:text-primary transition-colors">Gizlilik Politikası</Link></li>
-                <li><Link href="/safety" className="hover:text-primary transition-colors">Güvenlik Rehberi</Link></li>
-                <li className="text-red-500 font-bold">18+ Yetişkin İçerik</li>
-              </ul>
-            </div>
-          </div>
-          <Separator className="my-12 bg-white/5" />
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-muted-foreground">
-            <p>© 2026 Escort Platform. Tüm hakları saklıdır.</p>
-            <div className="flex gap-6">
-              <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> SSL Korumalı</span>
-              <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> %100 Güvenli</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
