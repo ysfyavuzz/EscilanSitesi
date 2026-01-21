@@ -29,6 +29,7 @@
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'wouter';
 import { 
   Bell, 
   Calendar, 
@@ -184,6 +185,7 @@ const itemVariants = {
 };
 
 export default function Notifications() {
+  const [, setLocation] = useLocation();
   const [bildirimler, setBildirimler] = React.useState<Bildirim[]>(mockBildirimler);
   const [seciliBildirimler, setSeciliBildirimler] = React.useState<Set<string>>(new Set());
   const [aktifFiltre, setAktifFiltre] = React.useState<BildirimTuru | 'tumu'>('tumu');
@@ -289,7 +291,7 @@ export default function Notifications() {
               </p>
             </div>
             <button
-              onClick={() => window.location.href = '/customer/settings?tab=notifications'}
+              onClick={() => setLocation('/customer/settings?tab=notifications')}
               className="flex items-center gap-2 text-gray-600 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400 transition-colors"
             >
               <Settings className="h-5 w-5" />

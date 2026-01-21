@@ -29,6 +29,7 @@
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'wouter';
 import {
   Calendar,
   MapPin,
@@ -203,6 +204,7 @@ const modalVariants = {
 };
 
 export default function History() {
+  const [, setLocation] = useLocation();
   const [randevular] = React.useState<Appointment[]>(mockRandevular);
   const [aktifFiltre, setAktifFiltre] = React.useState<AppointmentStatus | 'tumu'>('tumu');
   const [aramaMetni, setAramaMetni] = React.useState('');
@@ -264,8 +266,7 @@ export default function History() {
 
   /** Tekrar randevu al */
   const tekrarRandevuAl = (randevu: Appointment) => {
-    // TODO: Randevu sayfasına yönlendir
-    window.location.href = `/escort/${randevu.escortId}`;
+    setLocation(`/escort/${randevu.escortId}`);
   };
 
   /** Fatura görüntüle */
