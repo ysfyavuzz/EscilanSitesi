@@ -77,8 +77,8 @@ Proje artık production-ready durumunda. Hata kodu yok, %100 test kapsama, güve
 
 ```bash
 # 1. Depoyu klonlayın
-git clone <repo-url>
-cd escort-platform
+git clone https://github.com/ysfyavuzz/EscilanSitesi.git
+cd EscilanSitesi
 
 # 2. Bağımlılıkları yükleyin
 npm install
@@ -195,7 +195,7 @@ Escort Platform, Türkiye'de hizmet veren escortların ilanlarını yayınlayabi
 │
 └── 📁 src (100+)
    │
-   ├── 📁 components/ (25)
+   ├── 📁 components/ (60+)
    │  ├── README.md
    │  ├── ui/ (17)                  - Radix UI components
    │  ├── AdBanner.tsx
@@ -203,9 +203,12 @@ Escort Platform, Türkiye'de hizmet veren escortların ilanlarını yayınlayabi
    │  ├── BookingForm.tsx
    │  ├── BottomNav.tsx
    │  ├── ChatInterface.tsx
+   │  ├── CookieConsent.tsx         - KVKK/GDPR uyumlu çerez onayı
+   │  ├── FloatingNavigation.tsx    - Alt navigasyon çubuğu
+   │  ├── Footer.tsx                - Global footer bileşeni
+   │  ├── Header.tsx                - React.memo optimize
    │  ├── StandardCard.tsx          - React.memo optimize
    │  ├── VipPremiumCard.tsx        - React.memo optimize
-   │  ├── Header.tsx                - React.memo optimize
    │  └── ...
    │
    ├── 📁 contexts/ (3)
@@ -263,6 +266,7 @@ Escort Platform, Türkiye'de hizmet veren escortların ilanlarını yayınlayabi
    │  ├── PrivacyPolicy.tsx
    │  ├── CookiePolicy.tsx
    │  ├── KVKK.tsx
+   │  ├── Safety.tsx               - Güvenlik rehberi
    │  └── NotFound.tsx
    │
    ├── 📁 tests/ (2)

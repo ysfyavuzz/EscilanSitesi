@@ -27,7 +27,7 @@ Bu klasör, escort ilan platformunun tüm sayfa component'lerini içerir.
 | `EscortLogin.tsx` | `/login-escort` | Escort girişi |
 | `EscortRegister.tsx` | `/register-escort` | Escort kaydı |
 | `ClientLogin.tsx` | `/login`, `/login-client` | Müşteri girişi |
-| `ClientRegister.tsx` | `/register-client` | Müşteri kaydı |
+| `ClientRegister.tsx` | `/register-client`, `/register`, `/signup` | Müşteri kaydı |
 
 ### Escort Dashboard
 
@@ -57,6 +57,18 @@ Bu klasör, escort ilan platformunun tüm sayfa component'lerini içerir.
 |-------|-------|----------|
 | `Pricing.tsx` | `/pricing`, `/vip` | VIP/Premium fiyatlandırma |
 | `SEO.tsx` | `/seo` | SEO ayarları sayfası |
+| `Contact.tsx` | `/contact` | İletişim sayfası |
+| `Blog.tsx` | `/blog` | Blog yazıları |
+
+### Yasal Sayfalar
+
+| Sayfa | Route | Açıklama |
+|-------|-------|----------|
+| `TermsOfService.tsx` | `/terms` | Kullanım koşulları |
+| `PrivacyPolicy.tsx` | `/privacy` | Gizlilik politikası |
+| `CookiePolicy.tsx` | `/cookies` | Çerez politikası |
+| `KVKK.tsx` | `/kvkk` | KVKK aydınlatma metni |
+| `Safety.tsx` | `/safety` | Güvenlik rehberi |
 
 ## 🎯 Route Yapısı
 

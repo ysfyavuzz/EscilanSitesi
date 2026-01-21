@@ -8,10 +8,13 @@ Bu klasör, escort ilan platformunun tüm React UI component'lerini içerir.
 
 | Component | Açıklama |
 |-----------|----------|
-| `Header.tsx` | Site başlığı, navigation ve kullanıcı menüsü |
+| `Header.tsx` | Site başlığı, navigation ve kullanıcı menüsü (React.memo optimize) |
+| `Footer.tsx` | Global footer - hızlı menü, yasal linkler, iletişim bilgileri |
 | `BottomNav.tsx` | Mobil alt navigation menüsü |
-| `StandardCard.tsx` | Standart escort kartı (liste görünümü) |
-| `VipPremiumCard.tsx` | VIP/Premium escort kartı (özel görünüm) |
+| `FloatingNavigation.tsx` | Sabit alt navigasyon çubuğu |
+| `CookieConsent.tsx` | KVKK/GDPR uyumlu çerez onay banner'ı |
+| `StandardCard.tsx` | Standart escort kartı (liste görünümü, React.memo) |
+| `VipPremiumCard.tsx` | VIP/Premium escort kartı (özel görünüm, React.memo) |
 
 ### Auth & Verification
 
