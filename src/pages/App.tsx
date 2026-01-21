@@ -125,6 +125,12 @@ const AdminReports = lazy(() => import("@/pages/AdminReports").then(m => ({ defa
 const Analytics = lazy(() => import("@/pages/Analytics").then(m => ({ default: m.default })));
 const Reviews = lazy(() => import("@/pages/Reviews").then(m => ({ default: m.default || m.Reviews })));
 
+// Phase 10 - New Platform Features
+const Login = lazy(() => import("@/pages/Login").then(m => ({ default: m.default })));
+const AdminPanel = lazy(() => import("@/pages/AdminPanel").then(m => ({ default: m.default })));
+const CustomerSettings = lazy(() => import("@/pages/customer/CustomerSettings").then(m => ({ default: m.default })));
+const About = lazy(() => import("@/pages/general/About").then(m => ({ default: m.default })));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // LOADING FALLBACK COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -264,6 +270,10 @@ function AppRouter() {
 
       {/* Client/Customer Routes */}
       <Route path="/login">
+        {() => <Suspense fallback={<RouteLoading />}><Login /></Suspense>}
+      </Route>
+
+      <Route path="/login-customer">
         {() => <Suspense fallback={<RouteLoading />}><ClientLogin /></Suspense>}
       </Route>
 
@@ -309,6 +319,20 @@ function AppRouter() {
 
       <Route path="/admin/approvals">
         {() => <Suspense fallback={<RouteLoading />}><AdminApprovals /></Suspense>}
+      </Route>
+
+      <Route path="/admin/panel">
+        {() => <Suspense fallback={<RouteLoading />}><AdminPanel /></Suspense>}
+      </Route>
+
+      {/* Customer Pages */}
+      <Route path="/customer/settings">
+        {() => <Suspense fallback={<RouteLoading />}><CustomerSettings /></Suspense>}
+      </Route>
+
+      {/* General Pages */}
+      <Route path="/about">
+        {() => <Suspense fallback={<RouteLoading />}><About /></Suspense>}
       </Route>
 
       {/* Other */}
