@@ -6,8 +6,8 @@
  */
 
 import '../setup';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { renderHook, act, render as rtlRender } from '@testing-library/react';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
@@ -171,16 +171,6 @@ describe('AuthProvider', () => {
 
 // Helper function for rendering with AuthProvider
 function render(component: React.ReactElement) {
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <AuthProvider>{children}</AuthProvider>
-  );
-  
-  const utils = renderHook(() => ({}), {
-    wrapper: Wrapper,
-    initialProps: {},
-  });
-  
-  return {
-    container: document.createElement('div'),
-  };
+  const { container } = rtlRender(component);
+  return { container };
 }
