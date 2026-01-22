@@ -139,6 +139,7 @@ interface WebSocketContextValue {
   isConnected: boolean;
   reconnect: () => void;
   disconnect: () => void;
+  connect: () => void;
 
   // Messages
   messages: Message[];
@@ -156,6 +157,15 @@ interface WebSocketContextValue {
   sendTypingIndicator: (conversationId: string, isTyping: boolean) => void;
   typingUsers: string[];
 
+  // Online status (NEW)
+  onlineUsers: Set<string>;
+  setOnlineStatus: (status: 'online' | 'away' | 'busy' | 'offline') => void;
+
+  // Event listeners (NEW)
+  onMessage: (callback: (message: Message) => void) => () => void;
+  onTyping: (callback: (data: TypingIndicator) => void) => () => void;
+  onUserStatus: (callback: (data: { userId: string; status: string; isOnline: boolean }) => void) => () => void;
+
   // Error handling
   error: Error | null;
   clearError: () => void;
@@ -169,6 +179,7 @@ const defaultContext: WebSocketContextValue = {
   isConnected: false,
   reconnect: () => {},
   disconnect: () => {},
+  connect: () => {},
   messages: [],
   sendMessage: () => {},
   markAsRead: () => {},
@@ -179,6 +190,11 @@ const defaultContext: WebSocketContextValue = {
   loadConversation: async () => {},
   sendTypingIndicator: () => {},
   typingUsers: [],
+  onlineUsers: new Set(),
+  setOnlineStatus: () => {},
+  onMessage: () => () => {},
+  onTyping: () => () => {},
+  onUserStatus: () => () => {},
   error: null,
   clearError: () => {},
 };
@@ -239,11 +255,18 @@ export function WebSocketProvider({
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [currentStatus, setCurrentStatus] = useState<'online' | 'away' | 'busy' | 'offline'>('online');
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const messageQueueRef = useRef<Omit<Message, 'id' | 'timestamp'>[]>([]);
+  
+  // Event subscribers
+  const messageSubscribersRef = useRef<Set<(message: Message) => void>>(new Set());
+  const typingSubscribersRef = useRef<Set<(data: TypingIndicator) => void>>(new Set());
+  const statusSubscribersRef = useRef<Set<(data: { userId: string; status: string; isOnline: boolean }) => void>>(new Set());
 
   // Connect to WebSocket
   const connect = useCallback(() => {
@@ -351,6 +374,15 @@ export function WebSocketProvider({
           return [...prev, message];
         });
 
+        // Notify message subscribers
+        messageSubscribersRef.current.forEach(callback => {
+          try {
+            callback(message);
+          } catch (error) {
+            console.error('Error in message subscriber:', error);
+          }
+        });
+
         // Update conversation last message
         setConversations(prev => prev.map(conv => {
           if (conv.id === message.conversationId) {
@@ -373,6 +405,15 @@ export function WebSocketProvider({
             return [...prev.filter(u => u !== typing.userId), typing.userId];
           } else {
             return prev.filter(u => u !== typing.userId);
+          }
+        });
+
+        // Notify typing subscribers
+        typingSubscribersRef.current.forEach(callback => {
+          try {
+            callback(typing);
+          } catch (error) {
+            console.error('Error in typing subscriber:', error);
           }
         });
 
@@ -406,14 +447,41 @@ export function WebSocketProvider({
 
       case 'presence':
         // Update user online status
+        const presenceData = wsMessage.data;
+        
+        // Update online users set
+        setOnlineUsers(prev => {
+          const newSet = new Set(prev);
+          if (presenceData.isOnline) {
+            newSet.add(presenceData.userId);
+          } else {
+            newSet.delete(presenceData.userId);
+          }
+          return newSet;
+        });
+
+        // Notify status subscribers
+        statusSubscribersRef.current.forEach(callback => {
+          try {
+            callback({
+              userId: presenceData.userId,
+              status: presenceData.status || 'offline',
+              isOnline: presenceData.isOnline || false,
+            });
+          } catch (error) {
+            console.error('Error in status subscriber:', error);
+          }
+        });
+
+        // Update conversations
         setConversations(prev => prev.map(conv => ({
           ...conv,
           participants: conv.participants.map(p => {
-            if (p.id === wsMessage.data.userId) {
+            if (p.id === presenceData.userId) {
               return {
                 ...p,
-                isOnline: wsMessage.data.isOnline,
-                lastSeen: wsMessage.data.lastSeen ? new Date(wsMessage.data.lastSeen) : undefined,
+                isOnline: presenceData.isOnline,
+                lastSeen: presenceData.lastSeen ? new Date(presenceData.lastSeen) : undefined,
               };
             }
             return p;
@@ -538,6 +606,41 @@ export function WebSocketProvider({
     setError(null);
   }, []);
 
+  // Event subscription functions
+  const onMessage = useCallback((callback: (message: Message) => void) => {
+    messageSubscribersRef.current.add(callback);
+    return () => {
+      messageSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  const onTyping = useCallback((callback: (data: TypingIndicator) => void) => {
+    typingSubscribersRef.current.add(callback);
+    return () => {
+      typingSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  const onUserStatus = useCallback((callback: (data: { userId: string; status: string; isOnline: boolean }) => void) => {
+    statusSubscribersRef.current.add(callback);
+    return () => {
+      statusSubscribersRef.current.delete(callback);
+    };
+  }, []);
+
+  // Set online status
+  const setOnlineStatus = useCallback((status: 'online' | 'away' | 'busy' | 'offline') => {
+    setCurrentStatus(status);
+    
+    // Send status update via WebSocket
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'presence',
+        data: { status, timestamp: new Date().toISOString() },
+      }));
+    }
+  }, []);
+
   // Auto-connect on mount
   useEffect(() => {
     if (autoConnect) {
@@ -567,6 +670,7 @@ export function WebSocketProvider({
     isConnected: connectionStatus === 'connected',
     reconnect,
     disconnect,
+    connect,
     messages,
     sendMessage,
     markAsRead,
@@ -577,6 +681,11 @@ export function WebSocketProvider({
     loadConversation,
     sendTypingIndicator,
     typingUsers,
+    onlineUsers,
+    setOnlineStatus,
+    onMessage,
+    onTyping,
+    onUserStatus,
     error,
     clearError,
   };
