@@ -364,10 +364,18 @@ export function useOnlineStatus(options: UseOnlineStatusOptions = {}): UseOnline
    * Handle visibility change (page hidden/visible)
    */
   useEffect(() => {
+    let visibilityTimeout: NodeJS.Timeout | null = null;
+
     const handleVisibilityChange = () => {
+      // Clear any existing timeout
+      if (visibilityTimeout) {
+        clearTimeout(visibilityTimeout);
+        visibilityTimeout = null;
+      }
+
       if (document.hidden) {
         // Page is hidden, set to away after delay
-        setTimeout(() => {
+        visibilityTimeout = setTimeout(() => {
           if (document.hidden && myStatus === 'online') {
             setMyStatus('away');
           }
@@ -384,6 +392,9 @@ export function useOnlineStatus(options: UseOnlineStatusOptions = {}): UseOnline
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (visibilityTimeout) {
+        clearTimeout(visibilityTimeout);
+      }
     };
   }, [myStatus, setMyStatus]);
 

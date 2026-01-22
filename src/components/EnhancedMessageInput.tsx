@@ -376,7 +376,7 @@ export function EnhancedMessageInput({
         )}
 
         {/* Emoji button */}
-        {enableEmoji && (
+        {enableEmoji && false && ( /* TODO: Implement emoji picker */
           <Button
             type="button"
             variant="ghost"

@@ -217,10 +217,14 @@ const soundManager = new SoundManager();
  * Preload all sounds on module load
  */
 if (typeof window !== 'undefined') {
-  // Preload after a short delay to not block initial page load
-  setTimeout(() => {
+  // Preload on page load event
+  if (document.readyState === 'complete') {
     soundManager.preloadSounds();
-  }, 1000);
+  } else {
+    window.addEventListener('load', () => {
+      soundManager.preloadSounds();
+    });
+  }
 }
 
 /**

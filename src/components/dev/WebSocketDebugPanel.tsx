@@ -116,13 +116,17 @@ export function WebSocketDebugPanel() {
   const handleSendMessage = () => {
     if (!messageContent.trim() || !isConnected) return;
 
-    sendMessage({
+    // Note: sendMessage from context expects different signature
+    // Using the context's sendMessage which takes a message object
+    const messageObj = {
       conversationId,
       senderId: 'debug-user',
       receiverId: 'test-user',
-      type: 'text',
+      type: 'text' as const,
       content: messageContent,
-    });
+    };
+
+    sendMessage(messageObj);
 
     addLog('sent', { type: 'message', content: messageContent, conversationId });
     setMessageContent('');

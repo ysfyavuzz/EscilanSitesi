@@ -270,12 +270,17 @@ class PushNotificationService {
 
     // Update browser badge (if supported)
     if ('setAppBadge' in navigator) {
-      if (this.badgeCount > 0) {
-        (navigator as any).setAppBadge(this.badgeCount).catch((error: Error) => {
+      const nav = navigator as Navigator & {
+        setAppBadge?: (count: number) => Promise<void>;
+        clearAppBadge?: () => Promise<void>;
+      };
+
+      if (this.badgeCount > 0 && nav.setAppBadge) {
+        nav.setAppBadge(this.badgeCount).catch((error: Error) => {
           console.error('Failed to set app badge:', error);
         });
-      } else {
-        (navigator as any).clearAppBadge().catch((error: Error) => {
+      } else if (nav.clearAppBadge) {
+        nav.clearAppBadge().catch((error: Error) => {
           console.error('Failed to clear app badge:', error);
         });
       }

@@ -493,7 +493,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     return () => {
       disconnect();
     };
-  }, []); // Empty deps - only run on mount/unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only run on mount/unmount, connect/disconnect are stable
 
   return {
     // Connection state
