@@ -20,7 +20,7 @@
 
 import * as React from 'react';
 import { Link } from 'wouter';
-import { AdminSidebar } from '@/components/admin';
+import { AdminSidebar, StatCard } from '@/components/admin';
 import { Card } from '@/components/ui/card';
 import { CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import {
   FileText, Download, Filter, Calendar, TrendingUp, Users,
   DollarSign, BarChart3, PieChart, Printer, Share2, Eye,
-  ChevronDown, Search, X, ArrowLeft
+  ChevronDown, Search, X, ArrowLeft, Star
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -51,6 +51,67 @@ interface ReportData {
   title: string;
   data: any[];
   generatedAt: Date;
+}
+
+/**
+ * Type definitions for report totals based on report type
+ */
+interface RevenueReportTotals {
+  totalRevenue: number;
+  totalAppointments: number;
+  avgRating: string;
+  activeEscorts: number;
+}
+
+interface PersonReportTotals {
+  totalSpent: number;
+  totalEarned: number;
+  totalAppointments: number;
+  activeUsers: number;
+}
+
+interface DateReportTotals {
+  totalRevenue: number;
+  totalAppointments: number;
+  totalNewUsers: number;
+  avgDailyRevenue: number;
+}
+
+interface DetailedReportTotals {
+  totalAmount: number;
+  totalCommission: number;
+  completed: number;
+  pending: number;
+}
+
+/**
+ * Union type for all possible report totals
+ * Empty object represents the initial state when no report type is selected
+ */
+type ReportTotals = 
+  | RevenueReportTotals 
+  | PersonReportTotals 
+  | DateReportTotals 
+  | DetailedReportTotals 
+  | Record<string, never>;
+
+/**
+ * Type guard functions for report totals
+ */
+function isRevenueReportTotals(totals: ReportTotals): totals is RevenueReportTotals {
+  return 'avgRating' in totals && 'activeEscorts' in totals;
+}
+
+function isPersonReportTotals(totals: ReportTotals): totals is PersonReportTotals {
+  return 'totalSpent' in totals && 'totalEarned' in totals;
+}
+
+function isDateReportTotals(totals: ReportTotals): totals is DateReportTotals {
+  return 'totalNewUsers' in totals && 'avgDailyRevenue' in totals;
+}
+
+function isDetailedReportTotals(totals: ReportTotals): totals is DetailedReportTotals {
+  return 'totalAmount' in totals && 'totalCommission' in totals;
 }
 
 export default function AdminReports() {
@@ -116,14 +177,17 @@ export default function AdminReports() {
     );
   }, [currentData, searchQuery]);
 
-  // Calculate totals
-  const totals = React.useMemo(() => {
+  // Calculate totals with proper typing
+  const totals = React.useMemo((): ReportTotals => {
     if (reportType === 'revenue') {
+      const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
+      const totalRating = revenueData.reduce((sum, item) => sum + item.rating, 0);
       return {
-        totalRevenue: revenueData.reduce((sum, item) => sum + item.revenue, 0),
+        totalRevenue,
         totalAppointments: revenueData.reduce((sum, item) => sum + item.appointments, 0),
-        avgRating: (revenueData.reduce((sum, item) => sum + item.rating, 0) / revenueData.length).toFixed(1),
-      };
+        avgRating: revenueData.length > 0 ? (totalRating / revenueData.length).toFixed(1) : '0.0',
+        activeEscorts: revenueData.length,
+      } satisfies RevenueReportTotals;
     } else if (reportType === 'person') {
       const customers = personData.filter(p => p.type === 'customer');
       const escorts = personData.filter(p => p.type === 'escort');
@@ -131,20 +195,23 @@ export default function AdminReports() {
         totalSpent: customers.reduce((sum, item) => sum + item.spent, 0),
         totalEarned: escorts.reduce((sum, item) => sum + item.earned, 0),
         totalAppointments: personData.reduce((sum, item) => sum + item.appointments, 0),
-      };
+        activeUsers: personData.length,
+      } satisfies PersonReportTotals;
     } else if (reportType === 'date') {
+      const totalRevenue = dateData.reduce((sum, item) => sum + item.revenue, 0);
       return {
-        totalRevenue: dateData.reduce((sum, item) => sum + item.revenue, 0),
+        totalRevenue,
         totalAppointments: dateData.reduce((sum, item) => sum + item.appointments, 0),
         totalNewUsers: dateData.reduce((sum, item) => sum + item.newUsers, 0),
-      };
+        avgDailyRevenue: dateData.length > 0 ? Math.round(totalRevenue / dateData.length) : 0,
+      } satisfies DateReportTotals;
     } else if (reportType === 'detailed') {
       return {
         totalAmount: detailedData.reduce((sum, item) => sum + item.amount, 0),
         totalCommission: detailedData.reduce((sum, item) => sum + item.commission, 0),
         completed: detailedData.filter(d => d.status === 'completed').length,
         pending: detailedData.filter(d => d.status === 'pending').length,
-      };
+      } satisfies DetailedReportTotals;
     }
     return {};
   }, [reportType]);
@@ -435,148 +502,116 @@ export default function AdminReports() {
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {reportType === 'revenue' && (
+            {reportType === 'revenue' && isRevenueReportTotals(totals) && (
               <>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      ₺{(totals as any).totalRevenue?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Randevu</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {(totals as any).totalAppointments}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Ortalama Puan</p>
-                    <p className="text-2xl font-bold text-yellow-600">
-                      ⭐ {(totals as any).avgRating}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Aktif Eskort</p>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {revenueData.length}
-                    </p>
-                  </CardContent>
-                </Card>
+                <StatCard
+                  title="Toplam Gelir"
+                  value={`₺${totals.totalRevenue.toLocaleString()}`}
+                  icon={DollarSign}
+                  variant="green"
+                />
+                <StatCard
+                  title="Toplam Randevu"
+                  value={totals.totalAppointments}
+                  icon={Calendar}
+                  variant="blue"
+                />
+                <StatCard
+                  title="Ortalama Puan"
+                  value={`⭐ ${totals.avgRating}`}
+                  icon={Star}
+                  variant="yellow"
+                />
+                <StatCard
+                  title="Aktif Eskort"
+                  value={totals.activeEscorts}
+                  icon={Users}
+                  variant="purple"
+                />
               </>
             )}
-            {reportType === 'person' && (
+            {reportType === 'person' && isPersonReportTotals(totals) && (
               <>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Harcama</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      ₺{(totals as any).totalSpent?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Kazanç</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      ₺{(totals as any).totalEarned?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Randevu</p>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {(totals as any).totalAppointments}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Aktif Kullanıcı</p>
-                    <p className="text-2xl font-bold text-orange-600">
-                      {personData.length}
-                    </p>
-                  </CardContent>
-                </Card>
+                <StatCard
+                  title="Toplam Harcama"
+                  value={`₺${totals.totalSpent.toLocaleString()}`}
+                  icon={DollarSign}
+                  variant="blue"
+                />
+                <StatCard
+                  title="Toplam Kazanç"
+                  value={`₺${totals.totalEarned.toLocaleString()}`}
+                  icon={TrendingUp}
+                  variant="green"
+                />
+                <StatCard
+                  title="Toplam Randevu"
+                  value={totals.totalAppointments}
+                  icon={Calendar}
+                  variant="purple"
+                />
+                <StatCard
+                  title="Aktif Kullanıcı"
+                  value={totals.activeUsers}
+                  icon={Users}
+                  variant="orange"
+                />
               </>
             )}
-            {reportType === 'date' && (
+            {reportType === 'date' && isDateReportTotals(totals) && (
               <>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      ₺{(totals as any).totalRevenue?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Randevu</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {(totals as any).totalAppointments}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Yeni Üye</p>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {(totals as any).totalNewUsers}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Ort. Günlük Gelir</p>
-                    <p className="text-2xl font-bold text-orange-600">
-                      ₺{Math.round((totals as any).totalRevenue / dateData.length).toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
+                <StatCard
+                  title="Toplam Gelir"
+                  value={`₺${totals.totalRevenue.toLocaleString()}`}
+                  icon={DollarSign}
+                  variant="green"
+                />
+                <StatCard
+                  title="Toplam Randevu"
+                  value={totals.totalAppointments}
+                  icon={Calendar}
+                  variant="blue"
+                />
+                <StatCard
+                  title="Yeni Üye"
+                  value={totals.totalNewUsers}
+                  icon={Users}
+                  variant="purple"
+                />
+                <StatCard
+                  title="Ort. Günlük Gelir"
+                  value={`₺${totals.avgDailyRevenue.toLocaleString()}`}
+                  icon={BarChart3}
+                  variant="orange"
+                />
               </>
             )}
-            {reportType === 'detailed' && (
+            {reportType === 'detailed' && isDetailedReportTotals(totals) && (
               <>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Toplam Tutar</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      ₺{(totals as any).totalAmount?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Komisyon</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      ₺{(totals as any).totalCommission?.toLocaleString()}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Tamamlanan</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      {(totals as any).completed}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <p className="text-sm text-muted-foreground">Bekleyen</p>
-                    <p className="text-2xl font-bold text-orange-600">
-                      {(totals as any).pending}
-                    </p>
-                  </CardContent>
-                </Card>
+                <StatCard
+                  title="Toplam Tutar"
+                  value={`₺${totals.totalAmount.toLocaleString()}`}
+                  icon={DollarSign}
+                  variant="green"
+                />
+                <StatCard
+                  title="Komisyon"
+                  value={`₺${totals.totalCommission.toLocaleString()}`}
+                  icon={PieChart}
+                  variant="blue"
+                />
+                <StatCard
+                  title="Tamamlanan"
+                  value={totals.completed}
+                  icon={FileText}
+                  variant="green"
+                />
+                <StatCard
+                  title="Bekleyen"
+                  value={totals.pending}
+                  icon={Eye}
+                  variant="orange"
+                />
               </>
             )}
           </div>
