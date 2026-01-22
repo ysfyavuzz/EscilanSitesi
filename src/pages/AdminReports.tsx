@@ -84,6 +84,10 @@ interface DetailedReportTotals {
   pending: number;
 }
 
+/**
+ * Union type for all possible report totals
+ * Empty object represents the initial state when no report type is selected
+ */
 type ReportTotals = 
   | RevenueReportTotals 
   | PersonReportTotals 

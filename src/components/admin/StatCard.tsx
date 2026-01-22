@@ -175,11 +175,12 @@ export function StatCard({
     : value;
 
   // Determine trend color based on type
-  const trendColorClass = trendType === 'positive' 
-    ? 'text-green-600' 
-    : trendType === 'negative'
-    ? 'text-red-600'
-    : 'text-gray-600';
+  const trendColors = {
+    positive: 'text-green-600',
+    negative: 'text-red-600',
+    neutral: 'text-gray-600',
+  };
+  const trendColorClass = trendColors[trendType];
 
   return (
     <Card className={cn('transition-shadow hover:shadow-lg', className)}>
