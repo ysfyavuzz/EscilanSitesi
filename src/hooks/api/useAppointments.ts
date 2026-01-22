@@ -150,7 +150,6 @@ export function useCreateAppointment(
       queryClient.invalidateQueries({
         queryKey: appointmentsKeys.availability(variables.escortId, variables.date),
       });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -173,7 +172,6 @@ export function useUpdateAppointment(
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.upcoming() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -194,7 +192,6 @@ export function useConfirmAppointment(options?: UseMutationOptions<Appointment, 
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.detail(variables) });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.upcoming() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -217,7 +214,6 @@ export function useCancelAppointment(
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.upcoming() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -239,7 +235,6 @@ export function useCompleteAppointment(options?: UseMutationOptions<Appointment,
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.detail(variables) });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.upcoming() });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.past() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -261,7 +256,6 @@ export function useDeleteAppointment(options?: UseMutationOptions<void, Error, s
       queryClient.removeQueries({ queryKey: appointmentsKeys.detail(variables) });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.upcoming() });
       queryClient.invalidateQueries({ queryKey: appointmentsKeys.past() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });

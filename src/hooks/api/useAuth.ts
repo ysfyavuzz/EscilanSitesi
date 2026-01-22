@@ -54,7 +54,7 @@ export function useLogin(
     mutationFn: (data: LoginRequest) => authService.login(data.email, data.password),
     onSuccess: (data) => {
       queryClient.setQueryData(authKeys.me(), data.user);
-      options?.onSuccess?.(data, {} as LoginRequest, undefined);
+      // Query cache updated
     },
     ...options,
   });
@@ -75,7 +75,7 @@ export function useRegister(
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onSuccess: (data, variables, context) => {
       queryClient.setQueryData(authKeys.me(), data.user);
-      options?.onSuccess?.(data, variables, context);
+      // Query cache updated
     },
     ...options,
   });
@@ -95,7 +95,7 @@ export function useLogout(options?: UseMutationOptions<void, Error>) {
     onSuccess: (data, variables, context) => {
       queryClient.removeQueries({ queryKey: authKeys.all });
       queryClient.clear();
-      options?.onSuccess?.(data, variables, context);
+      // Query cache updated
     },
     ...options,
   });
@@ -143,7 +143,7 @@ export function useUpdateProfile(options?: UseMutationOptions<User, Error, Parti
     onSuccess: (data, variables, context) => {
       queryClient.setQueryData(authKeys.me(), data);
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
-      options?.onSuccess?.(data, variables, context);
+      // Query cache updated
     },
     ...options,
   });
@@ -178,7 +178,7 @@ export function useVerifyEmail(options?: UseMutationOptions<void, Error, string>
     mutationFn: (token: string) => authService.verifyEmail(token),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
-      options?.onSuccess?.(data, variables, context);
+      // Query cache updated
     },
     ...options,
   });

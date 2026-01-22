@@ -119,7 +119,6 @@ export function useSendMessage(
           queryKey: messagesKeys.conversation(variables.conversationId),
         });
       }
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -139,7 +138,6 @@ export function useMarkAsRead(options?: UseMutationOptions<void, Error, string>)
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversations() });
       queryClient.invalidateQueries({ queryKey: messagesKeys.unreadCount() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -160,7 +158,6 @@ export function useMarkConversationAsRead(options?: UseMutationOptions<void, Err
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversations() });
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversation(variables) });
       queryClient.invalidateQueries({ queryKey: messagesKeys.unreadCount() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -179,7 +176,6 @@ export function useDeleteMessage(options?: UseMutationOptions<void, Error, strin
     mutationFn: (messageId: string) => messagesService.deleteMessage(messageId),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversations() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -199,7 +195,6 @@ export function useDeleteConversation(options?: UseMutationOptions<void, Error, 
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversations() });
       queryClient.removeQueries({ queryKey: messagesKeys.conversation(variables) });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -219,7 +214,6 @@ export function useBlockUser(options?: UseMutationOptions<void, Error, string>) 
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.blockedUsers() });
       queryClient.invalidateQueries({ queryKey: messagesKeys.conversations() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -238,7 +232,6 @@ export function useUnblockUser(options?: UseMutationOptions<void, Error, string>
     mutationFn: (userId: string) => messagesService.unblockUser(userId),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.blockedUsers() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });

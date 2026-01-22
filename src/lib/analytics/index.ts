@@ -71,4 +71,4 @@ export {
   hasConsent,
   grantConsent,
   revokeConsent,
-} from '../contexts/AnalyticsContext';
+} from '@/contexts/AnalyticsContext';

@@ -152,7 +152,6 @@ export function useConfirmPayment(
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: paymentsKeys.transactions() });
       queryClient.invalidateQueries({ queryKey: paymentsKeys.payment(variables.paymentId) });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -179,7 +178,6 @@ export function usePurchaseVip(
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: paymentsKeys.transactions() });
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -201,7 +199,6 @@ export function useRequestRefund(
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: paymentsKeys.transactions() });
       queryClient.invalidateQueries({ queryKey: paymentsKeys.payment(variables.paymentId) });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -226,7 +223,6 @@ export function useAddPaymentMethod(
     mutationFn: (paymentMethodId: string) => paymentsService.addPaymentMethod(paymentMethodId),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: paymentsKeys.paymentMethods() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -245,7 +241,6 @@ export function useDeletePaymentMethod(options?: UseMutationOptions<void, Error,
     mutationFn: (id: string) => paymentsService.deletePaymentMethod(id),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: paymentsKeys.paymentMethods() });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });

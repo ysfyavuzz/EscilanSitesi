@@ -213,7 +213,6 @@ export function useAddToFavorites(options?: UseMutationOptions<void, Error, stri
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: escortsKeys.favorites() });
       queryClient.invalidateQueries({ queryKey: escortsKeys.detail(variables) });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
@@ -233,7 +232,6 @@ export function useRemoveFromFavorites(options?: UseMutationOptions<void, Error,
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: escortsKeys.favorites() });
       queryClient.invalidateQueries({ queryKey: escortsKeys.detail(variables) });
-      options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });
