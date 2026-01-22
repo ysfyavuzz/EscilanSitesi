@@ -22,12 +22,14 @@
  * 
  * Routes:
  * - Public: Home, Catalog, EscortList, EscortProfile, Pricing, Contact, Blog
- * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy, KVKK
+ * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy, KVKK, Safety
  * - Auth: ClientLogin, ClientRegister, EscortLogin, EscortRegister
  * - User: MyFavorites, Messages, MyAppointments
- * - Escort: EscortDashboard, EscortMarket, VerificationCenter
- * - Payment: PaymentResult
- * - Admin: AdminDashboard, AdminApprovals
+ * - Escort Panel: EscortDashboard, EscortMarket, ProfileEdit, Photos, Calendar, Earnings
+ * - Customer Panel: CustomerDashboard, CustomerSettings, Notifications, History, Wallet
+ * - Payment: PaymentResult, MembershipUpgrade, BillingDashboard
+ * - Admin: AdminDashboard, AdminApprovals, AdminPanel, AdminReports, AdminRealTimeMonitoring
+ * - General: About, FAQ, HowItWorks, Support, Report
  * - Utilities: SEO, NotFound
  * 
  * @example
@@ -134,6 +136,20 @@ const FAQ = lazy(() => import("@/pages/general/FAQ").then(m => ({ default: m.def
 const HowItWorks = lazy(() => import("@/pages/general/HowItWorks").then(m => ({ default: m.default })));
 const SupportPage = lazy(() => import("@/pages/general/Support").then(m => ({ default: m.default })));
 
+// Phase 2 - Escort Panel Pages (Faz 2)
+const EscortProfileEdit = lazy(() => import("@/pages/escort/ProfileEdit").then(m => ({ default: m.default })));
+const EscortPhotos = lazy(() => import("@/pages/escort/PhotoManager").then(m => ({ default: m.default })));
+const EscortCalendar = lazy(() => import("@/pages/escort/CalendarManager").then(m => ({ default: m.default })));
+const EscortEarnings = lazy(() => import("@/pages/escort/EarningsReport").then(m => ({ default: m.default })));
+
+// Phase 2 - Customer Panel Pages (Faz 2)
+const CustomerNotifications = lazy(() => import("@/pages/customer/Notifications").then(m => ({ default: m.default })));
+const CustomerHistory = lazy(() => import("@/pages/customer/History").then(m => ({ default: m.default })));
+const CustomerWallet = lazy(() => import("@/pages/customer/Wallet").then(m => ({ default: m.default })));
+
+// Phase 2 - General Pages (Faz 2)
+const ReportPage = lazy(() => import("@/pages/Report").then(m => ({ default: m.default })));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // LOADING FALLBACK COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,79 +185,59 @@ function LazyRoute({ path, component: Component }: LazyRouteProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AppRouter() {
-  // Debug: Geçerli path'i kontrol et
-  React.useEffect(() => {
-    console.log('[AppRouter] Current path:', window.location.pathname);
-  }, []);
-
   return (
     <>
       {/* Home & Catalog - High Priority */}
       <Route path="/">
-        {() => {
-          console.log('[Route] Matched: / (Home)');
-          return (
-            <RouteErrorBoundary>
-              <Suspense fallback={<RouteLoading />}>
-                <Home />
-              </Suspense>
-            </RouteErrorBoundary>
-          );
-        }}
+        {() => (
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <Home />
+            </Suspense>
+          </RouteErrorBoundary>
+        )}
       </Route>
 
       <Route path="/catalog">
-        {() => {
-          console.log('[Route] Matched: /catalog');
-          return (
-            <RouteErrorBoundary>
-              <Suspense fallback={<RouteLoading />}>
-                <Catalog />
-              </Suspense>
-            </RouteErrorBoundary>
-          );
-        }}
+        {() => (
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <Catalog />
+            </Suspense>
+          </RouteErrorBoundary>
+        )}
       </Route>
 
       <Route path="/escorts">
-        {() => {
-          console.log('[Route] Matched: /escorts');
-          return (
-            <RouteErrorBoundary>
-              <Suspense fallback={<RouteLoading />}>
-                <EscortList />
-              </Suspense>
-            </RouteErrorBoundary>
-          );
-        }}
+        {() => (
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <EscortList />
+            </Suspense>
+          </RouteErrorBoundary>
+        )}
       </Route>
 
       {/* Guest Catalog - Phase 2 */}
       <Route path="/guest-catalog">
-        {() => {
-          console.log('[Route] Matched: /guest-catalog');
-          return (
-            <RouteErrorBoundary>
-              <Suspense fallback={<RouteLoading />}>
-                <GuestCatalog />
-              </Suspense>
-            </RouteErrorBoundary>
-          );
-        }}
+        {() => (
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <GuestCatalog />
+            </Suspense>
+          </RouteErrorBoundary>
+        )}
       </Route>
 
       {/* Profile Pages */}
       <Route path="/escort/:id">
-        {(params) => {
-          console.log('[Route] Matched: /escort/:id', params);
-          return (
-            <RouteErrorBoundary>
-              <Suspense fallback={<RouteLoading />}>
-                <EscortProfile />
-              </Suspense>
-            </RouteErrorBoundary>
-          );
-        }}
+        {() => (
+          <RouteErrorBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <EscortProfile />
+            </Suspense>
+          </RouteErrorBoundary>
+        )}
       </Route>
 
       {/* Escort Routes */}
@@ -269,6 +265,23 @@ function AppRouter() {
       {/* Escort Analytics Dashboard - Phase 3 */}
       <Route path="/escort/dashboard/analytics">
         {() => <Suspense fallback={<RouteLoading />}><EscortAnalyticsDashboard /></Suspense>}
+      </Route>
+
+      {/* Escort Panel Pages - Phase 2 (Faz 2) */}
+      <Route path="/escort/profile/edit">
+        {() => <Suspense fallback={<RouteLoading />}><EscortProfileEdit /></Suspense>}
+      </Route>
+
+      <Route path="/escort/photos">
+        {() => <Suspense fallback={<RouteLoading />}><EscortPhotos /></Suspense>}
+      </Route>
+
+      <Route path="/escort/calendar">
+        {() => <Suspense fallback={<RouteLoading />}><EscortCalendar /></Suspense>}
+      </Route>
+
+      <Route path="/escort/earnings">
+        {() => <Suspense fallback={<RouteLoading />}><EscortEarnings /></Suspense>}
       </Route>
 
       {/* Client/Customer Routes */}
@@ -333,6 +346,19 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><CustomerSettings /></Suspense>}
       </Route>
 
+      {/* Customer Panel Pages - Phase 2 (Faz 2) */}
+      <Route path="/customer/notifications">
+        {() => <Suspense fallback={<RouteLoading />}><CustomerNotifications /></Suspense>}
+      </Route>
+
+      <Route path="/customer/history">
+        {() => <Suspense fallback={<RouteLoading />}><CustomerHistory /></Suspense>}
+      </Route>
+
+      <Route path="/customer/wallet">
+        {() => <Suspense fallback={<RouteLoading />}><CustomerWallet /></Suspense>}
+      </Route>
+
       {/* General Pages */}
       <Route path="/about">
         {() => <Suspense fallback={<RouteLoading />}><About /></Suspense>}
@@ -348,6 +374,11 @@ function AppRouter() {
 
       <Route path="/support">
         {() => <Suspense fallback={<RouteLoading />}><SupportPage /></Suspense>}
+      </Route>
+
+      {/* Report Page - Phase 2 (Faz 2) */}
+      <Route path="/report">
+        {() => <Suspense fallback={<RouteLoading />}><ReportPage /></Suspense>}
       </Route>
 
       {/* Other */}
@@ -456,15 +487,12 @@ function AppRouter() {
 
       {/* 404 */}
       <Route path="/404">
-        {() => {
-          console.log('[Route] Matched: /404');
-          return <NotFound />;
-        }}
+        {() => <NotFound />}
       </Route>
 
       {/* Final fallback route - Only show for truly unmatched paths */}
       <Route>
-        {(params) => {
+        {() => {
           // Get current path
           const path = window.location.pathname;
 
@@ -478,7 +506,10 @@ function AppRouter() {
             '/favorites', '/messages', '/appointments', '/dashboard',
             '/escort/dashboard', '/escort/market',
             '/escort/dashboard/private', '/escort/dashboard/analytics',
-            '/admin/dashboard', '/admin/approvals',
+            '/escort/profile/edit', '/escort/photos', '/escort/calendar', '/escort/earnings',
+            '/customer/settings', '/customer/notifications', '/customer/history', '/customer/wallet',
+            '/admin/dashboard', '/admin/approvals', '/admin/panel',
+            '/about', '/faq', '/how-it-works', '/support', '/report',
             '/contact', '/payment-result', '/verification', '/blog',
             '/upgrade', '/billing', '/dashboard/billing', '/faturalar',
             '/role-selection', '/404',
@@ -496,7 +527,6 @@ function AppRouter() {
 
           if (isValidPath) return null;
 
-          console.log('[Route] No match - showing 404. Current path:', path);
           return <NotFound />;
         }}
       </Route>

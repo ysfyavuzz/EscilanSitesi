@@ -34,31 +34,76 @@ Bu klasör, escort ilan platformunun tüm sayfa component'lerini içerir.
 | Sayfa | Route | Açıklama |
 |-------|-------|----------|
 | `EscortDashboard.tsx` | `/escort/dashboard` | Escort kontrol paneli |
+| `EscortPrivateDashboard.tsx` | `/escort/dashboard/private` | Escort özel panel |
+| `EscortAnalyticsDashboard.tsx` | `/escort/dashboard/analytics` | Escort analytics paneli |
 | `EscortMarket.tsx` | `/escort/market` | Escort pazar yeri |
+
+#### Escort Panel Alt Sayfaları (`escort/`)
+
+| Sayfa | Route | Açıklama |
+|-------|-------|----------|
+| `ProfileEdit.tsx` | `/escort/profile/edit` | Profil düzenleme |
+| `PhotoManager.tsx` | `/escort/photos` | Fotoğraf yönetimi |
+| `CalendarManager.tsx` | `/escort/calendar` | Takvim ve müsaitlik yönetimi |
+| `EarningsReport.tsx` | `/escort/earnings` | Kazanç raporları |
 
 ### Müşteri Paneli
 
 | Sayfa | Route | Açıklama |
 |-------|-------|----------|
+| `CustomerDashboard.tsx` | `/customer/dashboard` | Müşteri kontrol paneli |
 | `MyFavorites.tsx` | `/favorites` | Favorilerim |
 | `Messages.tsx` | `/messages` | Mesajlar |
 | `MyAppointments.tsx` | `/appointments` | Randevularım |
+
+#### Müşteri Panel Alt Sayfaları (`customer/`)
+
+| Sayfa | Route | Açıklama |
+|-------|-------|----------|
+| `Notifications.tsx` | `/customer/notifications` | Bildirimler sayfası |
+| `History.tsx` | `/customer/history` | Randevu geçmişi |
+| `Wallet.tsx` | `/customer/wallet` | Cüzdan ve bakiye yönetimi |
+| `CustomerSettings.tsx` | `/customer/settings` | Müşteri ayarları |
 
 ### Admin Paneli
 
 | Sayfa | Route | Açıklama |
 |-------|-------|----------|
+| `AdminPanel.tsx` | `/admin` | Ana admin paneli |
 | `AdminDashboard.tsx` | `/admin/dashboard` | Admin kontrol paneli |
 | `AdminApprovals.tsx` | `/admin/approvals` | Onay bekleyenler |
+| `AdminRealTimeMonitoring.tsx` | `/admin/monitoring` | Gerçek zamanlı izleme |
+| `AdminReports.tsx` | `/admin/reports` | Admin raporları |
 
-### Diğer
+### Genel Sayfalar
 
 | Sayfa | Route | Açıklama |
 |-------|-------|----------|
+| `GuestCatalog.tsx` | `/guest-catalog` | Misafir katalog görünümü |
 | `Pricing.tsx` | `/pricing`, `/vip` | VIP/Premium fiyatlandırma |
+| `MembershipUpgrade.tsx` | `/upgrade` | Üyelik yükseltme |
+| `BillingDashboard.tsx` | `/billing`, `/dashboard/billing`, `/faturalar` | Fatura yönetimi |
 | `SEO.tsx` | `/seo` | SEO ayarları sayfası |
 | `Contact.tsx` | `/contact` | İletişim sayfası |
 | `Blog.tsx` | `/blog` | Blog yazıları |
+| `Report.tsx` | `/report` | Şikayet/Rapor oluşturma |
+| `VerificationCenter.tsx` | `/verification` | Doğrulama merkezi |
+| `PaymentResult.tsx` | `/payment-result` | Ödeme sonuç sayfası |
+
+### Mesajlaşma ve İletişim
+
+| Sayfa | Route | Açıklama |
+|-------|-------|----------|
+| `Messages.tsx` | `/messages` | Mesajlaşma sayfası |
+| `RealTimeMessaging.tsx` | `/messages/realtime` | Gerçek zamanlı mesajlaşma |
+| `VideoCallPage.tsx` | `/messages/video`, `/video-call` | Video görüşme |
+
+### Analytics ve Değerlendirmeler
+
+| Sayfa | Route | Açıklama |
+|-------|-------|----------|
+| `Analytics.tsx` | `/analytics` | Platform analytics |
+| `Reviews.tsx` | `/reviews` | Değerlendirmeler sayfası |
 
 ### Yasal Sayfalar
 
@@ -72,20 +117,90 @@ Bu klasör, escort ilan platformunun tüm sayfa component'lerini içerir.
 
 ## 🎯 Route Yapısı
 
+### Genel Routes
 ```typescript
 /                           → Home
 /catalog                    → Catalog
+/guest-catalog              → GuestCatalog
 /escorts                    → EscortList
 /escort/:id                 → EscortProfile
-/login                      → ClientLogin
-/register                   → ClientRegister
-/favorites                  → MyFavorites
-/messages                   → Messages
-/appointments               → MyAppointments
 /pricing, /vip              → Pricing
+/upgrade                    → MembershipUpgrade
+/contact                    → Contact
+/blog                       → Blog
+/report                     → Report
+/verification               → VerificationCenter
+/analytics                  → Analytics
+/reviews                    → Reviews
+```
+
+### Kimlik Doğrulama Routes
+```typescript
+/login                      → ClientLogin
+/login-client               → ClientLogin
+/login-customer             → ClientLogin
+/login-escort               → EscortLogin
+/register                   → ClientRegister
+/register-client            → ClientRegister
+/signup                     → ClientRegister
+/register-escort            → EscortRegister
+```
+
+### Escort Dashboard Routes
+```typescript
 /escort/dashboard           → EscortDashboard
+/escort/dashboard/private   → EscortPrivateDashboard
+/escort/dashboard/analytics → EscortAnalyticsDashboard
 /escort/market              → EscortMarket
+/escort/profile/edit        → ProfileEdit
+/escort/photos              → PhotoManager
+/escort/calendar            → CalendarManager
+/escort/earnings            → EarningsReport
+```
+
+### Müşteri Routes
+```typescript
+/customer/dashboard         → CustomerDashboard
+/favorites                  → MyFavorites
+/appointments               → MyAppointments
+/customer/notifications     → Notifications
+/customer/history           → History
+/customer/wallet            → Wallet
+/customer/settings          → CustomerSettings
+```
+
+### Mesajlaşma Routes
+```typescript
+/messages                   → Messages
+/messages/realtime          → RealTimeMessaging
+/messages/video             → VideoCallPage
+/video-call                 → VideoCallPage
+```
+
+### Admin Routes
+```typescript
+/admin                      → AdminPanel
 /admin/dashboard            → AdminDashboard
+/admin/approvals            → AdminApprovals
+/admin/monitoring           → AdminRealTimeMonitoring
+/admin/reports              → AdminReports
+```
+
+### Faturalama Routes
+```typescript
+/billing                    → BillingDashboard
+/dashboard/billing          → BillingDashboard
+/faturalar                  → BillingDashboard
+/payment-result             → PaymentResult
+```
+
+### Yasal Routes
+```typescript
+/terms                      → TermsOfService
+/privacy                    → PrivacyPolicy
+/cookies                    → CookiePolicy
+/kvkk                       → KVKK
+/safety                     → Safety
 ```
 
 ## 📝 Sayfa Component'leri
