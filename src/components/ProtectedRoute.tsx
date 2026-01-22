@@ -247,7 +247,7 @@ export default function ProtectedRoute({
   message,
   title
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user, viewRole } = useAuth();
+  const { isAuthenticated, isLoading, user, viewRole, isAdmin, isSuperAdmin } = useAuth();
   const [location] = useLocation();
   const storedRole = getStoredRole();
   const [isChecking, setIsChecking] = useState(true);
@@ -261,6 +261,11 @@ export default function ProtectedRoute({
   // Still checking
   if (isLoading || isChecking) {
     return <LoadingState />;
+  }
+
+  // Admin bypass - Admin kullanıcılar her yere erişebilir
+  if (isAdmin || isSuperAdmin) {
+    return <>{children}</>;
   }
 
   // Public access - always render

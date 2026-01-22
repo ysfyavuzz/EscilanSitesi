@@ -12,6 +12,35 @@ export interface User {
   membership?: 'standard' | 'vip' | 'premium';
   hasCustomerAccount?: boolean;
   hasEscortAccount?: boolean;
+  // Super Admin Yetkileri
+  isSuperAdmin?: boolean;
+  permissions?: AdminPermissions;
+}
+
+export interface AdminPermissions {
+  // İlan Yönetimi
+  canCreateListings: boolean;
+  canEditListings: boolean;
+  canDeleteListings: boolean;
+  canApproveListings: boolean;
+  // Kullanıcı Yönetimi
+  canViewAllUsers: boolean;
+  canEditUsers: boolean;
+  canDeleteUsers: boolean;
+  canBanUsers: boolean;
+  // Mesajlar
+  canViewAllMessages: boolean;
+  canModerateMessages: boolean;
+  // İçerik Yönetimi
+  canManageAds: boolean;
+  canEditContent: boolean;
+  canManageBanner: boolean;
+  // Analitik
+  canViewAnalytics: boolean;
+  canExportData: boolean;
+  // Sistem Ayarları
+  canManageSettings: boolean;
+  canManagePayments: boolean;
 }
 
 interface AuthContextValue {
@@ -19,17 +48,43 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   isEscort: boolean;
   // Rol bazlı görüntüleme limitleri için
   viewRole: 'guest' | 'user' | 'premium' | 'vip';
   // Kullanıcının rolü (customer, escort, admin)
   userRole: 'customer' | 'escort' | 'admin' | null;
+  // Admin Yetkileri
+  permissions: AdminPermissions | null;
+  hasPermission: (permission: keyof AdminPermissions) => boolean;
+  canAccessAnySection: boolean;
   login: (emailOrUser: string | User, password?: string) => Promise<void>;
   logout: () => void;
   register: (data: RegisterData) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
   refreshToken: () => Promise<void>;
 }
+
+// Super Admin için varsayılan yetkiler
+const SUPER_ADMIN_PERMISSIONS: AdminPermissions = {
+  canCreateListings: true,
+  canEditListings: true,
+  canDeleteListings: true,
+  canApproveListings: true,
+  canViewAllUsers: true,
+  canEditUsers: true,
+  canDeleteUsers: true,
+  canBanUsers: true,
+  canViewAllMessages: true,
+  canModerateMessages: true,
+  canManageAds: true,
+  canEditContent: true,
+  canManageBanner: true,
+  canViewAnalytics: true,
+  canExportData: true,
+  canManageSettings: true,
+  canManagePayments: true,
+};
 
 interface RegisterData {
   name: string;
@@ -50,16 +105,53 @@ const authService = {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Mock response - replace with actual API call
+    // Super Admin - sınırsız yetkiler
     if (email === 'admin@example.com' && password === 'admin') {
       return {
         user: {
           id: 'admin-1',
-          name: 'Admin',
+          name: 'Super Admin',
           email: 'admin@example.com',
           role: 'admin',
           verified: true,
+          isSuperAdmin: true,
+          permissions: SUPER_ADMIN_PERMISSIONS,
         },
         token: 'mock-admin-token',
+      };
+    }
+
+    // Regular Admin
+    if (email === 'moderator@example.com' && password === 'moderator') {
+      return {
+        user: {
+          id: 'mod-1',
+          name: 'Moderator',
+          email: 'moderator@example.com',
+          role: 'admin',
+          verified: true,
+          isSuperAdmin: false,
+          permissions: {
+            canCreateListings: false,
+            canEditListings: true,
+            canDeleteListings: false,
+            canApproveListings: true,
+            canViewAllUsers: true,
+            canEditUsers: false,
+            canDeleteUsers: false,
+            canBanUsers: true,
+            canViewAllMessages: true,
+            canModerateMessages: true,
+            canManageAds: false,
+            canEditContent: true,
+            canManageBanner: false,
+            canViewAnalytics: true,
+            canExportData: false,
+            canManageSettings: false,
+            canManagePayments: false,
+          },
+        },
+        token: 'mock-moderator-token',
       };
     }
 
@@ -252,14 +344,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? 'customer'
         : null;
 
+  // Admin yetkileri
+  const permissions = user?.permissions || null;
+  const isSuperAdmin = user?.isSuperAdmin || false;
+
+  // Belirli bir yetki kontrolü
+  const hasPermission = (permission: keyof AdminPermissions): boolean => {
+    if (isSuperAdmin) return true;
+    return permissions?.[permission] || false;
+  };
+
+  // Herhangi bir bölüme erişim yetkisi (super admin için her bölüme erişim)
+  const canAccessAnySection = isSuperAdmin;
+
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user,
     isLoading,
     isAdmin: user?.role === 'admin',
+    isSuperAdmin,
     isEscort: user?.role === 'escort',
     viewRole,
     userRole,
+    permissions,
+    hasPermission,
+    canAccessAnySection,
     login,
     logout,
     register,

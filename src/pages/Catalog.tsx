@@ -67,6 +67,17 @@ export default function Catalog() {
           }
         : undefined,
       services: searchParams.get('services')?.split(',').filter(Boolean) || undefined,
+      physical: {
+        hairColor: searchParams.get('hairColor')?.split(',').filter(Boolean) || undefined,
+        eyeColor: searchParams.get('eyeColor')?.split(',').filter(Boolean) || undefined,
+        bodyType: searchParams.get('bodyType')?.split(',').filter(Boolean) || undefined,
+        ageRange: searchParams.get('ageMin') || searchParams.get('ageMax')
+          ? [
+              parseInt(searchParams.get('ageMin') || '18'),
+              parseInt(searchParams.get('ageMax') || '55'),
+            ] as [number, number]
+          : undefined,
+      },
       searchQuery: searchParams.get('q') || undefined,
     };
   }, [searchParams]);
@@ -86,6 +97,19 @@ export default function Catalog() {
     }
     if (newFilters.services?.length) {
       params.set('services', newFilters.services.join(','));
+    }
+    if (newFilters.physical?.hairColor?.length) {
+      params.set('hairColor', newFilters.physical.hairColor.join(','));
+    }
+    if (newFilters.physical?.eyeColor?.length) {
+      params.set('eyeColor', newFilters.physical.eyeColor.join(','));
+    }
+    if (newFilters.physical?.bodyType?.length) {
+      params.set('bodyType', newFilters.physical.bodyType.join(','));
+    }
+    if (newFilters.physical?.ageRange) {
+      params.set('ageMin', newFilters.physical.ageRange[0].toString());
+      params.set('ageMax', newFilters.physical.ageRange[1].toString());
     }
     if (searchQuery) params.set('q', searchQuery);
 
@@ -155,6 +179,38 @@ export default function Catalog() {
       );
     }
 
+    // Apply physical filters - hair color
+    if (filters.physical?.hairColor && filters.physical.hairColor.length > 0) {
+      // Mock data'da hairColor yok, gerçek veride burası çalışacak
+      // results = results.filter(escort =>
+      //   filters.physical?.hairColor?.includes(escort.hairColor)
+      // );
+    }
+
+    // Apply physical filters - eye color
+    if (filters.physical?.eyeColor && filters.physical.eyeColor.length > 0) {
+      // Mock data'da eyeColor yok, gerçek veride burası çalışacak
+      // results = results.filter(escort =>
+      //   filters.physical?.eyeColor?.includes(escort.eyeColor)
+      // );
+    }
+
+    // Apply physical filters - body type
+    if (filters.physical?.bodyType && filters.physical.bodyType.length > 0) {
+      // Mock data'da bodyType yok, gerçek veride burası çalışacak
+      // results = results.filter(escort =>
+      //   filters.physical?.bodyType?.includes(escort.bodyType)
+      // );
+    }
+
+    // Apply physical filters - age range
+    if (filters.physical?.ageRange) {
+      results = results.filter(escort => {
+        const age = escort.age || 0;
+        return age >= filters.physical!.ageRange![0] && age <= filters.physical!.ageRange![1];
+      });
+    }
+
     // Apply sorting
     if (filters.sortBy) {
       switch (filters.sortBy) {
@@ -195,6 +251,10 @@ export default function Catalog() {
     if (filters.isVerified) count++;
     if (filters.priceRange) count++;
     if (filters.services?.length) count++;
+    if (filters.physical?.hairColor?.length) count++;
+    if (filters.physical?.eyeColor?.length) count++;
+    if (filters.physical?.bodyType?.length) count++;
+    if (filters.physical?.ageRange) count++;
     if (filters.sortBy) count++;
     return count;
   }, [filters]);

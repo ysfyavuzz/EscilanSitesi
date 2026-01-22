@@ -139,5 +139,26 @@ function Root() {
   );
 }
 
-// Render the app
-ReactDOM.createRoot(document.getElementById('root')!).render(<Root />);
+// Render the app - Store root instance to prevent multiple createRoot calls
+let root: ReactDOM.Root | null = null;
+
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root element not found');
+}
+
+if (!root) {
+  root = ReactDOM.createRoot(container);
+}
+
+// HMR-safe rendering
+const renderApp = () => {
+  root!.render(<Root />);
+};
+
+renderApp();
+
+// Enable HMR
+if (import.meta.hot) {
+  import.meta.hot.accept('./main.tsx', renderApp);
+}

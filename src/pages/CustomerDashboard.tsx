@@ -208,7 +208,7 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
  * Customer dashboard component
  */
 export default function CustomerDashboard() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'appointments' | 'favorites' | 'messages' | 'reviews' | 'reports' | 'analytics' | 'settings'>('overview');
 
   // Mock favorite escorts
@@ -262,7 +262,7 @@ export default function CustomerDashboard() {
   ];
 
   return (
-    <ProtectedRoute accessLevel="customer">
+    <ProtectedRoute accessLevel={isAdmin ? "admin" : "customer"}>
       <div className="min-h-screen bg-background">
         <SEO
           title="Müşteri Paneli | Escort Platform"

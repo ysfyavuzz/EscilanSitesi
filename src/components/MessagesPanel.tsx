@@ -270,17 +270,23 @@ export function MessagesPanel({
 
                     {/* Quick actions menu */}
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowMenuFor(showMenuFor === conversation.id ? null : conversation.id);
                         }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                            setShowMenuFor(showMenuFor === conversation.id ? null : conversation.id);
+                          }
+                        }}
                       >
                         <MoreVertical className="w-3 h-3" />
-                      </Button>
+                      </div>
                     </div>
 
                     {/* Menu dropdown */}
@@ -295,56 +301,80 @@ export function MessagesPanel({
                         >
                           <div className="p-1">
                             {conversation.isPinned ? (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-start"
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                className="w-full flex items-center justify-start px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
                                 onClick={() => {
                                   onUnpinConversation?.(conversation.id);
                                   setShowMenuFor(null);
                                 }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    onUnpinConversation?.(conversation.id);
+                                    setShowMenuFor(null);
+                                  }
+                                }}
                               >
                                 <Pin className="w-4 h-4 mr-2" />
                                 Sabitlemeyi kaldır
-                              </Button>
+                              </div>
                             ) : (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-start"
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                className="w-full flex items-center justify-start px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
                                 onClick={() => {
                                   onPinConversation?.(conversation.id);
                                   setShowMenuFor(null);
                                 }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    onPinConversation?.(conversation.id);
+                                    setShowMenuFor(null);
+                                  }
+                                }}
                               >
                                 <Pin className="w-4 h-4 mr-2" />
                                 Sabitle
-                              </Button>
+                              </div>
                             )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start"
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              className="w-full flex items-center justify-start px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer"
                               onClick={() => {
                                 onArchiveConversation?.(conversation.id);
                                 setShowMenuFor(null);
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  onArchiveConversation?.(conversation.id);
+                                  setShowMenuFor(null);
+                                }
+                              }}
                             >
                               <Archive className="w-4 h-4 mr-2" />
                               Arşivle
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start text-red-600 hover:text-red-700"
+                            </div>
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              className="w-full flex items-center justify-start px-3 py-2 text-sm rounded-md text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                               onClick={() => {
                                 onDeleteConversation?.(conversation.id);
                                 setShowMenuFor(null);
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  onDeleteConversation?.(conversation.id);
+                                  setShowMenuFor(null);
+                                }
+                              }}
                             >
                               <X className="w-4 h-4 mr-2" />
                               Sil
-                            </Button>
+                            </div>
                           </div>
                         </motion.div>
                       )}

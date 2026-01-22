@@ -66,6 +66,8 @@ export interface EscortProfile {
   lastSeen: string;
   isOnline: boolean;
   verificationStatus: 'pending' | 'verified' | 'rejected';
+  /** Red reason (only for rejected listings) */
+  rejectReason?: string;
 }
 
 export const mockEscorts: EscortProfile[] = [

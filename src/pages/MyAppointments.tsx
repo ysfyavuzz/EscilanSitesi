@@ -49,7 +49,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Separator } from '../components/ui/separator';
-import { 
+import ProtectedRoute from '../components/ProtectedRoute';
+import {
   Calendar, Clock, MapPin, Phone, MessageCircle, Star,
   CheckCircle2, XCircle, AlertCircle, ArrowLeft, Eye,
   User, DollarSign, FileText, MoreVertical
@@ -276,7 +277,8 @@ export default function MyAppointments() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <ProtectedRoute accessLevel="customer">
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b">
         <div className="container py-4">
@@ -416,5 +418,6 @@ export default function MyAppointments() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

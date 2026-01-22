@@ -353,9 +353,14 @@ Escort Platform, Türkiye'de hizmet veren escortların ilanlarını yayınlayabi
 - ✅ Dashboard
 - ✅ Onay bekleyen escortlar
 - ✅ Onay bekleyen yorumlar
+- ✅ **Kullanıcı CRUD** (View, Edit, Ban, Delete)
+- ✅ **İlan CRUD** (Approve, Reject, Edit, Delete)
+- ✅ **Finansal Raporlar** (Kişi, Tarih, Kar bazlı)
+- ✅ **Rapor Export** (CSV, JSON, PDF, Excel)
 - ✅ Kullanıcı yönetimi
 - ✅ Real-time monitoring
-- ✅ Raporlama
+- ✅ Şikayet yönetimi
+- ✅ Mesaj inceleme
 
 ### Payment & Billing
 - ✅ İyzico entegrasyonu

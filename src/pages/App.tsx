@@ -92,6 +92,16 @@ const EscortMarket = lazy(() => import("@/pages/EscortMarket").then(m => ({ defa
 // Admin
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard").then(m => ({ default: m.default })));
 const AdminApprovals = lazy(() => import("@/pages/AdminApprovals").then(m => ({ default: m.default })));
+const AdminListings = lazy(() => import("@/pages/AdminListings").then(m => ({ default: m.default })));
+const AdminMedia = lazy(() => import("@/pages/AdminMedia").then(m => ({ default: m.default })));
+const AdminFinancial = lazy(() => import("@/pages/AdminFinancial").then(m => ({ default: m.default })));
+const AdminMessages = lazy(() => import("@/pages/AdminMessages").then(m => ({ default: m.default })));
+const AdminAnalytics = lazy(() => import("@/pages/AdminAnalytics").then(m => ({ default: m.default })));
+const AdminSecurity = lazy(() => import("@/pages/AdminSecurity").then(m => ({ default: m.default })));
+const AdminNotifications = lazy(() => import("@/pages/AdminNotifications").then(m => ({ default: m.default })));
+const AdminSettings = lazy(() => import("@/pages/AdminSettings").then(m => ({ default: m.default })));
+const AdminUsers = lazy(() => import("@/pages/AdminUsers").then(m => ({ default: m.default })));
+const Settings = lazy(() => import("@/pages/Settings").then(m => ({ default: m.default })));
 
 // Other
 const Pricing = lazy(() => import("@/pages/Pricing").then(m => ({ default: m.default })));
@@ -130,6 +140,7 @@ const Reviews = lazy(() => import("@/pages/Reviews").then(m => ({ default: m.def
 // Phase 10 - New Platform Features
 const Login = lazy(() => import("@/pages/Login").then(m => ({ default: m.default })));
 const AdminPanel = lazy(() => import("@/pages/AdminPanel").then(m => ({ default: m.default })));
+const AdminComplaints = lazy(() => import("@/pages/AdminComplaints").then(m => ({ default: m.default })));
 const CustomerSettings = lazy(() => import("@/pages/customer/CustomerSettings").then(m => ({ default: m.default })));
 const About = lazy(() => import("@/pages/general/About").then(m => ({ default: m.default })));
 const FAQ = lazy(() => import("@/pages/general/FAQ").then(m => ({ default: m.default })));
@@ -341,9 +352,50 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><AdminPanel /></Suspense>}
       </Route>
 
+      <Route path="/admin/listings">
+        {() => <Suspense fallback={<RouteLoading />}><AdminListings /></Suspense>}
+      </Route>
+
+      <Route path="/admin/media">
+        {() => <Suspense fallback={<RouteLoading />}><AdminMedia /></Suspense>}
+      </Route>
+
+      <Route path="/admin/financial">
+        {() => <Suspense fallback={<RouteLoading />}><AdminFinancial /></Suspense>}
+      </Route>
+
+      <Route path="/admin/messages">
+        {() => <Suspense fallback={<RouteLoading />}><AdminMessages /></Suspense>}
+      </Route>
+
+      <Route path="/admin/analytics">
+        {() => <Suspense fallback={<RouteLoading />}><AdminAnalytics /></Suspense>}
+      </Route>
+
+      <Route path="/admin/security">
+        {() => <Suspense fallback={<RouteLoading />}><AdminSecurity /></Suspense>}
+      </Route>
+
+      <Route path="/admin/notifications">
+        {() => <Suspense fallback={<RouteLoading />}><AdminNotifications /></Suspense>}
+      </Route>
+
+      <Route path="/admin/settings">
+        {() => <Suspense fallback={<RouteLoading />}><AdminSettings /></Suspense>}
+      </Route>
+
+      <Route path="/admin/users">
+        {() => <Suspense fallback={<RouteLoading />}><AdminUsers /></Suspense>}
+      </Route>
+
       {/* Customer Pages */}
       <Route path="/customer/settings">
         {() => <Suspense fallback={<RouteLoading />}><CustomerSettings /></Suspense>}
+      </Route>
+
+      {/* Universal Settings Route - Redirects based on role */}
+      <Route path="/settings">
+        {() => <Suspense fallback={<RouteLoading />}><Settings /></Suspense>}
       </Route>
 
       {/* Customer Panel Pages - Phase 2 (Faz 2) */}
@@ -476,6 +528,10 @@ function AppRouter() {
         {() => <Suspense fallback={<RouteLoading />}><AdminReports /></Suspense>}
       </Route>
 
+      <Route path="/admin/complaints">
+        {() => <Suspense fallback={<RouteLoading />}><AdminComplaints /></Suspense>}
+      </Route>
+
       {/* Phase 7 - Analytics & Reviews Routes */}
       <Route path="/analytics">
         {() => <Suspense fallback={<RouteLoading />}><Analytics /></Suspense>}
@@ -503,12 +559,15 @@ function AppRouter() {
             '/register-escort', '/register-client', '/register', '/signup',
             '/pricing', '/vip', '/seo', '/safety',
             '/terms', '/privacy', '/cookies', '/kvkk',
-            '/favorites', '/messages', '/appointments', '/dashboard',
+            '/favorites', '/messages', '/appointments', '/dashboard', '/settings',
             '/escort/dashboard', '/escort/market',
             '/escort/dashboard/private', '/escort/dashboard/analytics',
             '/escort/profile/edit', '/escort/photos', '/escort/calendar', '/escort/earnings',
             '/customer/settings', '/customer/notifications', '/customer/history', '/customer/wallet',
             '/admin/dashboard', '/admin/approvals', '/admin/panel',
+            '/admin/listings', '/admin/media', '/admin/financial',
+            '/admin/messages', '/admin/analytics', '/admin/security',
+            '/admin/notifications', '/admin/settings', '/admin/users',
             '/about', '/faq', '/how-it-works', '/support', '/report',
             '/contact', '/payment-result', '/verification', '/blog',
             '/upgrade', '/billing', '/dashboard/billing', '/faturalar',
@@ -516,7 +575,7 @@ function AppRouter() {
             // Phase 6 - Real-Time Messaging
             '/messages/realtime', '/messages/video', '/video-call',
             // Phase 6 - Admin Enhancements
-            '/admin/monitoring', '/admin/reports',
+            '/admin/monitoring', '/admin/reports', '/admin/complaints',
             // Phase 7 - Analytics & Reviews
             '/analytics', '/reviews'
           ];

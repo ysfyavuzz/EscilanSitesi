@@ -107,6 +107,30 @@ export interface ActiveFilter {
 /**
  * Filter configuration presets
  */
+/**
+ * Türkçe göz rengi seçenekleri (türleri)
+ */
+export type TurkEyeColor = 'mavi' | 'yesil' | 'kahverengi' | 'ela' | 'siyah' | 'gri' | 'hazel' | 'amber';
+
+/**
+ * Türkçe saç rengi seçenekleri (türleri)
+ */
+export type TurkHairColor = 'siyah' | 'kahverengi' | 'sari' | 'kizil' | 'gri' | 'balay';
+
+/**
+ * Renkli filtre seçeneği interface'i
+ */
+export interface ColorFilterOption {
+  value: string;
+  label: string;
+  color: string;
+  icon: string;
+  count?: number;
+}
+
+/**
+ * İngilizce saç renkleri (mevcut sistem için)
+ */
 export const HAIR_COLORS = [
   { value: 'blonde', label: 'Sarı', count: 120 },
   { value: 'brunette', label: 'Kumral', count: 95 },
@@ -115,6 +139,9 @@ export const HAIR_COLORS = [
   { value: 'colored', label: 'Renkli', count: 18 },
 ] as const;
 
+/**
+ * İngilizce göz renkleri (mevcut sistem için)
+ */
 export const EYE_COLORS = [
   { value: 'brown', label: 'Kahverengi', count: 140 },
   { value: 'blue', label: 'Mavi', count: 65 },
@@ -122,6 +149,34 @@ export const EYE_COLORS = [
   { value: 'hazel', label: 'Ela', count: 38 },
   { value: 'gray', label: 'Gri', count: 15 },
 ] as const;
+
+/**
+ * Türkçe saç renkleri - görselli filtreler için
+ * Her renk için gerçekçi ton ve emoji icon
+ */
+export const TURK_HAIR_COLORS: ColorFilterOption[] = [
+  { value: 'siyah', label: 'Siyah', color: '#1F2937', icon: '⚫', count: 89 },
+  { value: 'kahverengi', label: 'Kahverengi', color: '#92400E', icon: '🟤', count: 134 },
+  { value: 'sari', label: 'Sarı', color: '#FCD34D', icon: '🟡', count: 45 },
+  { value: 'kizil', label: 'Kızıl', color: '#DC2626', icon: '🔴', count: 12 },
+  { value: 'gri', label: 'Gri/Beyaz', color: '#9CA3AF', icon: '⚪', count: 8 },
+  { value: 'balay', label: 'Balayı', color: '#D97706', icon: '🌈', count: 23 },
+];
+
+/**
+ * Türkçe göz renkleri - görselli filtreler için
+ * Her renk için gerçekçi ton ve emoji icon
+ */
+export const TURK_EYE_COLORS: ColorFilterOption[] = [
+  { value: 'mavi', label: 'Mavi', color: '#3B82F6', icon: '🔵', count: 45 },
+  { value: 'yesil', label: 'Yeşil', color: '#10B981', icon: '🟢', count: 23 },
+  { value: 'kahverengi', label: 'Kahverengi', color: '#92400E', icon: '🟤', count: 120 },
+  { value: 'ela', label: 'Ela', color: '#A78BFA', icon: '🩷', count: 18 },
+  { value: 'siyah', label: 'Siyah', color: '#1F2937', icon: '⚫', count: 67 },
+  { value: 'gri', label: 'Gri', color: '#9CA3AF', icon: '⚪', count: 12 },
+  { value: 'hazel', label: 'Hazel', color: '#F59E0B', icon: '🟡', count: 8 },
+  { value: 'amber', label: 'Amber', color: '#F97316', icon: '🟠', count: 5 },
+];
 
 export const BODY_TYPES = [
   { value: 'slim', label: 'Zayıf', count: 85 },

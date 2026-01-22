@@ -116,7 +116,7 @@ const NavItemButton = ({
 
 export const FloatingNavigation = React.memo(function FloatingNavigation() {
   const [location] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -138,7 +138,17 @@ export const FloatingNavigation = React.memo(function FloatingNavigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const navItems: NavItem[] = [
+  // Admin menü öğeleri
+  const adminNavItems: NavItem[] = [
+    { icon: Home, label: 'Dashboard', href: '/admin/dashboard' },
+    { icon: Users, label: 'Kullanıcılar', href: '/admin/users' },
+    { icon: Sparkles, label: 'İlanlar', href: '/admin/listings' },
+    { icon: MessageSquare, label: 'Mesajlar', href: '/admin/messages' },
+    { icon: Bell, label: 'Panel', href: '/admin/panel' },
+  ];
+
+  // Normal kullanıcı menü öğeleri
+  const userNavItems: NavItem[] = [
     { icon: Home, label: 'Ana Sayfa', href: '/' },
     { icon: Users, label: 'İlanlar', href: '/escorts' },
     { icon: Crown, label: 'VIP', href: '/vip' },
@@ -146,6 +156,7 @@ export const FloatingNavigation = React.memo(function FloatingNavigation() {
     { icon: MessageSquare, label: 'Mesajlar', href: '/messages', requireAuth: true, badge: 3 },
   ];
 
+  const navItems = isAdmin ? adminNavItems : userNavItems;
   const visibleNavItems = navItems.filter(item => !item.requireAuth || isAuthenticated);
 
   return (

@@ -43,8 +43,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Heart, Star, MapPin, Phone, MessageCircle, Trash2 } from 'lucide-react';
-import Header from '@/components/Header';
-import BottomNav from '@/components/BottomNav';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface FavoriteEscort {
   id: string;
@@ -125,10 +124,11 @@ export default function MyFavorites() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <Header />
+    <ProtectedRoute accessLevel="customer">
+      <div className="min-h-screen bg-gray-50 pb-20">
+        {/* Header removed - using global Header */}
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -271,8 +271,7 @@ export default function MyFavorites() {
           </div>
         )}
       </main>
-
-      <BottomNav />
     </div>
+    </ProtectedRoute>
   );
 }

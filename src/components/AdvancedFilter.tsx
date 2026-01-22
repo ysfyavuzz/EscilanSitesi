@@ -473,7 +473,7 @@ export function AdvancedFilter({
                       <div className="space-y-4 pt-4">
                         {/* Hair Color */}
                         <div>
-                          <label className="text-sm text-muted-foreground mb-2 block">Saç Rengi</label>
+                          <label className="text-sm text-muted-foreground mb-2 block">💇 Saç Rengi</label>
                           <div className="flex flex-wrap gap-2">
                             {HAIR_COLORS.map((color) => (
                               <Badge
@@ -492,6 +492,36 @@ export function AdvancedFilter({
                                   updateFilter('physical', {
                                     ...filters.physical,
                                     hairColor: newValue.length > 0 ? newValue : undefined,
+                                  });
+                                }}
+                              >
+                                {color.label}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Eye Color */}
+                        <div>
+                          <label className="text-sm text-muted-foreground mb-2 block">👁️ Göz Rengi</label>
+                          <div className="flex flex-wrap gap-2">
+                            {EYE_COLORS.map((color) => (
+                              <Badge
+                                key={color.value}
+                                variant={
+                                  filters.physical?.eyeColor?.includes(color.value)
+                                    ? 'default'
+                                    : 'outline'
+                                }
+                                className="cursor-pointer hover:opacity-80"
+                                onClick={() => {
+                                  const current = filters.physical?.eyeColor || [];
+                                  const newValue = current.includes(color.value)
+                                    ? current.filter((c) => c !== color.value)
+                                    : [...current, color.value];
+                                  updateFilter('physical', {
+                                    ...filters.physical,
+                                    eyeColor: newValue.length > 0 ? newValue : undefined,
                                   });
                                 }}
                               >
