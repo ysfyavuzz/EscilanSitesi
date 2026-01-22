@@ -33,7 +33,14 @@ import type { CurrencyCode, PaymentMethod } from './types';
  * @returns Amount in smallest unit
  */
 export function convertToSmallestUnit(amount: number): number {
-  return Math.round(amount * 100);
+  // IEEE 754 floating point hatalarını önlemek için:
+  // 1. Önce 100 ile çarp
+  // 2. toFixed ile string'e çevir (2 ondalık basamak)
+  // 3. Tekrar number'a çevir
+  // 4. Math.round ile yuvarla
+  const multiplied = amount * 100;
+  const fixed = Number(multiplied.toFixed(2));
+  return Math.round(fixed);
 }
 
 /**
@@ -204,7 +211,18 @@ export function validateCardNumber(cardNumber: string): boolean {
     return false;
   }
   
-  // Luhn algorithm
+  // Tüm rakamlar aynı ise reddet (0000, 1111, vb.)
+  if (/^(.)\1+$/.test(cleaned)) {
+    return false;
+  }
+  
+  // Bilinen geçerli kart önekleri (Visa: 4, Mastercard: 51-55 veya 2221-2720, Amex: 34,37, Discover: 6011,65)
+  const validPrefixes = /^(4|5[1-5]|2(2(2[1-9]|[3-9]\d)|[3-6]\d{2}|7([01]\d|20))|3[47]|6(011|5))/;
+  if (!validPrefixes.test(cleaned)) {
+    return false;
+  }
+  
+  // Luhn algoritması
   let sum = 0;
   let isEven = false;
   

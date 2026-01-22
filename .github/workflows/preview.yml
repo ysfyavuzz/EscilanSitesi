@@ -45,6 +45,7 @@ jobs:
 
       - name: Deploy to Vercel Preview
         id: deploy
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -55,6 +56,7 @@ jobs:
           working-directory: ./
 
       - name: Comment PR with preview URL
+        if: steps.deploy.outcome == 'success'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -110,6 +112,7 @@ jobs:
             }
 
       - name: Add deployment status check
+        if: steps.deploy.outcome == 'success'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -129,6 +132,7 @@ jobs:
     name: Lighthouse CI
     runs-on: ubuntu-latest
     needs: deploy-preview
+    if: needs.deploy-preview.result == 'success'
     permissions:
       contents: read
     steps:
