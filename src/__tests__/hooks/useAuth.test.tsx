@@ -6,7 +6,7 @@
  */
 
 import '../setup';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook, act, render as rtlRender } from '@testing-library/react';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
