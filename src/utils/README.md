@@ -717,7 +717,6 @@ import {
   sanitizeHTML,
   validateEmail,
   validatePhoneNumber,
-  formatCurrency,
 } from '@/utils/security';
 
 describe('Security Utils', () => {
@@ -736,10 +735,6 @@ describe('Security Utils', () => {
   test('should validate Turkish phone', () => {
     expect(validatePhoneNumber('05551234567')).toBe(true);
     expect(validatePhoneNumber('123')).toBe(false);
-  });
-
-  test('should format currency', () => {
-    expect(formatCurrency(1500)).toBe('₺1.500,00');
   });
 });
 ```

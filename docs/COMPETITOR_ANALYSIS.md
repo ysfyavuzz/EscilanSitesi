@@ -466,15 +466,17 @@ export const userBadges = sqliteTable('user_badges', {
 
 ## 🎓 Learning Resources
 
+> **Note:** External links accessed January 2026. These resources provide industry context and best practices for implementing the proposed features. If links become unavailable, refer to the implementation details and examples provided throughout this document.
+
 ### Research Links
-- [Sugar Dating Industry Trends 2025](https://www.businessofapps.com/data/sugar-dating-app-market/)
-- [Seeking.com Feature Analysis](https://www.seeking.com/)
-- [Luxury Dating Platform UX Patterns](https://www.nngroup.com/articles/luxury-ecommerce/)
+- [Sugar Dating Industry Trends 2025](https://www.businessofapps.com/data/sugar-dating-app-market/) - Industry market data and trends
+- [Seeking.com Feature Analysis](https://www.seeking.com/) - Leading platform feature reference
+- [Luxury Dating Platform UX Patterns](https://www.nngroup.com/articles/luxury-ecommerce/) - UX best practices for luxury platforms
 
 ### Technical References
-- [Gift Economy Design Patterns](https://uxdesign.cc/gift-economy-in-digital-products-3f4d5a3c6e1b)
-- [Financial Verification Best Practices](https://plaid.com/docs/income/)
-- [Badge Gamification Research](https://www.gamify.com/gamification-blog/gamification-badges)
+- [Gift Economy Design Patterns](https://uxdesign.cc/gift-economy-in-digital-products-3f4d5a3c6e1b) - Gift system design patterns
+- [Financial Verification Best Practices](https://plaid.com/docs/income/) - Income verification API reference
+- [Badge Gamification Research](https://www.gamify.com/gamification-blog/gamification-badges) - Badge system psychology and design
 
 ---
 
