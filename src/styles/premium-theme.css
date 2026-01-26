@@ -1,0 +1,140 @@
+/**
+ * Premium Theme Styles
+ * EscilanSitesi için lüks ve premium görsel efektler.
+ */
+
+:root {
+  --gold-primary: #d4af37;
+  --gold-secondary: #f9e29c;
+  --gold-dark: #aa8412;
+  --purple-premium: #4b0082;
+  --rose-premium: #e0115f;
+  --dark-bg: #0a0a0a;
+  --dark-card: #141414;
+  --dark-border: #262626;
+}
+
+/* Premium Card Base */
+.premium-card {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Glow Effects */
+.hover\:glow-gold:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  border-color: var(--gold-primary);
+}
+
+.hover\:glow-purple:hover {
+  box-shadow: 0 0 20px rgba(75, 0, 130, 0.3);
+  border-color: var(--purple-premium);
+}
+
+.hover\:glow-rose:hover {
+  box-shadow: 0 0 20px rgba(224, 17, 95, 0.3);
+  border-color: var(--rose-premium);
+}
+
+/* Badges */
+.badge-premium {
+  background: linear-gradient(45deg, var(--gold-dark), var(--gold-secondary));
+  color: #000;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-verified {
+  background: #10b981;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+.badge-vip {
+  background: linear-gradient(45deg, #4b0082, #8a2be2);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+.badge-boost {
+  background: linear-gradient(45deg, #e0115f, #ff69b4);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+/* Gradients */
+.bg-gradient-gold-purple {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(75, 0, 130, 0.1));
+}
+
+.bg-gradient-dark-overlay {
+  background: linear-gradient(to top, rgba(10, 10, 10, 0.9), transparent);
+}
+
+.bg-gradient-premium-dark {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.bg-gradient-purple-rose {
+  background: linear-gradient(135deg, #4b0082, #e0115f);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(45deg, #d4af37, #f9e29c, #aa8412);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-premium {
+  background: linear-gradient(45deg, #d4af37, #e0115f, #4b0082);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-premium {
+  background: linear-gradient(45deg, #d4af37, #f9e29c);
+  color: #000;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn-premium:hover {
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  transform: translateY(-2px);
+}
+
+.text-dark-text-secondary {
+  color: #a0a0a0;
+}
+
+.gold-500 {
+  background-color: #d4af37;
+}
+
+.separator-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+

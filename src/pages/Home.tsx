@@ -1,383 +1,172 @@
 /**
  * Home Page
  * 
- * Landing page showcasing the platform with hero section, VIP carousel, and main escort catalog.
- * Features responsive design with advertisements, statistics, and intuitive navigation elements.
- * Serves as the primary entry point for users discovering and browsing the platform.
- * 
- * @module pages/Home
- * @category Pages - Public
- * 
- * Features:
- * - Hero section with platform branding and value proposition
- * - Search bar for escort name/category search
- * - VIP showcase carousel with coverflow effect
- * - Latest listings grid with responsive layout
- * - Horizontal and vertical advertisement placements
- * - Platform statistics display (active listings, daily visits, verified users)
- * - Responsive navigation for mobile and desktop
- * - Animated elements using Framer Motion
- * - Swiper carousel for VIP showcase
- * - Filter buttons for sorting (newest, popular)
- * - Load more functionality for pagination
- * - Footer with quick links and legal information
- * - Real-time data from database with mock fallback
- * - SEO meta tags for search engine optimization
- * 
- * Data Sources:
- * - VIP escorts from trpc.vip.getFeatured
- * - All escorts from trpc.catalog.list
- * - Cities from trpc.catalog.getCities
- * - Mock data fallback when database is empty
- * 
- * @example
- * ```tsx
- * // Route: /
- * // Home landing page
- * <Home />
- * ```
+ * Landing page showcasing the platform with premium hero section, VIP showcase, and main catalog.
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { AdBanner } from "@/components/AdBanner";
-import { SEO } from "@/pages/SEO";
+import { Header } from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import { PremiumHeroBanner, PremiumSectionHeader, PremiumDivider } from "@/components/PremiumHeroBanner";
 import { VipPremiumCard } from "@/components/VipPremiumCard";
 import { StandardCard } from "@/components/StandardCard";
-import Footer from "@/components/Footer";
-import { mockEscorts, mockAds } from "@/mockData";
-import {
-  Search, MapPin, Star, Shield, Heart, Sparkles,
-  ArrowRight, Crown, CheckCircle2, Zap, Users,
-  Award, ChevronRight, ChevronLeft, Flame, TrendingUp, Eye
-} from "lucide-react";
-import { useState, useEffect, useRef } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation, EffectCoverflow } from 'swiper/modules';
-
-// Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import 'swiper/css/effect-coverflow';
-
-// Animated Counter Component
-function AnimatedCounter({ end, duration = 2000, suffix = '' }: { end: number; duration?: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const countRef = useRef<HTMLSpanElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (countRef.current) {
-      observer.observe(countRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    let startTime: number;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * end));
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-    requestAnimationFrame(step);
-  }, [isVisible, end, duration]);
-
-  return <span ref={countRef}>{count.toLocaleString()}{suffix}</span>;
-}
-
-// StandardCard bileşeni artık dışarıdan alınıyor
+import { mockEscorts } from "@/data/mockData";
+import { Crown, Shield, Star, Zap, Users, ArrowRight } from "lucide-react";
+import { AnimatedContainer, AnimatedItem } from "@/components/PremiumAnimations";
 
 export default function Home() {
-  const { data: vipEscortsDb = [] } = trpc.vip.getFeatured.useQuery({ limit: 10 });
-  const { data: allEscortsDb = [] } = trpc.catalog.list.useQuery({ limit: 12, offset: 0 });
-  const { data: citiesDb = [] } = trpc.catalog.getCities.useQuery();
-
-  // Veritabanı boşsa mock verileri kullan
-  const vipEscorts = vipEscortsDb.length > 0 ? vipEscortsDb : mockEscorts.filter(e => e.isVip);
-  const allEscorts = allEscortsDb.length > 0 ? allEscortsDb : mockEscorts;
-  const cities = citiesDb.length > 0 ? citiesDb : ["İstanbul", "Bursa", "Kocaeli", "Sakarya", "Tekirdağ"];
+  const vipEscorts = mockEscorts.filter(e => e.isVip).slice(0, 3);
+  const recentEscorts = mockEscorts.filter(e => !e.isVip).slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/30">
-      <SEO
-        title="Marmara Escort İlanları | İstanbul, Bursa, Kocaeli VIP Escort"
-        description="Marmara bölgesinin en seçkin escort ilan platformu. İstanbul, Bursa ve Kocaeli'de onaylı, VIP ve güvenilir escort profilleri ile tanışın."
-        keywords="istanbul escort, bursa escort, kocaeli escort, marmara escort, vip escort istanbul, onaylı escort ilanları, şişli escort, beşiktaş escort, kadıköy escort"
+    <div className="min-h-screen bg-dark-bg text-white">
+      <Header />
+      
+      <PremiumHeroBanner 
+        title="Lüks ve Seçkin Deneyim"
+        subtitle="Türkiye'nin en kaliteli ve güvenilir eskort platformuna hoş geldiniz. Sizin için en iyileri bir araya getirdik."
+        backgroundImage="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200"
+        onCtaClick={() => window.location.href = '/catalog'}
+        ctaText="Hemen Keşfet"
       />
-      {/* Header artık App.tsx'ten geliyor */}
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,70,239,0.1),transparent_50%)]" />
-        <div className="container relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Badge className="mb-6 px-4 py-1.5 text-xs font-bold bg-primary/10 text-primary border-primary/20 uppercase tracking-widest">
-                <Sparkles className="w-3.5 h-3.5 mr-2" />
-                Türkiye'nin En Seçkin Platformu
-              </Badge>
-
-              <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
-                KALİTE <br />
-                <span className="text-gradient">AYRICALIKTIR</span>
-              </h1>
-
-              <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-                En seçkin escort ilanları, doğrulanmış profiller ve premium hizmet anlayışı ile tanışın.
-              </p>
-
-              {/* Search Box */}
-              <Card className="glass shadow-2xl border-white/10 p-2 max-w-3xl mx-auto mb-16">
-                <div className="flex flex-col md:flex-row gap-2">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="İsim veya kategori ara..."
-                      className="w-full pl-12 pr-4 py-4 bg-transparent border-none focus:ring-0 text-lg"
-                    />
-                  </div>
-                  <div className="h-10 w-px bg-white/10 hidden md:block self-center" />
-                  <select className="bg-transparent border-none focus:ring-0 px-6 py-4 text-lg cursor-pointer">
-                    <option value="">Tüm Şehirler</option>
-                    {cities.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                  <Button size="lg" className="md:px-10 py-7 bg-gradient-to-r from-primary to-accent text-lg font-bold">
-                    ARA
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Animated Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
+      <main className="container mx-auto px-4 py-16 space-y-24">
+        
+        {/* VIP Section */}
+        <section>
+          <PremiumSectionHeader 
+            title="VIP Vitrini" 
+            subtitle="En seçkin üyelerimizle tanışın. Kalite ve zarafetin buluşma noktası."
+          />
+          <AnimatedContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+            {vipEscorts.map((escort, index) => (
+              <AnimatedItem key={escort.id} delay={index * 0.1}>
+                <VipPremiumCard escort={escort} />
+              </AnimatedItem>
+            ))}
+          </AnimatedContainer>
+          <div className="flex justify-center mt-12">
+            <Link href="/catalog?isVip=true">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 text-gold-500 font-bold border-b border-gold-500 pb-1"
               >
-                <div className="frosted-glass rounded-2xl p-6 text-center card-depth">
-                  <div className="flex justify-center mb-2">
-                    <Users className="w-8 h-8 text-primary" />
-                  </div>
-                  <p className="text-3xl md:text-4xl font-black text-foreground">
-                    <AnimatedCounter end={1240} suffix="+" />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Aktif İlan</p>
-                </div>
-                <div className="frosted-glass rounded-2xl p-6 text-center card-depth">
-                  <div className="flex justify-center mb-2">
-                    <Eye className="w-8 h-8 text-purple-500" />
-                  </div>
-                  <p className="text-3xl md:text-4xl font-black text-foreground">
-                    <AnimatedCounter end={45000} suffix="+" />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Günlük Ziyaret</p>
-                </div>
-                <div className="frosted-glass rounded-2xl p-6 text-center card-depth">
-                  <div className="flex justify-center mb-2">
-                    <Shield className="w-8 h-8 text-green-500" />
-                  </div>
-                  <p className="text-3xl md:text-4xl font-black text-foreground">
-                    <AnimatedCounter end={850} suffix="+" />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Doğrulanmış</p>
-                </div>
-                <div className="frosted-glass rounded-2xl p-6 text-center card-depth">
-                  <div className="flex justify-center mb-2">
-                    <TrendingUp className="w-8 h-8 text-amber-500" />
-                  </div>
-                  <p className="text-3xl md:text-4xl font-black text-foreground">
-                    <AnimatedCounter end={98} suffix="%" />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Memnuniyet</p>
-                </div>
-              </motion.div>
-            </motion.div>
+                Tüm VIP Profilleri Gör <ArrowRight className="w-4 h-4" />
+              </motion.button>
+            </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* VIP Showcase - Carousel */}
-      <section className="py-24 bg-black/20 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-        <div className="container">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+        <PremiumDivider variant="gradient" />
+
+        {/* Features Section */}
+        <section className="bg-dark-card rounded-3xl p-12 border border-dark-border relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold-500 via-purple-500 to-gold-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <FeatureCard 
+              icon={<Shield className="w-8 h-8 text-gold-500" />}
+              title="Güvenli ve Gizli"
+              description="Tüm verileriniz uçtan uca şifrelenir ve gizliliğiniz en üst düzeyde tutulur."
+            />
+            <FeatureCard 
+              icon={<Star className="w-8 h-8 text-gold-500" />}
+              title="Doğrulanmış Profiller"
+              description="Fotoğraf doğrulama sistemimizle gerçek ve güncel profillerle tanışın."
+            />
+            <FeatureCard 
+              icon={<Zap className="w-8 h-8 text-gold-500" />}
+              title="Hızlı İletişim"
+              description="Gelişmiş mesajlaşma sistemiyle anında bağlantı kurun."
+            />
+            <FeatureCard 
+              icon={<Users className="w-8 h-8 text-gold-500" />}
+              title="Geniş Katalog"
+              description="Türkiye genelinde binlerce seçkin profil arasından seçim yapın."
+            />
+          </div>
+        </section>
+
+        {/* Recent Listings */}
+        <section>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
             <div>
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <Crown className="w-6 h-6" />
-                <span className="text-sm font-black uppercase tracking-[0.3em]">Premium Seçimler</span>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter">VIP VİTRİN</h2>
+              <h2 className="text-4xl font-bold text-white mb-2">Yeni İlanlar</h2>
+              <p className="text-dark-text-secondary">Platformumuza en son katılan seçkin üyeler.</p>
             </div>
-            <Link href="/escorts?filter=vip">
-              <Button variant="link" className="text-primary font-bold p-0 h-auto text-lg">
-                Tüm VIP İlanları Gör <ArrowRight className="w-5 h-5 ml-2" />
+            <Link href="/catalog">
+              <Button variant="outline" className="border-dark-border hover:border-gold-500">
+                Tümünü Gör
               </Button>
             </Link>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentEscorts.map(escort => (
+              <StandardCard key={escort.id} escort={escort} />
+            ))}
+          </div>
+        </section>
 
-          <Swiper
-            modules={[Autoplay, Pagination, Navigation, EffectCoverflow]}
-            effect={'coverflow'}
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView={'auto'}
-            coverflowEffect={{
-              rotate: 5,
-              stretch: 0,
-              depth: 100,
-              modifier: 2,
-              slideShadows: true,
-            }}
-            autoplay={{ delay: 3000 }}
-            pagination={{ clickable: true }}
-            className="vip-swiper !pb-16"
-            breakpoints={{
-              320: { slidesPerView: 1.2, spaceBetween: 20 },
-              768: { slidesPerView: 2.5, spaceBetween: 30 },
-              1024: { slidesPerView: 3.5, spaceBetween: 40 }
-            }}
-          >
-            {vipEscorts.length > 0 ? vipEscorts.map((escort) => (
-              <SwiperSlide key={escort.id} className="!h-auto !w-[380px] md:!w-[450px] py-10">
-                <VipPremiumCard escort={escort} />
-              </SwiperSlide>
-            )) : (
-              [...Array(5)].map((_, i) => (
-                <SwiperSlide key={i} className="!h-auto">
-                  <div className="aspect-[3/4] rounded-2xl bg-white/5 animate-pulse" />
-                </SwiperSlide>
-              ))
-            )}
-          </Swiper>
-        </div>
-      </section>
-
-      {/* Main Content with Ads */}
-      <section className="py-24 container">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left Content - Main Grid */}
-          <div className="lg:col-span-9 space-y-12">
-            <div className="flex items-center justify-between">
-              <h3 className="text-3xl font-black tracking-tighter">YENİ İLANLAR</h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">En Yeni</Button>
-                <Button variant="outline" size="sm">Popüler</Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {allEscorts.map((escort, idx) => (
-                <motion.div
-                  key={escort.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <StandardCard escort={escort} type={idx % 4 === 0 ? 'boost' : 'normal'} />
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Horizontal Ad between content */}
-            <AdBanner
-              type="horizontal"
-              title={mockAds[0].title}
-              description={mockAds[0].description}
-              imageUrl={mockAds[0].imageUrl}
-              link={mockAds[0].link}
-              className="my-12"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {/* More items... */}
-              {allEscorts.slice(0, 6).map((escort, idx) => (
-                <StandardCard key={`more-${idx}`} escort={escort} />
-              ))}
-            </div>
-
-            <div className="text-center pt-12">
-              <Button size="lg" variant="outline" className="px-12 py-8 text-xl font-bold border-2 hover:bg-primary hover:text-white transition-all">
-                DAHA FAZLA YÜKLE
-              </Button>
+        {/* Join CTA */}
+        <section className="relative rounded-3xl overflow-hidden py-20 px-8 text-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/40 to-gold-900/40 z-0" />
+          <div className="absolute inset-0 bg-black/60 z-0" />
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <Crown className="w-16 h-16 text-gold-500 mx-auto mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Kendi İlanınızı Oluşturun</h2>
+            <p className="text-xl text-dark-text-secondary mb-10">
+              Siz de seçkin üyelerimiz arasına katılın ve binlerce kullanıcıya ulaşın. 
+              Hemen kayıt olun ve profilinizi oluşturun.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/escort/register">
+                <Button className="btn-premium px-10 py-6 text-lg rounded-xl w-full sm:w-auto">
+                  Üye Ol
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button variant="outline" className="border-white/20 px-10 py-6 text-lg rounded-xl w-full sm:w-auto">
+                  Daha Fazla Bilgi
+                </Button>
+              </Link>
             </div>
           </div>
+        </section>
 
-          {/* Right Sidebar - Ads & Stats */}
-          <aside className="lg:col-span-3 space-y-8">
-            <div className="sticky top-24 space-y-8">
-              <AdBanner
-                type="vertical"
-                title={mockAds[1].title}
-                description={mockAds[1].description}
-                imageUrl={mockAds[1].imageUrl}
-                link={mockAds[1].link}
-              />
-
-              <Card className="glass p-6">
-                <h4 className="font-bold mb-4 flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-primary" />
-                  İSTATİSTİKLER
-                </h4>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Aktif İlan</span>
-                    <span className="font-bold">1,240</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Günlük Ziyaret</span>
-                    <span className="font-bold">45,000+</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Onaylı Üye</span>
-                    <span className="font-bold">850</span>
-                  </div>
-                </div>
-              </Card>
-
-              <AdBanner
-                type="native"
-                title="GÜVENLİ ÖDEME"
-                description="Tüm işlemleriniz uçtan uca şifreli ve anonimdir."
-              />
-            </div>
-          </aside>
+      </main>
+      
+      <footer className="bg-black py-12 border-t border-dark-border mt-20">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-2xl font-bold text-gradient-gold mb-6">ESCİLAN SİTESİ</div>
+          <p className="text-dark-text-secondary max-w-md mx-auto mb-8">
+            Türkiye'nin en prestijli eskort ilan platformu. Kalite, güven ve gizlilik esastır.
+          </p>
+          <div className="flex justify-center gap-8 text-sm text-dark-text-secondary mb-8">
+            <Link href="/terms">Kullanım Koşulları</Link>
+            <Link href="/privacy">Gizlilik Politikası</Link>
+            <Link href="/kvkk">KVKK</Link>
+            <Link href="/contact">İletişim</Link>
+          </div>
+          <div className="text-xs text-dark-text-secondary opacity-50">
+            &copy; 2024 EscilanSitesi. Tüm hakları saklıdır. +18
+          </div>
         </div>
-      </section>
+      </footer>
 
-      {/* Footer */}
-      <Footer />
+      <BottomNav />
     </div>
   );
 }
 
-export { Home };
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="flex flex-col items-center text-center space-y-4">
+      <div className="p-4 bg-dark-bg rounded-2xl border border-dark-border shadow-inner">
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold text-white">{title}</h3>
+      <p className="text-dark-text-secondary text-sm leading-relaxed">{description}</p>
+    </div>
+  );
+}

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./styles/premium-theme.css";
+@import "./styles/animations.css";
+@import "./styles/3d-effects.css";
+
 :root {
   /* Elegant rose gold and deep purple palette */
   --primary: oklch(0.55 0.18 340); /* Rose gold */
