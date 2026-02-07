@@ -14,6 +14,7 @@ import { VipPremiumCard } from "@/components/VipPremiumCard";
 import { StandardCard } from "@/components/StandardCard";
 import { mockEscorts } from "@/data/mockData";
 import { Crown, Shield, Star, Zap, Users, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { AnimatedContainer, AnimatedItem } from "@/components/PremiumAnimations";
 
 export default function Home() {

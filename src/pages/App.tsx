@@ -1,42 +1,5 @@
 /**
  * App Root Router Page
- * 
- * Central routing and layout component that orchestrates the entire application.
- * Implements route configuration with code splitting, error boundaries, and loading states.
- * Provides global UI providers (tooltips, notifications) and lazy-loaded route definitions.
- * 
- * @module pages/App
- * @category Pages - Dashboard
- * 
- * Features:
- * - Lazy-loaded route definitions for optimal code splitting
- * - Comprehensive route organization (Home, Auth, Dashboard, Admin)
- * - Error boundary wrapping for route-level error handling
- * - Suspense fallback with loading state component
- * - Global UI providers (Tooltip, Toaster for notifications)
- * - 404 fallback page for undefined routes
- * - Route-level performance optimization
- * - Responsive layout with mobile navigation support
- * - Protected route implementation for authenticated pages
- * - Loading states during route transitions
- * 
- * Routes:
- * - Public: Home, Catalog, EscortList, EscortProfile, Pricing, Contact, Blog
- * - Legal: TermsOfService, PrivacyPolicy, CookiePolicy, KVKK, Safety
- * - Auth: ClientLogin, ClientRegister, EscortLogin, EscortRegister
- * - User: MyFavorites, Messages, MyAppointments
- * - Escort Panel: EscortDashboard, EscortMarket, ProfileEdit, Photos, Calendar, Earnings
- * - Customer Panel: CustomerDashboard, CustomerSettings, Notifications, History, Wallet
- * - Payment: PaymentResult, MembershipUpgrade, BillingDashboard
- * - Admin: AdminDashboard, AdminApprovals, AdminPanel, AdminReports, AdminRealTimeMonitoring
- * - General: About, FAQ, HowItWorks, Support, Report
- * - Utilities: SEO, NotFound
- * 
- * @example
- * ```tsx
- * // Root application entry point
- * <App />
- * ```
  */
 
 import React, { Suspense, lazy } from 'react';
@@ -45,324 +8,189 @@ import { Toaster } from "@/components/ui/sonner";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { FullPageLoading } from "@/components/LoadingStates";
 import CookieConsent from "@/components/CookieConsent";
-import RoleSelector from "@/components/RoleSelector";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { NotificationToast, NotificationCenter } from "@/components/Notifications";
 import { FloatingNavigation } from "@/components/FloatingNavigation";
 import { Header } from "@/components/Header";
-import { Route } from "wouter";
+import { Route, Switch } from "wouter";
 import NotFound from "@/pages/NotFound";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAZY LOADED ROUTES (Code Splitting)
-// ─────────────────────────────────────────────────────────────────────────────
-// This improves initial load time by splitting routes into separate chunks
-
-// Home & Catalog (High priority - loaded first)
-const Home = lazy(() => import("@/pages/Home").then(m => ({ default: m.default || m.Home })));
-const Catalog = lazy(() => import("@/pages/Catalog").then(m => ({ default: m.default })));
-const EscortList = lazy(() => import("@/pages/EscortList").then(m => ({ default: m.default })));
-
-// Profile Pages
-const EscortProfile = lazy(() => import("@/pages/EscortProfile").then(m => ({ default: m.default })));
-
-// Legal Pages
-const TermsOfService = lazy(() => import("@/pages/TermsOfService").then(m => ({ default: m.default })));
-const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy").then(m => ({ default: m.default })));
-const CookiePolicy = lazy(() => import("@/pages/CookiePolicy").then(m => ({ default: m.default })));
-const KVKK = lazy(() => import("@/pages/KVKK").then(m => ({ default: m.default })));
-const Safety = lazy(() => import("@/pages/Safety").then(m => ({ default: m.default })));
-
-
-// Authentication
-const EscortLogin = lazy(() => import("@/pages/EscortLogin").then(m => ({ default: m.default })));
-const ClientLogin = lazy(() => import("@/pages/ClientLogin").then(m => ({ default: m.default })));
-const EscortRegister = lazy(() => import("@/pages/EscortRegister").then(m => ({ default: m.default })));
-const ClientRegister = lazy(() => import("@/pages/ClientRegister").then(m => ({ default: m.default })));
-
-// User Dashboard
-const MyFavorites = lazy(() => import("@/pages/MyFavorites").then(m => ({ default: m.default })));
-const Messages = lazy(() => import("@/pages/Messages").then(m => ({ default: m.default })));
-const MyAppointments = lazy(() => import("@/pages/MyAppointments").then(m => ({ default: m.default })));
-
-// Escort Dashboard
-const EscortDashboard = lazy(() => import("@/pages/EscortDashboard").then(m => ({ default: m.default })));
-const EscortMarket = lazy(() => import("@/pages/EscortMarket").then(m => ({ default: m.default })));
-
-// Admin
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard").then(m => ({ default: m.default })));
-const AdminApprovals = lazy(() => import("@/pages/AdminApprovals").then(m => ({ default: m.default })));
-const AdminListings = lazy(() => import("@/pages/AdminListings").then(m => ({ default: m.default })));
-const AdminMedia = lazy(() => import("@/pages/AdminMedia").then(m => ({ default: m.default })));
-const AdminFinancial = lazy(() => import("@/pages/AdminFinancial").then(m => ({ default: m.default })));
-const AdminMessages = lazy(() => import("@/pages/AdminMessages").then(m => ({ default: m.default })));
-const AdminAnalytics = lazy(() => import("@/pages/AdminAnalytics").then(m => ({ default: m.default })));
-const AdminSecurity = lazy(() => import("@/pages/AdminSecurity").then(m => ({ default: m.default })));
-const AdminNotifications = lazy(() => import("@/pages/AdminNotifications").then(m => ({ default: m.default })));
-const AdminSettings = lazy(() => import("@/pages/AdminSettings").then(m => ({ default: m.default })));
-const AdminUsers = lazy(() => import("@/pages/AdminUsers").then(m => ({ default: m.default })));
-const Settings = lazy(() => import("@/pages/Settings").then(m => ({ default: m.default })));
-
-// Other
-const Pricing = lazy(() => import("@/pages/Pricing").then(m => ({ default: m.default })));
-const SEO = lazy(() => import("@/pages/SEO").then(m => ({ default: m.default })));
-
-// New Pages - High-End Features
-const Contact = lazy(() => import("@/pages/Contact").then(m => ({ default: m.default })));
-const PaymentResult = lazy(() => import("@/pages/PaymentResult").then(m => ({ default: m.default })));
-const VerificationCenter = lazy(() => import("@/pages/VerificationCenter").then(m => ({ default: m.default })));
-const Blog = lazy(() => import("@/pages/Blog").then(m => ({ default: m.default })));
-
-// Phase 2 - Guest & Customer Pages
-const GuestCatalog = lazy(() => import("@/pages/GuestCatalog").then(m => ({ default: m.default })));
-const CustomerDashboard = lazy(() => import("@/pages/CustomerDashboard").then(m => ({ default: m.default })));
-
-// Phase 3 - Escort Dashboard Pages
-const EscortPrivateDashboard = lazy(() => import("@/pages/EscortPrivateDashboard").then(m => ({ default: m.default })));
-const EscortAnalyticsDashboard = lazy(() => import("@/pages/EscortAnalyticsDashboard").then(m => ({ default: m.default })));
-
-// Phase 5 - Billing & Payment Pages
-const MembershipUpgrade = lazy(() => import("@/pages/MembershipUpgrade").then(m => ({ default: m.default })));
-const BillingDashboard = lazy(() => import("@/pages/BillingDashboard").then(m => ({ default: m.default })));
-
-// Phase 6 - Advanced Features (Real-Time Messaging & Video Calls)
-const RealTimeMessaging = lazy(() => import("@/pages/RealTimeMessaging").then(m => ({ default: m.default })));
-const VideoCallPage = lazy(() => import("@/pages/VideoCallPage").then(m => ({ default: m.default })));
-
-// Phase 6 - Admin Enhancements
-const AdminRealTimeMonitoring = lazy(() => import("@/pages/AdminRealTimeMonitoring").then(m => ({ default: m.default })));
-const AdminReports = lazy(() => import("@/pages/AdminReports").then(m => ({ default: m.default })));
-
-// Phase 7 - Analytics & Reviews
-const Analytics = lazy(() => import("@/pages/Analytics").then(m => ({ default: m.default })));
-const Reviews = lazy(() => import("@/pages/Reviews").then(m => ({ default: m.default || m.Reviews })));
-
-// Phase 10 - New Platform Features
-const Login = lazy(() => import("@/pages/Login").then(m => ({ default: m.default })));
-const AdminPanel = lazy(() => import("@/pages/AdminPanel").then(m => ({ default: m.default })));
-const AdminComplaints = lazy(() => import("@/pages/AdminComplaints").then(m => ({ default: m.default })));
-const CustomerSettings = lazy(() => import("@/pages/customer/CustomerSettings").then(m => ({ default: m.default })));
-const About = lazy(() => import("@/pages/general/About").then(m => ({ default: m.default })));
-const FAQ = lazy(() => import("@/pages/general/FAQ").then(m => ({ default: m.default })));
-const HowItWorks = lazy(() => import("@/pages/general/HowItWorks").then(m => ({ default: m.default })));
-const SupportPage = lazy(() => import("@/pages/general/Support").then(m => ({ default: m.default })));
-
-// Phase 2 - Escort Panel Pages (Faz 2)
-const EscortProfileEdit = lazy(() => import("@/pages/escort/ProfileEdit").then(m => ({ default: m.default })));
-const EscortPhotos = lazy(() => import("@/pages/escort/PhotoManager").then(m => ({ default: m.default })));
-const EscortCalendar = lazy(() => import("@/pages/escort/CalendarManager").then(m => ({ default: m.default })));
-const EscortEarnings = lazy(() => import("@/pages/escort/EarningsReport").then(m => ({ default: m.default })));
-
-// Phase 2 - Customer Panel Pages (Faz 2)
-const CustomerNotifications = lazy(() => import("@/pages/customer/Notifications").then(m => ({ default: m.default })));
-const CustomerHistory = lazy(() => import("@/pages/customer/History").then(m => ({ default: m.default })));
-const CustomerWallet = lazy(() => import("@/pages/customer/Wallet").then(m => ({ default: m.default })));
-
-// Phase 2 - General Pages (Faz 2)
-const ReportPage = lazy(() => import("@/pages/Report").then(m => ({ default: m.default })));
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LOADING FALLBACK COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
+// LAZY LOADED ROUTES
+const Home = lazy(() => import("@/pages/Home"));
+const Catalog = lazy(() => import("@/pages/Catalog"));
+const EscortList = lazy(() => import("@/pages/EscortList"));
+const EscortProfile = lazy(() => import("@/pages/EscortProfile"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
+const KVKK = lazy(() => import("@/pages/KVKK"));
+const Safety = lazy(() => import("@/pages/Safety"));
+const EscortLogin = lazy(() => import("@/pages/EscortLogin"));
+const ClientLogin = lazy(() => import("@/pages/ClientLogin"));
+const EscortRegister = lazy(() => import("@/pages/EscortRegister"));
+const ClientRegister = lazy(() => import("@/pages/ClientRegister"));
+const MyFavorites = lazy(() => import("@/pages/MyFavorites"));
+const Messages = lazy(() => import("@/pages/Messages"));
+const MyAppointments = lazy(() => import("@/pages/MyAppointments"));
+const EscortDashboard = lazy(() => import("@/pages/EscortDashboard"));
+const EscortMarket = lazy(() => import("@/pages/EscortMarket"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminApprovals = lazy(() => import("@/pages/AdminApprovals"));
+const AdminListings = lazy(() => import("@/pages/AdminListings"));
+const AdminMedia = lazy(() => import("@/pages/AdminMedia"));
+const AdminFinancial = lazy(() => import("@/pages/AdminFinancial"));
+const AdminMessages = lazy(() => import("@/pages/AdminMessages"));
+const AdminAnalytics = lazy(() => import("@/pages/AdminAnalytics"));
+const AdminSecurity = lazy(() => import("@/pages/AdminSecurity"));
+const AdminNotifications = lazy(() => import("@/pages/AdminNotifications"));
+const AdminSettings = lazy(() => import("@/pages/AdminSettings"));
+const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const PaymentResult = lazy(() => import("@/pages/PaymentResult"));
+const VerificationCenter = lazy(() => import("@/pages/VerificationCenter"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const GuestCatalog = lazy(() => import("@/pages/GuestCatalog"));
+const CustomerDashboard = lazy(() => import("@/pages/CustomerDashboard"));
+const EscortPrivateDashboard = lazy(() => import("@/pages/EscortPrivateDashboard"));
+const EscortAnalyticsDashboard = lazy(() => import("@/pages/EscortAnalyticsDashboard"));
+const MembershipUpgrade = lazy(() => import("@/pages/MembershipUpgrade"));
+const BillingDashboard = lazy(() => import("@/pages/BillingDashboard"));
+const RealTimeMessaging = lazy(() => import("@/pages/RealTimeMessaging"));
+const VideoCallPage = lazy(() => import("@/pages/VideoCallPage"));
+const AdminRealTimeMonitoring = lazy(() => import("@/pages/AdminRealTimeMonitoring"));
+const AdminReports = lazy(() => import("@/pages/AdminReports"));
+const Analytics = lazy(() => import("@/pages/Analytics"));
+const Reviews = lazy(() => import("@/pages/Reviews"));
+const Login = lazy(() => import("@/pages/Login"));
+const AdminPanel = lazy(() => import("@/pages/AdminPanel"));
+const AdminComplaints = lazy(() => import("@/pages/AdminComplaints"));
+const CustomerSettings = lazy(() => import("@/pages/customer/CustomerSettings"));
+const About = lazy(() => import("@/pages/general/About"));
+const FAQ = lazy(() => import("@/pages/general/FAQ"));
+const HowItWorks = lazy(() => import("@/pages/general/HowItWorks"));
+const SupportPage = lazy(() => import("@/pages/general/Support"));
+const EscortProfileEdit = lazy(() => import("@/pages/escort/ProfileEdit"));
+const EscortPhotos = lazy(() => import("@/pages/escort/PhotoManager"));
+const EscortCalendar = lazy(() => import("@/pages/escort/CalendarManager"));
+const EscortEarnings = lazy(() => import("@/pages/escort/EarningsReport"));
+const CustomerNotifications = lazy(() => import("@/pages/customer/Notifications"));
+const CustomerHistory = lazy(() => import("@/pages/customer/History"));
+const CustomerWallet = lazy(() => import("@/pages/customer/Wallet"));
+const ReportPage = lazy(() => import("@/pages/Report"));
 
 function RouteLoading() {
   return <FullPageLoading message="Sayfa yükleniyor..." />;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAZY ROUTE WRAPPER
-// ─────────────────────────────────────────────────────────────────────────────
-// Wraps lazy-loaded components with Suspense and ErrorBoundary
-
-interface LazyRouteProps {
-  path: string;
-  component: React.LazyExoticComponent<() => JSX.Element>;
-}
-
-function LazyRoute({ path, component: Component }: LazyRouteProps) {
+function AppRouter() {
   return (
-    <Route path={path}>
-      <RouteErrorBoundary>
-        <Suspense fallback={<RouteLoading />}>
-          <Component />
-        </Suspense>
-      </RouteErrorBoundary>
-    </Route>
+    <Suspense fallback={<RouteLoading />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/catalog" component={Catalog} />
+        <Route path="/escorts" component={EscortList} />
+        <Route path="/guest-catalog" component={GuestCatalog} />
+        <Route path="/escort/:id" component={EscortProfile} />
+        
+        {/* Auth */}
+        <Route path="/login" component={Login} />
+        <Route path="/login-escort" component={EscortLogin} />
+        <Route path="/login-customer" component={ClientLogin} />
+        <Route path="/register-escort" component={EscortRegister} />
+        <Route path="/register-client" component={ClientRegister} />
+        <Route path="/register" component={ClientRegister} />
+        <Route path="/signup" component={ClientRegister} />
+
+        {/* Dashboards */}
+        <Route path="/dashboard" component={CustomerDashboard} />
+        <Route path="/favorites" component={MyFavorites} />
+        <Route path="/messages" component={Messages} />
+        <Route path="/appointments" component={MyAppointments} />
+        
+        {/* Escort Panel */}
+        <Route path="/escort/dashboard" component={EscortDashboard} />
+        <Route path="/escort/market" component={EscortMarket} />
+        <Route path="/escort/dashboard/private" component={EscortPrivateDashboard} />
+        <Route path="/escort/dashboard/analytics" component={EscortAnalyticsDashboard} />
+        <Route path="/escort/profile/edit" component={EscortProfileEdit} />
+        <Route path="/escort/photos" component={EscortPhotos} />
+        <Route path="/escort/calendar" component={EscortCalendar} />
+        <Route path="/escort/earnings" component={EscortEarnings} />
+
+        {/* Admin Panel */}
+        <Route path="/admin/dashboard" component={AdminDashboard} />
+        <Route path="/admin/approvals" component={AdminApprovals} />
+        <Route path="/admin/panel" component={AdminPanel} />
+        <Route path="/admin/listings" component={AdminListings} />
+        <Route path="/admin/media" component={AdminMedia} />
+        <Route path="/admin/financial" component={AdminFinancial} />
+        <Route path="/admin/messages" component={AdminMessages} />
+        <Route path="/admin/analytics" component={AdminAnalytics} />
+        <Route path="/admin/security" component={AdminSecurity} />
+        <Route path="/admin/notifications" component={AdminNotifications} />
+        <Route path="/admin/settings" component={AdminSettings} />
+        <Route path="/admin/users" component={AdminUsers} />
+        <Route path="/admin/complaints" component={AdminComplaints} />
+        <Route path="/admin/real-time" component={AdminRealTimeMonitoring} />
+        <Route path="/admin/reports" component={AdminReports} />
+
+        {/* Customer Panel */}
+        <Route path="/customer/settings" component={CustomerSettings} />
+        <Route path="/customer/notifications" component={CustomerNotifications} />
+        <Route path="/customer/history" component={CustomerHistory} />
+        <Route path="/customer/wallet" component={CustomerWallet} />
+
+        {/* General */}
+        <Route path="/terms" component={TermsOfService} />
+        <Route path="/privacy" component={PrivacyPolicy} />
+        <Route path="/cookies" component={CookiePolicy} />
+        <Route path="/kvkk" component={KVKK} />
+        <Route path="/safety" component={Safety} />
+        <Route path="/pricing" component={Pricing} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/about" component={About} />
+        <Route path="/faq" component={FAQ} />
+        <Route path="/how-it-works" component={HowItWorks} />
+        <Route path="/support" component={SupportPage} />
+        <Route path="/report" component={ReportPage} />
+        <Route path="/verification" component={VerificationCenter} />
+
+        {/* Payment */}
+        <Route path="/payment/result" component={PaymentResult} />
+        <Route path="/membership/upgrade" component={MembershipUpgrade} />
+        <Route path="/billing" component={BillingDashboard} />
+
+        {/* Advanced */}
+        <Route path="/real-time-messaging" component={RealTimeMessaging} />
+        <Route path="/video-call" component={VideoCallPage} />
+        <Route path="/analytics-page" component={Analytics} />
+        <Route path="/reviews" component={Reviews} />
+
+        {/* 404 */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ROUTER CONFIGURATION
-// ─────────────────────────────────────────────────────────────────────────────
-
-function AppRouter() {
+export default function App() {
   return (
-    <>
-      {/* Home & Catalog - High Priority */}
-      <Route path="/">
-        {() => (
-          <RouteErrorBoundary>
-            <Suspense fallback={<RouteLoading />}>
-              <Home />
-            </Suspense>
-          </RouteErrorBoundary>
-        )}
-      </Route>
-
-      <Route path="/catalog">
-        {() => (
-          <RouteErrorBoundary>
-            <Suspense fallback={<RouteLoading />}>
-              <Catalog />
-            </Suspense>
-          </RouteErrorBoundary>
-        )}
-      </Route>
-
-      <Route path="/escorts">
-        {() => (
-          <RouteErrorBoundary>
-            <Suspense fallback={<RouteLoading />}>
-              <EscortList />
-            </Suspense>
-          </RouteErrorBoundary>
-        )}
-      </Route>
-
-      {/* Guest Catalog - Phase 2 */}
-      <Route path="/guest-catalog">
-        {() => (
-          <RouteErrorBoundary>
-            <Suspense fallback={<RouteLoading />}>
-              <GuestCatalog />
-            </Suspense>
-          </RouteErrorBoundary>
-        )}
-      </Route>
-
-      {/* Profile Pages */}
-      <Route path="/escort/:id">
-        {() => (
-          <RouteErrorBoundary>
-            <Suspense fallback={<RouteLoading />}>
-              <EscortProfile />
-            </Suspense>
-          </RouteErrorBoundary>
-        )}
-      </Route>
-
-      {/* Escort Routes */}
-      <Route path="/login-escort">
-        {() => <Suspense fallback={<RouteLoading />}><EscortLogin /></Suspense>}
-      </Route>
-
-      <Route path="/register-escort">
-        {() => <Suspense fallback={<RouteLoading />}><EscortRegister /></Suspense>}
-      </Route>
-
-      <Route path="/escort/dashboard">
-        {() => <Suspense fallback={<RouteLoading />}><EscortDashboard /></Suspense>}
-      </Route>
-
-      <Route path="/escort/market">
-        {() => <Suspense fallback={<RouteLoading />}><EscortMarket /></Suspense>}
-      </Route>
-
-      {/* Escort Private Dashboard - Phase 3 */}
-      <Route path="/escort/dashboard/private">
-        {() => <Suspense fallback={<RouteLoading />}><EscortPrivateDashboard /></Suspense>}
-      </Route>
-
-      {/* Escort Analytics Dashboard - Phase 3 */}
-      <Route path="/escort/dashboard/analytics">
-        {() => <Suspense fallback={<RouteLoading />}><EscortAnalyticsDashboard /></Suspense>}
-      </Route>
-
-      {/* Escort Panel Pages - Phase 2 (Faz 2) */}
-      <Route path="/escort/profile/edit">
-        {() => <Suspense fallback={<RouteLoading />}><EscortProfileEdit /></Suspense>}
-      </Route>
-
-      <Route path="/escort/photos">
-        {() => <Suspense fallback={<RouteLoading />}><EscortPhotos /></Suspense>}
-      </Route>
-
-      <Route path="/escort/calendar">
-        {() => <Suspense fallback={<RouteLoading />}><EscortCalendar /></Suspense>}
-      </Route>
-
-      <Route path="/escort/earnings">
-        {() => <Suspense fallback={<RouteLoading />}><EscortEarnings /></Suspense>}
-      </Route>
-
-      {/* Client/Customer Routes */}
-      <Route path="/login">
-        {() => <Suspense fallback={<RouteLoading />}><Login /></Suspense>}
-      </Route>
-
-      <Route path="/login-customer">
-        {() => <Suspense fallback={<RouteLoading />}><ClientLogin /></Suspense>}
-      </Route>
-
-      <Route path="/login-client">
-        {() => <Suspense fallback={<RouteLoading />}><ClientLogin /></Suspense>}
-      </Route>
-
-      <Route path="/register-client">
-        {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
-      </Route>
-
-      {/* Generic Register Routes - Redirects to ClientRegister */}
-      <Route path="/register">
-        {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
-      </Route>
-
-      <Route path="/signup">
-        {() => <Suspense fallback={<RouteLoading />}><ClientRegister /></Suspense>}
-      </Route>
-
-      {/* User Dashboard Routes */}
-      <Route path="/favorites">
-        {() => <Suspense fallback={<RouteLoading />}><MyFavorites /></Suspense>}
-      </Route>
-
-      <Route path="/messages">
-        {() => <Suspense fallback={<RouteLoading />}><Messages /></Suspense>}
-      </Route>
-
-      <Route path="/appointments">
-        {() => <Suspense fallback={<RouteLoading />}><MyAppointments /></Suspense>}
-      </Route>
-
-      {/* Customer Dashboard - Phase 2 */}
-      <Route path="/dashboard">
-        {() => <Suspense fallback={<RouteLoading />}><CustomerDashboard /></Suspense>}
-      </Route>
-
-      {/* Admin Routes */}
-      <Route path="/admin/dashboard">
-        {() => <Suspense fallback={<RouteLoading />}><AdminDashboard /></Suspense>}
-      </Route>
-
-      <Route path="/admin/approvals">
-        {() => <Suspense fallback={<RouteLoading />}><AdminApprovals /></Suspense>}
-      </Route>
-
-      <Route path="/admin/panel">
-        {() => <Suspense fallback={<RouteLoading />}><AdminPanel /></Suspense>}
-      </Route>
-
-      <Route path="/admin/listings">
-        {() => <Suspense fallback={<RouteLoading />}><AdminListings /></Suspense>}
-      </Route>
-
-      <Route path="/admin/media">
-        {() => <Suspense fallback={<RouteLoading />}><AdminMedia /></Suspense>}
-      </Route>
-
-      <Route path="/admin/financial">
-        {() => <Suspense fallback={<RouteLoading />}><AdminFinancial /></Suspense>}
-      </Route>
-
-      <Route path="/admin/messages">
-(Content truncated due to size limit. Use line ranges to read remaining content)
+    <NotificationProvider>
+      <TooltipProvider>
+        <div className="min-h-screen bg-background font-sans antialiased">
+          <Header />
+          <main className="pb-20 md:pb-0">
+            <AppRouter />
+          </main>
+          <FloatingNavigation />
+          <NotificationCenter />
+          <NotificationToast />
+          <CookieConsent />
+          <Toaster position="top-right" />
+        </div>
+      </TooltipProvider>
+    </NotificationProvider>
+  );
+}
