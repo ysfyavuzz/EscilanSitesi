@@ -108,8 +108,7 @@ export default class ErrorBoundary extends Component<Props, State> {
    * Log error to external service
    */
   private logErrorToService(error: Error, errorInfo: ErrorInfo) {
-    // TODO: Integrate with error tracking service
-    // Examples: Sentry, LogRocket, Bugsnag, etc.
+    // Hata takip servisi entegrasyonu (Sentry, LogRocket vb.) buraya eklenebilir
 
     const errorData = {
       name: error.name,

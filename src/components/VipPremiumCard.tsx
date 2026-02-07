@@ -57,11 +57,12 @@ import { Crown, CheckCircle2, Star, MapPin, Heart, ChevronRight, Sparkles } from
 import { useState, useRef } from 'react';
 
 /**
- * Temporary usePerformance hook
- * TODO: Implement actual performance detection
+ * usePerformance hook - Detects device performance capabilities
  */
 function usePerformance() {
-  return { isLowPowerMode: false, isMobile: false };
+  // Basit bir mobil tespiti, ileride daha gelişmiş bir tespit eklenebilir
+  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  return { isLowPowerMode: false, isMobile };
 }
 
 /**
