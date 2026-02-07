@@ -48,11 +48,10 @@ export default function Home(): JSX.Element {
   return (
     <div className="min-h-screen bg-background text-foreground">
 
-      
+      {/* Hero Section - Kozmik temalı ana banner */}
       <PremiumHeroBanner 
         title="Lüks ve Seçkin Deneyim"
         subtitle="Türkiye'nin en kaliteli ve güvenilir eskort platformuna hoş geldiniz. Sizin için en iyileri bir araya getirdik."
-        backgroundImage="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200"
         onCtaClick={() => window.location.href = '/catalog'}
         ctaText="Hemen Keşfet"
       />
@@ -169,14 +168,41 @@ export default function Home(): JSX.Element {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+/**
+ * FeatureCard - Özellik Kartı Bileşeni
+ * 
+ * Platform özelliklerini sergileyen 3D ikon kartları.
+ * Kozmik tema ile uyumlu hover efektleri ve floating animasyonlar.
+ * 
+ * @param {Object} props - Bileşen props'ları
+ * @param {React.ReactNode} props.icon - Lucide ikon bileşeni
+ * @param {string} props.title - Özellik başlığı
+ * @param {string} props.description - Özellik açıklaması
+ * @returns {JSX.Element} Render edilmiş özellik kartı
+ */
+function FeatureCard({ 
+  icon, 
+  title, 
+  description 
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+}): JSX.Element {
   return (
     <div className="flex flex-col items-center text-center space-y-4 group">
+      {/* 3D Floating Icon Container */}
       <div className="icon-3d icon-floating p-5">
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-foreground group-hover:text-gradient-cosmic transition-all">{title}</h3>
-      <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+      {/* Title with hover gradient effect */}
+      <h3 className="text-xl font-bold text-foreground group-hover:text-gradient-cosmic transition-all">
+        {title}
+      </h3>
+      {/* Description */}
+      <p className="text-muted-foreground text-sm leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
