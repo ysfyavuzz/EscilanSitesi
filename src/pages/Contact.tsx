@@ -179,7 +179,7 @@ export default function Contact() {
       icon: Phone,
       title: 'Telefon',
       content: '+90 (555) 123-4567',
-      color: 'text-purple-500',
+      color: 'text-blue-500',
     },
     {
       icon: Clock,

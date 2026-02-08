@@ -261,7 +261,7 @@ export default function BillingDashboard() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-black tracking-tighter">Fatura Geçmişi</h2>
-                  <Button variant="link" className="text-purple-500 dark:text-purple-400 font-bold p-0">
+                  <Button variant="link" className="text-blue-500 dark:text-blue-400 font-bold p-0">
                     Tümünü Gör
                   </Button>
                 </div>
@@ -413,7 +413,7 @@ export default function BillingDashboard() {
                 <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <Calendar className="w-10 h-10 text-purple-500 flex-shrink-0" />
+                      <Calendar className="w-10 h-10 text-blue-500 flex-shrink-0" />
                       <div>
                         <h3 className="font-bold mb-1">Sonraki Ödeme</h3>
                         <p className="text-sm text-muted-foreground mb-2">

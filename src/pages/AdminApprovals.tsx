@@ -174,7 +174,7 @@ export default function AdminApprovals() {
                 <p className="text-sm text-gray-600 mb-1">Bekleyen</p>
                 <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
               </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center">
                 <Filter className="w-6 h-6 text-yellow-600" />
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function AdminApprovals() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-4 font-medium transition ${
                     activeTab === tab
-                      ? 'text-pink-600 border-b-2 border-pink-600'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >

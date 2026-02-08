@@ -276,11 +276,11 @@ export default function AdminMessages() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <MessageSquare className="w-5 h-5 text-pink-600" />
+                          <MessageSquare className="w-5 h-5 text-blue-600" />
                           <h3 className="font-semibold text-gray-900">{conversation.subject}</h3>
                           <Badge
                             variant={conversation.status === 'unread' ? 'default' : 'secondary'}
-                            className={conversation.status === 'unread' ? 'bg-orange-500' : ''}
+                            className={conversation.status === 'unread' ? 'bg-sky-500' : ''}
                           >
                             {conversation.status === 'unread' ? 'Okunmamış' : 'Okunmuş'}
                           </Badge>

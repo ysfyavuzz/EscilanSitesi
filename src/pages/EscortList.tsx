@@ -575,7 +575,7 @@ export default function EscortList() {
                         className="border-border/50"
                       />
                       <span className="flex items-center gap-1">
-                        <SparklesIcon className="w-3.5 h-3.5 text-purple-500" />
+                        <SparklesIcon className="w-3.5 h-3.5 text-cyan-500" />
                         Fotoğraflı
                       </span>
                     </label>
@@ -589,7 +589,7 @@ export default function EscortList() {
                         className="border-border/50"
                       />
                       <span className="flex items-center gap-1">
-                        <VideoIcon className="w-3.5 h-3.5 text-pink-500" />
+                        <VideoIcon className="w-3.5 h-3.5 text-blue-500" />
                         Videolu
                       </span>
                     </label>

@@ -48,10 +48,10 @@ export default function AdminPanel() {
                   <div>
                     <p className="text-sm text-gray-500">Bekleyen İlanlar</p>
                     <p className="text-3xl font-bold text-gray-900 mt-1">23</p>
-                    <p className="text-xs text-orange-600 mt-1">İnceleme gerekli</p>
+                    <p className="text-xs text-sky-600 mt-1">İnceleme gerekli</p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <FileCheck className="w-6 h-6 text-orange-600" />
+                  <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+                    <FileCheck className="w-6 h-6 text-sky-600" />
                   </div>
                 </div>
               </Card>
@@ -96,7 +96,7 @@ export default function AdminPanel() {
                   { type: 'report', message: 'Yeni şikayet: İlan #456', time: '2 saat önce' },
                 ].map((activity, index) => (
                   <div key={index} className="flex items-start gap-3 pb-4 border-b last:border-0">
-                    <div className="w-2 h-2 bg-pink-500 rounded-full mt-2" />
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{activity.message}</p>
                       <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
@@ -110,27 +110,27 @@ export default function AdminPanel() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => setActiveSection('users')}
-                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-pink-500 hover:shadow-md transition-all text-left"
+                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all text-left"
               >
-                <Users className="w-8 h-8 text-pink-600 mb-3" />
+                <Users className="w-8 h-8 text-blue-600 mb-3" />
                 <h3 className="font-semibold text-gray-900">Kullanıcı Yönetimi</h3>
                 <p className="text-sm text-gray-500 mt-1">Kullanıcıları görüntüle ve yönet</p>
               </button>
 
               <button
                 onClick={() => setActiveSection('listings')}
-                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-pink-500 hover:shadow-md transition-all text-left"
+                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all text-left"
               >
-                <FileCheck className="w-8 h-8 text-pink-600 mb-3" />
+                <FileCheck className="w-8 h-8 text-cyan-600 mb-3" />
                 <h3 className="font-semibold text-gray-900">İlan Onayları</h3>
                 <p className="text-sm text-gray-500 mt-1">Bekleyen ilanları incele</p>
               </button>
 
               <button
                 onClick={() => setActiveSection('financial')}
-                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-pink-500 hover:shadow-md transition-all text-left"
+                className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all text-left"
               >
-                <DollarSign className="w-8 h-8 text-pink-600 mb-3" />
+                <DollarSign className="w-8 h-8 text-green-600 mb-3" />
                 <h3 className="font-semibold text-gray-900">Finansal Raporlar</h3>
                 <p className="text-sm text-gray-500 mt-1">Gelir ve ödemeler</p>
               </button>

@@ -64,8 +64,8 @@ interface Bildirim {
 const bildirimTurleri: Record<BildirimTuru, { ikon: typeof Bell; renk: string; etiket: string }> = {
   randevu: { ikon: Calendar, renk: 'text-blue-500', etiket: 'Randevu' },
   mesaj: { ikon: MessageSquare, renk: 'text-green-500', etiket: 'Mesaj' },
-  sistem: { ikon: Bell, renk: 'text-purple-500', etiket: 'Sistem' },
-  odeme: { ikon: CreditCard, renk: 'text-pink-500', etiket: 'Ödeme' },
+  sistem: { ikon: Bell, renk: 'text-blue-500', etiket: 'Sistem' },
+  odeme: { ikon: CreditCard, renk: 'text-indigo-500', etiket: 'Ödeme' },
 };
 
 /** Mock bildirim verileri */
@@ -320,7 +320,7 @@ export default function Notifications() {
               <div className="text-sm text-gray-600 dark:text-gray-400">Randevu</div>
             </Card3D>
             <Card3D padding="sm" className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-blue-600">
                 {bildirimler.filter(b => b.tur === 'mesaj').length}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Mesaj</div>

@@ -114,7 +114,7 @@ export default function AdminSecurity() {
 
             <Card className="p-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
                   <AlertTriangle className="w-6 h-6 text-yellow-600" />
                 </div>
                 <div>
@@ -191,7 +191,7 @@ export default function AdminSecurity() {
                 <div key={log.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                     log.severity === 'high' ? 'bg-red-100' :
-                    log.severity === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'
+                    log.severity === 'medium' ? 'bg-sky-100' : 'bg-blue-100'
                   }`}>
                     {log.type === 'blocked' && <Ban className="w-5 h-5 text-red-600" />}
                     {log.type === 'suspicious' && <AlertTriangle className="w-5 h-5 text-yellow-600" />}

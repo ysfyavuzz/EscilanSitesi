@@ -237,7 +237,7 @@ export default function AdminRealTimeMonitoring() {
     const styles = {
       excellent: { bg: 'bg-green-500', label: 'Mükemmel' },
       good: { bg: 'bg-blue-500', label: 'İyi' },
-      fair: { bg: 'bg-yellow-500', label: 'Orta' },
+      fair: { bg: 'bg-sky-500', label: 'Orta' },
       poor: { bg: 'bg-red-500', label: 'Zayıf' },
     };
     const style = styles[quality];
@@ -342,7 +342,7 @@ export default function AdminRealTimeMonitoring() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <MessageCircle className="w-4 h-4 text-purple-500" />
+                      <MessageCircle className="w-4 h-4 text-blue-500" />
                       <p className="text-sm text-muted-foreground">Aktif Sohbet</p>
                     </div>
                     <p className="text-3xl font-bold">{liveStats.activeChats}</p>
@@ -352,7 +352,7 @@ export default function AdminRealTimeMonitoring() {
                     </Badge>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-purple-500" />
+                    <MessageCircle className="w-6 h-6 text-blue-500" />
                   </div>
                 </div>
               </CardContent>
@@ -436,7 +436,7 @@ export default function AdminRealTimeMonitoring() {
                         liveStats.apiLatency < 100
                           ? 'bg-green-500'
                           : liveStats.apiLatency < 200
-                          ? 'bg-yellow-500'
+                          ? 'bg-sky-500'
                           : 'bg-red-500'
                       }`}
                       initial={{ width: 0 }}
@@ -585,7 +585,7 @@ export default function AdminRealTimeMonitoring() {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <MessageCircle className="w-4 h-4 text-purple-500" />
+                            <MessageCircle className="w-4 h-4 text-blue-500" />
                             <span className="font-medium">{chat.participants.join(' ↔ ')}</span>
                             {chat.isFlagged && (
                               <Badge variant="outline" className="text-amber-600 border-amber-500">

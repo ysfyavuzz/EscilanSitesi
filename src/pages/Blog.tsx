@@ -200,8 +200,8 @@ export default function Blog() {
   const categoryColors: Record<string, string> = {
     news: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     tips: 'bg-green-500/10 text-green-500 border-green-500/20',
-    guides: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-    updates: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+    guides: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
+    updates: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
   };
 
   return (
