@@ -296,10 +296,10 @@ export const StandardCard = React.memo(function StandardCard({ escort, stats, ty
               </div>
 
               {/* Price */}
-              <div className="absolute bottom-3 left-3" style={{ transform: "translateZ(15px)" }}>
-                <div className="text-white font-bold text-lg">
+              <div className="absolute bottom-2 left-2" style={{ transform: "translateZ(15px)" }}>
+                <div className="text-white font-bold text-base">
                   ₺{escort.hourlyRate}
-                  <span className="text-[10px] font-normal opacity-70 ml-1">/saat</span>
+                  <span className="text-[9px] font-normal opacity-70 ml-1">/S</span>
                 </div>
               </div>
 
@@ -313,36 +313,33 @@ export const StandardCard = React.memo(function StandardCard({ escort, stats, ty
             </div>
 
             {/* Info Section */}
-            <div className="p-4" style={{ transform: "translateZ(10px)" }}>
-              <h3 className="font-bold text-base mb-1 group-hover:text-primary transition-colors truncate">
+            <div className="p-3" style={{ transform: "translateZ(10px)" }}>
+              <h3 className="font-bold text-sm mb-0.5 group-hover:text-primary transition-colors truncate">
                 {escort.displayName}
               </h3>
-              <div className="flex items-center text-[11px] text-muted-foreground mb-2">
-                <MapPin className="w-3 h-3 mr-1 text-primary" />
+              <div className="flex items-center text-[10px] text-muted-foreground mb-1.5">
+                <MapPin className="w-2.5 h-2.5 mr-1 text-primary" />
                 {escort.city}, {escort.district}
               </div>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-1 mb-2 pb-2 border-b border-white/5">
+              <div className="grid grid-cols-3 gap-1 mb-1.5 pb-1.5 border-b border-white/5">
                 {/* Bookings */}
-                <div className="text-center p-1 rounded bg-primary/5">
-                  <Calendar className="w-3 h-3 mx-auto mb-0.5 text-primary" />
-                  <p className="text-[10px] font-bold">{stats?.totalBookings || 0}</p>
-                  <p className="text-[8px] text-muted-foreground">Randevu</p>
+                <div className="text-center p-0.5 rounded bg-primary/5">
+                  <Calendar className="w-2.5 h-2.5 mx-auto mb-0.5 text-primary" />
+                  <p className="text-[9px] font-bold">{stats?.totalBookings || 0}</p>
                 </div>
 
                 {/* Reviews */}
-                <div className="text-center p-1 rounded bg-amber-500/5">
-                  <MessageCircle className="w-3 h-3 mx-auto mb-0.5 text-amber-500" />
-                  <p className="text-[10px] font-bold">{stats?.totalReviews || 0}</p>
-                  <p className="text-[8px] text-muted-foreground">Yorum</p>
+                <div className="text-center p-0.5 rounded bg-amber-500/5">
+                  <MessageCircle className="w-2.5 h-2.5 mx-auto mb-0.5 text-amber-500" />
+                  <p className="text-[9px] font-bold">{stats?.totalReviews || 0}</p>
                 </div>
 
                 {/* Rating */}
-                <div className="text-center p-1 rounded bg-green-500/5">
-                  <Star className="w-3 h-3 mx-auto mb-0.5 text-green-500 fill-green-500" />
-                  <p className="text-[10px] font-bold">{stats?.averageRating?.toFixed(1) || '5.0'}</p>
-                  <p className="text-[8px] text-muted-foreground">Puan</p>
+                <div className="text-center p-0.5 rounded bg-green-500/5">
+                  <Star className="w-2.5 h-2.5 mx-auto mb-0.5 text-green-500 fill-green-500" />
+                  <p className="text-[9px] font-bold">{stats?.averageRating?.toFixed(1) || '5.0'}</p>
                 </div>
               </div>
 
@@ -350,11 +347,11 @@ export const StandardCard = React.memo(function StandardCard({ escort, stats, ty
               <div className="flex items-center justify-between">
                 {/* Reliability Bar */}
                 <div className="flex-1">
-                  <div className="flex items-center gap-1 mb-1">
-                    <Shield className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] font-semibold text-primary">Güvenilirlik</span>
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <Shield className="w-2.5 h-2.5 text-primary" />
+                    <span className="text-[9px] font-semibold text-primary">Güven</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1 bg-muted rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${reliabilityScore}%` }}
@@ -372,8 +369,8 @@ export const StandardCard = React.memo(function StandardCard({ escort, stats, ty
 
                 {/* Last Seen */}
                 <div className="flex items-center gap-1 ml-2">
-                  <Clock className={`w-3 h-3 ${onlineStatus.statusColor}`} />
-                  <span className={`text-[10px] ${onlineStatus.statusColor}`}>
+                  <Clock className={`w-2.5 h-2.5 ${onlineStatus.statusColor}`} />
+                  <span className={`text-[9px] ${onlineStatus.statusColor}`}>
                     {onlineStatus.isOnline ? 'Aktif' : 'Görüldü'}
                   </span>
                 </div>

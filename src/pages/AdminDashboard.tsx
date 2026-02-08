@@ -47,7 +47,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -64,19 +63,51 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DashboardAuthGuard } from '@/components/DashboardAuthGuard';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import {
   useUpdateSiteSettings,
+  useBanUser,
+  useUnbanUser,
+  useSuspendUser,
+  useVerifyUser,
+  useSetUserMembership,
+  useSetUserFeaturedPosition,
+  useBoostUser,
+  useSetUserVisibility,
+  useDeleteUser,
+  useBulkSetMembership,
+  useBulkBoostUsers,
+  useBulkSetVisibility,
+  useApproveListing,
+  useRejectListing,
+  useDeleteListing,
+  useApproveReview,
+  useRejectReview,
+  useHideReview,
+  useDeleteReview,
 } from '@/hooks/useAdminActions';
+import {
+  usePlatformStats,
+  useRevenueStats,
+  useUserStats,
+  useChartData,
+  useUsers,
+  useListings,
+  useReviews,
+  useReports,
+  usePendingPhotos,
+  useFeaturedEscorts,
+  useSiteSettings,
+  useThemeSettings,
+  useMediaSettings,
+  usePages,
+  useNavigationItems,
+} from '@/hooks/useAdminData';
 import {
   UserX,
   Sliders,
-  ChevronRight,
   Home,
-  MoreHorizontal,
-  ArrowUpDown,
-  X,
   Loader2,
 } from 'lucide-react';
 
@@ -90,11 +121,7 @@ const fadeInVariants = {
   exit: { opacity: 0, y: -10 },
 };
 
-const scaleInVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.95 },
-};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATUS BADGE COMPONENT
@@ -1204,11 +1231,13 @@ export function AdminDashboard() {
                                 type="color"
                                 defaultValue={color.default}
                                 className="w-12 h-10 rounded cursor-pointer border"
+                                aria-label={`${color.name} rengi`}
                               />
                               <input
                                 type="text"
                                 defaultValue={color.default}
                                 className="flex-1 px-3 py-2 border rounded-lg"
+                                aria-label={`${color.name} renk kodu`}
                               />
                             </div>
                           </div>
@@ -1231,7 +1260,7 @@ export function AdminDashboard() {
                       <CardContent className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium mb-2">Ana Başlık Fontu</label>
-                          <select className="w-full px-3 py-2 border rounded-lg">
+                          <select className="w-full px-3 py-2 border rounded-lg" aria-label="Ana Başlık Fontu Seçimi">
                             <option>Inter</option>
                             <option>Poppins</option>
                             <option>Roboto</option>
@@ -1241,7 +1270,7 @@ export function AdminDashboard() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium mb-2">Gövde Fontu</label>
-                          <select className="w-full px-3 py-2 border rounded-lg">
+                          <select className="w-full px-3 py-2 border rounded-lg" aria-label="Gövde Fontu Seçimi">
                             <option>Inter</option>
                             <option>Poppins</option>
                             <option>Roboto</option>
@@ -1256,6 +1285,7 @@ export function AdminDashboard() {
                             max="72"
                             defaultValue="48"
                             className="w-full"
+                            aria-label="Ana Başlık Boyutu"
                           />
                           <div className="flex justify-between text-xs text-muted-foreground">
                             <span>24px</span>
@@ -1280,7 +1310,7 @@ export function AdminDashboard() {
                             <p className="font-medium">Karanlık Mod</p>
                             <p className="text-sm text-muted-foreground">Varsayılan tema</p>
                           </div>
-                          <select className="px-3 py-2 border rounded-lg">
+                          <select className="px-3 py-2 border rounded-lg" aria-label="Görünüm Modu Seçimi">
                             <option>Açık</option>
                             <option>Kapalı</option>
                             <option>Sistem</option>

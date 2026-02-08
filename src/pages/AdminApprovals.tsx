@@ -359,6 +359,7 @@ export default function AdminApprovals() {
                   <button
                     onClick={() => setSelectedEscort(null)}
                     className="text-gray-400 hover:text-gray-600"
+                    aria-label="Kapat"
                   >
                     <X className="w-6 h-6" />
                   </button>

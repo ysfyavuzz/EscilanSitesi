@@ -1065,7 +1065,7 @@ export default function CustomerDashboard() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Şehir</label>
-                        <select className="w-full px-4 py-3 bg-muted/30 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <select className="w-full px-4 py-3 bg-muted/30 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" aria-label="Şehir Seçin">
                           <option value="">Şehir Seçin</option>
                           <option value="istanbul">İstanbul</option>
                           <option value="ankara">Ankara</option>
@@ -1105,7 +1105,7 @@ export default function CustomerDashboard() {
                           <p className="text-sm text-muted-foreground">{item.desc}</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" defaultChecked={item.defaultChecked} className="sr-only peer" />
+                          <input type="checkbox" defaultChecked={item.defaultChecked} className="sr-only peer" aria-label={item.label} />
                           <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </label>
                       </div>

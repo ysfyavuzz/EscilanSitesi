@@ -4,41 +4,42 @@
 
 @layer base {
   :root {
-    /* Default to Celestial (Ice Mode) -> Cyan & White */
+    /* --- NEW: Ice Theme Variables (Migrated from Metallic Corona) --- */
     --color-primary: 6 182 212; /* Cyan 500 */
     --color-primary-light: 236 254 255; /* Cyan 50 */
     --color-primary-dark: 8 145 178; /* Cyan 600 */
     --color-accent: 255 255 255; /* White */
     --color-secondary: 103 232 249; /* Cyan 300 */
     
-    /* Mapping to Escilan System Variables */
-    --primary: 199 89% 48%; /* Sky 500 */
+    /* Mapping to Escilan System Variables - OVERRIDING FOR ICE THEME */
+    --primary: 6 182 212; /* Cyan 500 */
     --primary-foreground: 0 0% 100%;
-    --background: 210 40% 98%; 
+    --background: 236 254 255; /* Very light cyan as background */
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --secondary: 204 94% 94%;
-    --secondary-foreground: 199 89% 48%;
+    --secondary: 103 232 249;
+    --secondary-foreground: 6 182 212;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 204 94% 94%;
-    --accent-foreground: 199 89% 48%;
+    --accent: 255 255 255;
+    --accent-foreground: 6 182 212;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 90%;
+    --border: 6 182 212; /* Cyan border */
     --input: 210 20% 90%;
-    --ring: 199 89% 48%;
+    --ring: 6 182 212;
     --radius: 0.75rem;
     
     /* Glass Effect Variables (Frosty) */
     --glass-bg: rgba(255, 255, 255, 0.8);
     --glass-border: rgba(255, 255, 255, 0.6);
-    --glass-shadow: rgba(14, 165, 233, 0.15);
+    --glass-shadow: rgba(6, 182, 212, 0.15); /* Cyan shadow */
   }
 
+  /* ... (Existing Dark Mode Vars - Keeping as is or adapting if requested, focusing on Light Mode Ice Theme for now) ... */
   .dark {
     /* Cosmic (Dark Mode) -> Deep Blue & Cyan */
     --color-primary: 56 189 248; /* Sky 400 */

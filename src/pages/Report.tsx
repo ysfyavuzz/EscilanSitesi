@@ -447,6 +447,7 @@ export default function Report() {
                               type="button"
                               onClick={() => handleRemoveFile(index)}
                               className="p-1 hover:bg-red-100 rounded-full transition-colors"
+                              aria-label={`${uploaded.file.name} dosyasını kaldır`}
                             >
                               <X className="w-4 h-4 text-red-600" />
                             </button>

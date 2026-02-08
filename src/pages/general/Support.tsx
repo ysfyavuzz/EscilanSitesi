@@ -275,13 +275,13 @@ export default function Support() {
                 
                 <CardContent>
                   <div className="flex gap-4 justify-center">
-                    <button className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center transition-colors">
+                    <button className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                       <Facebook className="w-6 h-6 text-white" />
                     </button>
-                    <button className="w-12 h-12 rounded-full bg-sky-500 hover:bg-sky-600 flex items-center justify-center transition-colors">
+                    <button className="w-12 h-12 rounded-full bg-sky-500 hover:bg-sky-600 flex items-center justify-center transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                       <Twitter className="w-6 h-6 text-white" />
                     </button>
-                    <button className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 flex items-center justify-center transition-colors">
+                    <button className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 flex items-center justify-center transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                       <Instagram className="w-6 h-6 text-white" />
                     </button>
                   </div>

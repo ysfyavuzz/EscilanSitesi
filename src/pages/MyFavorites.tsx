@@ -203,6 +203,7 @@ export default function MyFavorites() {
                           onClick={() => removeFavorite(escort.id)}
                           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                           title="Favorilerden Çıkar"
+                          aria-label="Favorilerden çıkar"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -240,7 +241,7 @@ export default function MyFavorites() {
                           <Phone className="w-4 h-4" />
                           {showPhone === escort.id ? escort.phone : 'Ara'}
                         </button>
-                        <button className="px-4 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700">
+                        <button className="px-4 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700" aria-label="Mesaj Gönder">
                           <MessageCircle className="w-4 h-4" />
                         </button>
                       </div>

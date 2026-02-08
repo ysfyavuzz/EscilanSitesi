@@ -537,12 +537,13 @@ export default function ClientRegister() {
                   <label className="block text-sm font-medium mb-2">Doğum Tarihi</label>
                   <div className="relative">
                     <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      type="date"
-                      value={formData.birthDate}
-                      onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                    />
+                      <input
+                        type="date"
+                        value={formData.birthDate}
+                        onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                        aria-label="Doğum Tarihi"
+                      />
                   </div>
                 </div>
 
@@ -554,6 +555,7 @@ export default function ClientRegister() {
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       className="w-full pl-12 pr-4 py-3 rounded-xl border border-border/50 bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                      aria-label="Şehir Seçimi"
                     >
                       <option value="">Şehir Seçin</option>
                       {cities.map(city => (
@@ -579,6 +581,7 @@ export default function ClientRegister() {
                     checked={formData.agreeTerms}
                     onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
                     className="w-5 h-5 rounded border-border mt-0.5 flex-shrink-0"
+                    aria-label="Kullanım koşullarını kabul ediyorum"
                   />
                   <span className="text-sm">
                     <a href="#" className="text-primary hover:underline">Kullanım koşullarını</a> ve{' '}

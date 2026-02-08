@@ -435,6 +435,7 @@ export default function Notifications() {
                             bildirimSecToggle(bildirim.id);
                           }}
                           className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-600"
+                          aria-label={`${bildirim.baslik} bildirimini seç`}
                         />
 
                         {/* İkon */}
@@ -482,6 +483,7 @@ export default function Notifications() {
                             bildirimSil(bildirim.id);
                           }}
                           className="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          aria-label="Bildirimi Sil"
                         >
                           <X className="h-5 w-5" />
                         </button>

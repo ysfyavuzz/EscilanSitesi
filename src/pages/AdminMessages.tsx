@@ -237,11 +237,12 @@ export default function AdminMessages() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
                 />
               </div>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg"
-              >
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as any)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg"
+                  aria-label="Mesajları filtrele"
+                >
                 <option value="all">Tümü</option>
                 <option value="unread">Okunmamış</option>
                 <option value="inquiry">Sorgular</option>
@@ -328,6 +329,7 @@ export default function AdminMessages() {
                                 selectedConversation?.id === conversation.id ? null : conversation
                               );
                             }}
+                            aria-label="Detayları görüntüle"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -337,6 +339,7 @@ export default function AdminMessages() {
                             size="sm"
                             variant="destructive"
                             onClick={(e) => e.stopPropagation()}
+                            aria-label="Mesajı sil"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

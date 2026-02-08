@@ -209,10 +209,10 @@ export default function EscortProfile() {
                   </Button>
                 </>
               )}
-              <Button variant="outline" size="icon" onClick={() => setIsFavorite(!isFavorite)}>
+              <Button variant="outline" size="icon" onClick={() => setIsFavorite(!isFavorite)} aria-label={isFavorite ? "Favorilerden çıkar" : "Favorilere ekle"}>
                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
               </Button>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" aria-label="Profili paylaş">
                 <Share2 className="w-5 h-5" />
               </Button>
               <Button
@@ -220,6 +220,7 @@ export default function EscortProfile() {
                 size="icon"
                 onClick={() => setIsReportDialogOpen(true)}
                 title="İhbar Et"
+                aria-label="Profili ihbar et"
               >
                 <Flag className="w-5 h-5" />
               </Button>
@@ -270,17 +271,19 @@ export default function EscortProfile() {
                     {/* Navigation Arrows */}
                     {visiblePhotos.length > 1 && (
                       <>
-                        <button
-                          onClick={prevPhoto}
-                          disabled={selectedPhoto === 0}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          <ChevronLeft className="w-6 h-6" />
-                        </button>
+                          <button
+                            onClick={prevPhoto}
+                            disabled={selectedPhoto === 0}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="Önceki fotoğraf"
+                          >
+                            <ChevronLeft className="w-6 h-6" />
+                          </button>
                         <button
                           onClick={nextPhoto}
                           disabled={selectedPhoto === visiblePhotos.length - 1}
                           className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          aria-label="Sonraki fotoğraf"
                         >
                           <ChevronRight className="w-6 h-6" />
                         </button>
@@ -695,6 +698,7 @@ export default function EscortProfile() {
           <button
             onClick={() => setSelectedVideo(null)}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
+            aria-label="Videoyu kapat"
           >
             <X className="w-6 h-6" />
           </button>

@@ -175,11 +175,15 @@ function AppRouter() {
   );
 }
 
+import { AdSpace } from "@/components/AdSpace";
+
 export default function App() {
   return (
     <NotificationProvider>
       <TooltipProvider>
         <div className="min-h-screen bg-background font-sans antialiased">
+          <AdSpace position="left" />
+          <AdSpace position="right" />
           <Header />
           <main className="pb-20 md:pb-0">
             <AppRouter />

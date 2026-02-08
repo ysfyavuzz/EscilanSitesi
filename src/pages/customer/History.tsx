@@ -560,6 +560,7 @@ export default function History() {
                     <button
                       onClick={() => setSecilenRandevu(null)}
                       className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                      aria-label="Kapat"
                     >
                       <X className="h-6 w-6" />
                     </button>

@@ -263,7 +263,10 @@ export default function GuestCatalog() {
                       />
                     </div>
                     <div className="h-10 w-px bg-white/10 hidden md:block self-center" />
-                    <select className="bg-transparent border-none focus:ring-0 px-6 py-4 cursor-pointer">
+                    <select 
+                      className="bg-transparent border-none focus:ring-0 px-6 py-4 cursor-pointer"
+                      aria-label="Şehir seçin"
+                    >
                       <option value="">Tüm Şehirler</option>
                       {cities.map((city) => (
                         <option key={city} value={city}>{city}</option>
@@ -323,6 +326,7 @@ export default function GuestCatalog() {
                   value={filters.sortBy}
                   onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
                   className="px-4 py-2 rounded-lg border border-border/50 bg-background text-sm"
+                  aria-label="Sıralama ölçütü"
                 >
                   <option value="newest">En Yeni</option>
                   <option value="popular">En Popüler</option>
@@ -349,6 +353,7 @@ export default function GuestCatalog() {
                     value={filters.city}
                     onChange={(e) => setFilters({ ...filters, city: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg border border-border/50 bg-background"
+                    aria-label="Şehre göre filtrele"
                   >
                     <option value="">Tümü</option>
                     {cities.map((city) => (
@@ -363,6 +368,7 @@ export default function GuestCatalog() {
                     value={filters.ageRange}
                     onChange={(e) => setFilters({ ...filters, ageRange: e.target.value })}
                     className="w-full px-3 py-2 rounded-lg border border-border/50 bg-background"
+                    aria-label="Yaş aralığına göre filtrele"
                   >
                     <option value="">Tümü</option>
                     <option value="18-25">18-25</option>

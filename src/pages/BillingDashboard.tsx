@@ -32,14 +32,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import SubscriptionPlanSelector, { SubscriptionPlan, BillingCycle, PlanBadge } from '@/components/SubscriptionPlanSelector';
-import InvoiceHistory, { Invoice, InvoiceStatus } from '@/components/InvoiceHistory';
+import { SubscriptionPlan, PlanBadge } from '@/components/SubscriptionPlanSelector';
+import InvoiceHistory, { Invoice } from '@/components/InvoiceHistory';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import {
   CreditCard, Download, Plus, Settings, Crown, Sparkles,
-  Calendar, TrendingUp, AlertCircle, CheckCircle2, FileText,
-  RefreshCw, ExternalLink, HelpCircle, CreditCard as CardIcon
+  Calendar, AlertCircle, 
+  HelpCircle, CreditCard as CardIcon
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';

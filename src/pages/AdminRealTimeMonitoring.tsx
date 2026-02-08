@@ -36,8 +36,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
   Activity, Users, MessageCircle, Video, Phone, Globe,
-  Server, Database, Wifi, WifiOff, AlertTriangle,
-  TrendingUp, TrendingDown, Zap, Clock, MapPin,
+  Server, Wifi, AlertTriangle,
+  TrendingUp, Zap, Clock, MapPin,
   Eye, EyeOff, RefreshCw, Download, Calendar
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -116,7 +116,7 @@ export default function AdminRealTimeMonitoring() {
     apiLatency: 120,
     uptime: 99.9,
   });
-  const [activeCalls, setActiveCalls] = useState<ActiveCall[]>([
+  const [activeCalls] = useState<ActiveCall[]>([
     {
       id: 'call-1',
       participants: ['Ayşe Yılmaz', 'Mehmet Demir'],
@@ -139,7 +139,7 @@ export default function AdminRealTimeMonitoring() {
       quality: 'fair',
     },
   ]);
-  const [activeChats, setActiveChats] = useState<ActiveChat[]>([
+  const [activeChats] = useState<ActiveChat[]>([
     {
       id: 'chat-1',
       participants: ['Ayşe Yılmaz', 'Mehmet Demir'],
@@ -155,7 +155,7 @@ export default function AdminRealTimeMonitoring() {
       isFlagged: true,
     },
   ]);
-  const [alerts, setAlerts] = useState<SystemAlert[]>([
+  const [alerts] = useState<SystemAlert[]>([
     {
       id: 'alert-1',
       type: 'warning',
@@ -171,7 +171,7 @@ export default function AdminRealTimeMonitoring() {
       resolved: true,
     },
   ]);
-  const [geoDistribution, setGeoDistribution] = useState<GeoDistribution[]>([
+  const [geoDistribution] = useState<GeoDistribution[]>([
     { city: 'İstanbul', users: 456, percentage: 37 },
     { city: 'Ankara', users: 234, percentage: 19 },
     { city: 'İzmir', users: 189, percentage: 15 },

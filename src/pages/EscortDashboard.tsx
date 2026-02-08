@@ -916,28 +916,28 @@ export default function EscortDashboard() {
                       <p className="font-medium">Profil Görünürlük</p>
                       <p className="text-sm text-muted-foreground">Profiliniz aramalarda gösterilsin</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="w-5 h-5" />
+                    <input type="checkbox" defaultChecked className="w-5 h-5" aria-label="Profil Görünürlüğünü Değiştir" />
                   </div>
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <p className="font-medium">Mesaj Bildirimleri</p>
                       <p className="text-sm text-muted-foreground">Yeni mesajlarda bildirim alın</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="w-5 h-5" />
+                    <input type="checkbox" defaultChecked className="w-5 h-5" aria-label="Mesaj Bildirimlerini Aç/Kapat" />
                   </div>
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <p className="font-medium">Randevu Bildirimleri</p>
                       <p className="text-sm text-muted-foreground">Yeni randevu taleplerinde bildirim alın</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="w-5 h-5" />
+                    <input type="checkbox" defaultChecked className="w-5 h-5" aria-label="Randevu Bildirimlerini Aç/Kapat" />
                   </div>
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <p className="font-medium">Promosyonlar</p>
                       <p className="text-sm text-muted-foreground">Promosyon ve kampanya bilgileri alın</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="w-5 h-5" />
+                    <input type="checkbox" defaultChecked className="w-5 h-5" aria-label="Promosyon Bildirimlerini Aç/Kapat" />
                   </div>
                 </CardContent>
               </Card>

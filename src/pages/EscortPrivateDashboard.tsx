@@ -592,7 +592,7 @@ export default function EscortPrivateDashboard() {
                       <span className="font-semibold">{mockEarnings.todayViews} görüntülenme</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{ width: '70%' }} />
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-[70%]" />
                     </div>
                   </div>
 
@@ -602,7 +602,7 @@ export default function EscortPrivateDashboard() {
                       <span className="font-semibold">{mockEarnings.weekViews} görüntülenme</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{ width: '85%' }} />
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-[85%]" />
                     </div>
                   </div>
 
