@@ -31,8 +31,12 @@
  * ```
  */
 
+import { useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Link } from 'wouter';
 import {
   Select,
   SelectContent,
@@ -87,6 +91,9 @@ import {
   useRejectReview,
   useHideReview,
   useDeleteReview,
+  useUpdateReportStatus,
+  useApprovePhoto,
+  useRejectPhoto,
 } from '@/hooks/useAdminActions';
 import {
   usePlatformStats,
@@ -105,11 +112,64 @@ import {
   usePages,
   useNavigationItems,
 } from '@/hooks/useAdminData';
+import AdminMediaApprovals from '@/pages/admin/AdminMediaApprovals'; // Yeni eklenen
+import type {
+  AdminTab,
+  AdminUser,
+  AdminListing,
+  AdminReview,
+  AdminReport,
+  UserFilters,
+  ListingFilters,
+  ReviewFilters,
+  ReportFilters,
+  UserStatus as UserStatusType,
+  ListingStatus as ListingStatusType,
+  ReviewStatus as ReviewStatusType,
+  ReportStatus as ReportStatusType,
+} from '@/types/admin';
 import {
   UserX,
   Sliders,
   Home,
   Loader2,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  XCircle,
+  Eye,
+  Search,
+  FileText,
+  Plus,
+  Users,
+  DollarSign,
+  Activity,
+  Shield,
+  RefreshCw,
+  Download,
+  BarChart3,
+  Star,
+  Settings,
+  Palette,
+  Sparkles,
+  ImageIcon,
+  FileEdit,
+  Menu,
+  Crown,
+  Zap,
+  TrendingUp,
+  ChevronDown,
+  Ban,
+  EyeOff,
+  Type,
+  Monitor,
+  LayoutDashboard,
+  Crop,
+  RotateCw,
+  GripVertical,
+  Trash2,
+  ShieldCheck,
+  Unlock,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -566,6 +626,10 @@ export function AdminDashboard() {
                 <TabsTrigger value="showcase" className="rounded-md">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Vitrin
+                </TabsTrigger>
+                <TabsTrigger value="media-approvals" className="rounded-md">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Medya Onayları
                 </TabsTrigger>
                 <TabsTrigger value="media" className="rounded-md">
                   <ImageIcon className="w-4 h-4 mr-2" />
@@ -1415,6 +1479,18 @@ export function AdminDashboard() {
                       </CardContent>
                     </Card>
                   </div>
+                </motion.div>
+              </TabsContent>
+
+// TabsContent for Media Approvals
+              <TabsContent value="media-approvals">
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeInVariants}
+                >
+                  <AdminMediaApprovals />
                 </motion.div>
               </TabsContent>
 

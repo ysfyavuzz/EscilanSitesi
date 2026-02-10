@@ -45,7 +45,7 @@ export const PremiumCard: React.FC<PremiumCardProps> = ({
   return (
     <motion.div
       className={`
-        ${variantClasses[variant]}
+        ${variantClasses[variant]} glass-panel
         ${hoverable ? glowClasses[glowColor] : ''}
         ${className}
       `}

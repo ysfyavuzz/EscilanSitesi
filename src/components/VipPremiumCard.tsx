@@ -52,7 +52,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+
 import { Crown, CheckCircle2, Star, MapPin, Heart, ChevronRight, Sparkles } from "lucide-react";
 import { useState, useRef } from 'react';
 
@@ -70,9 +70,10 @@ function usePerformance() {
  */
 interface VipPremiumCardProps {
   escort: any;
+  onClick?: (escortId: string) => void;
 }
 
-export const VipPremiumCard = React.memo(function VipPremiumCard({ escort }: VipPremiumCardProps) {
+export const VipPremiumCard = React.memo(function VipPremiumCard({ escort, onClick }: VipPremiumCardProps) {
   const { isLowPowerMode, isMobile } = usePerformance();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -114,9 +115,9 @@ export const VipPremiumCard = React.memo(function VipPremiumCard({ escort }: Vip
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className="relative w-full max-w-[450px] aspect-[3/4.8] group cursor-pointer"
+      onClick={() => onClick && onClick(escort.id)}
     >
-      <Link href={`/escort/${escort.id}`}>
-        <Card className="w-full h-full vip-premium-frame overflow-hidden rounded-3xl bg-black border-0 shadow-2xl">
+      <Card className="w-full h-full vip-premium-frame glass-panel overflow-hidden rounded-3xl bg-black border-0 shadow-2xl">
           <CardContent className="p-0 h-full relative">
             {/* 3D Glow Effect - Enhanced */}
             <div className="vip-card-glow" />
@@ -193,7 +194,6 @@ export const VipPremiumCard = React.memo(function VipPremiumCard({ escort }: Vip
             </div>
           </CardContent>
         </Card>
-      </Link>
     </motion.div>
   );
 });

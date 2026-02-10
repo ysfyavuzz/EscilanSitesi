@@ -137,6 +137,33 @@ export function Footer() {
 
                 <Separator className="my-12 bg-white/5" />
 
+                {/* Escort & Model Entry Point - İzole Edilmiş Alan */}
+                <div className="bg-gradient-to-r from-amber-500/5 to-purple-500/5 rounded-3xl p-8 mb-12 border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20">
+                            <Shield className="w-8 h-8 text-amber-500" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-white mb-1">Escort & Model Paneli</h3>
+                            <p className="text-muted-foreground text-sm max-w-sm">
+                                Profesyonel kadromuza katılın, profilinizi yönetin ve kazancınızı takip edin.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <Link href="/register-escort" className="flex-1 md:flex-none">
+                            <button className="w-full px-6 py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-all text-sm">
+                                Hemen Kaydol
+                            </button>
+                        </Link>
+                        <Link href="/login-escort" className="flex-1 md:flex-none">
+                            <button className="w-full px-6 py-3 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold hover:bg-amber-500/20 transition-all text-sm">
+                                Escort Girişi
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+
                 {/* Bottom Bar */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-muted-foreground">
                     <p className="flex items-center gap-1">

@@ -1290,6 +1290,64 @@ export const mockEscorts: EscortProfile[] = [
     isOnline: true,
     verificationStatus: 'verified',
   },
+  // AI Girlfriend Planet eklendi
+  {
+    id: 'ia-girlfriend',
+    displayName: 'AI Girlfriend Planet',
+    city: 'Virtual',
+    district: 'Metaverse',
+    age: 1, // Yaşı temsil etmez, sadece sayısal olması için
+    height: 165, // Varsayılan
+    weight: 50,  // Varsayılan
+    bodyType: 'average',
+    ethnicity: 'AI',
+    hairColor: 'N/A',
+    eyeColor: 'N/A',
+    hourlyRate: 0, // Ücretsiz veya farklı bir model olabilir
+    isVip: true, // Özel bir gezegen olduğu için
+    isVerifiedByAdmin: true, // Gelecek özelliği temsil ettiği için doğrulanmış kabul edelim
+    profilePhoto: 'https://api.dicebear.com/7.x/bottts/svg?seed=AIGirlfriend', // AI gezegeni için robot avatarı
+    photos: [], // Placeholder
+    videos: [], // Placeholder
+    services: ['virtual_companion', 'ai_chat', 'custom_character'],
+    languages: ['English', 'Turkish', 'AI Model'],
+    about: 'Geleceğin sanal arkadaşlık deneyimi yakında burada!',
+    description: 'Karakterinizi yaratın, yayınlayın ve sohbet edin.',
+    smoking: 'no',
+    alcohol: 'no',
+    availability: {
+      monday: true,
+      tuesday: true,
+      wednesday: true,
+      thursday: true,
+      friday: true,
+      saturday: true,
+      sunday: true,
+    },
+    workingHours: {
+      start: '00:00',
+      end: '23:59',
+    },
+    stats: {
+      totalBookings: 0,
+      totalReviews: 0,
+      averageRating: 0,
+      responseRate: 0,
+      responseTime: 0,
+      completedBookings: 0,
+      cancelledBookings: 0,
+      viewCount: 0,
+    },
+    earnings: {
+      totalEarned: 0,
+      thisMonth: 0,
+      lastMonth: 0,
+    },
+    joinDate: '2024-01-01', // Placeholder
+    lastSeen: '2024-01-01T00:00:00Z', // Placeholder
+    isOnline: true,
+    verificationStatus: 'verified',
+  },
 ];
 
 /**

@@ -200,7 +200,7 @@ export default function EscUserProfileCard({
   }, [profile.lastUpdated]);
 
   return (
-    <Card className="card-premium overflow-hidden">
+    <Card className="card-premium glass-panel overflow-hidden">
       {/* Profile Header */}
       <div className="relative bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6">
         {/* VIP Badge */}
@@ -405,7 +405,7 @@ export function EscUserProfileCardCompact({
 
   return (
     <Card
-      className="card-premium hover:border-primary/50 transition-colors cursor-pointer"
+      className="card-premium glass-panel hover:border-primary/50 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <CardContent className="p-4">

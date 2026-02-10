@@ -322,7 +322,7 @@ class PushNotificationService {
    * Update document title with badge count
    */
   private updateDocumentTitle(): void {
-    const baseTitle = 'Escilan - Masaj & Escort Platformu';
+    const baseTitle = 'Escilan - Escort İlan Platformu';
     
     if (this.badgeCount > 0) {
       document.title = `(${this.badgeCount}) ${baseTitle}`;

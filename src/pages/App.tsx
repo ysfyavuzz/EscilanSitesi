@@ -11,9 +11,11 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { NotificationToast, NotificationCenter } from "@/components/Notifications";
 import { FloatingNavigation } from "@/components/FloatingNavigation";
 import { Header } from "@/components/Header";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import NotFound from "@/pages/NotFound";
 import { SpaceBackground } from "@/components/SpaceBackground";
+import { StarryBackground } from "@/components/StarryBackground";
+import { AdSpace } from "@/components/AdSpace";
 
 // LAZY LOADED ROUTES
 const Home = lazy(() => import("@/pages/Home"));
@@ -32,10 +34,11 @@ const ClientRegister = lazy(() => import("@/pages/ClientRegister"));
 const MyFavorites = lazy(() => import("@/pages/MyFavorites"));
 const Messages = lazy(() => import("@/pages/Messages"));
 const MyAppointments = lazy(() => import("@/pages/MyAppointments"));
-const EscortDashboard = lazy(() => import("@/pages/EscortDashboard"));
+const EscortDashboard = lazy(() => import("@/pages/dashboard/EscortDashboard")); // Update path
 const EscortMarket = lazy(() => import("@/pages/EscortMarket"));
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const AdminApprovals = lazy(() => import("@/pages/AdminApprovals"));
+const AdminMediaApprovals = lazy(() => import("@/pages/admin/AdminMediaApprovals")); // New
 const AdminListings = lazy(() => import("@/pages/AdminListings"));
 const AdminMedia = lazy(() => import("@/pages/AdminMedia"));
 const AdminFinancial = lazy(() => import("@/pages/AdminFinancial"));
@@ -70,7 +73,10 @@ const About = lazy(() => import("@/pages/general/About"));
 const FAQ = lazy(() => import("@/pages/general/FAQ"));
 const HowItWorks = lazy(() => import("@/pages/general/HowItWorks"));
 const SupportPage = lazy(() => import("@/pages/general/Support"));
-const EscortProfileEdit = lazy(() => import("@/pages/escort/ProfileEdit"));
+const ProfileEditor = lazy(() => import("@/pages/dashboard/ProfileEditor")); // Update path
+const ScheduleManager = lazy(() => import("@/pages/dashboard/ScheduleManager")); // New
+const InteractionsCenter = lazy(() => import("@/pages/dashboard/InteractionsCenter")); // New
+const ImageEditor = lazy(() => import("@/pages/dashboard/ImageEditor")); // New
 const EscortPhotos = lazy(() => import("@/pages/escort/PhotoManager"));
 const EscortCalendar = lazy(() => import("@/pages/escort/CalendarManager"));
 const EscortEarnings = lazy(() => import("@/pages/escort/EarningsReport"));
@@ -109,18 +115,22 @@ function AppRouter() {
         <Route path="/appointments" component={MyAppointments} />
         
         {/* Escort Panel */}
-        <Route path="/escort/dashboard" component={EscortDashboard} />
-        <Route path="/escort/market" component={EscortMarket} />
-        <Route path="/escort/dashboard/private" component={EscortPrivateDashboard} />
-        <Route path="/escort/dashboard/analytics" component={EscortAnalyticsDashboard} />
-        <Route path="/escort/profile/edit" component={EscortProfileEdit} />
-        <Route path="/escort/photos" component={EscortPhotos} />
-        <Route path="/escort/calendar" component={EscortCalendar} />
-        <Route path="/escort/earnings" component={EscortEarnings} />
+        <Route path="/dashboard" component={EscortDashboard} /> {/* Ana Dashboard */}
+        <Route path="/dashboard/profile" component={ProfileEditor} />
+        <Route path="/dashboard/schedule" component={ScheduleManager} />
+        <Route path="/dashboard/interactions" component={InteractionsCenter} />
+        <Route path="/dashboard/image-editor" component={ImageEditor} />
+        {/* <Route path="/escort/market" component={EscortMarket} /> */} {/* Henüz DashboardLayout'a entegre değil */}
+        {/* <Route path="/escort/dashboard/private" component={EscortPrivateDashboard} /> */}
+        {/* <Route path="/escort/dashboard/analytics" component={EscortAnalyticsDashboard} /> */}
+        {/* <Route path="/escort/photos" component={EscortPhotos} /> */}
+        {/* <Route path="/escort/calendar" component={EscortCalendar} /> */}
+        {/* <Route path="/escort/earnings" component={EscortEarnings} /> */}
 
         {/* Admin Panel */}
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route path="/admin/approvals" component={AdminApprovals} />
+        <Route path="/admin/media-approvals" component={AdminMediaApprovals} />
         <Route path="/admin/panel" component={AdminPanel} />
         <Route path="/admin/listings" component={AdminListings} />
         <Route path="/admin/media" component={AdminMedia} />
@@ -175,18 +185,21 @@ function AppRouter() {
   );
 }
 
-import { AdSpace } from "@/components/AdSpace";
-
 export default function App() {
+  const [location] = useLocation();
+  const isHomePage = location === "/";
+
   return (
     <NotificationProvider>
       <TooltipProvider>
-        <div className="min-h-screen bg-background font-sans antialiased relative selection:bg-primary/30">
-          <SpaceBackground />
+        <div className="min-h-screen bg-background font-sans antialiased relative selection:bg-primary/30 text-white">
+          {/* Koşullu Arka Plan Yönetimi */}
+          {isHomePage ? <SpaceBackground /> : <StarryBackground />}
+          
           <AdSpace position="left" />
           <AdSpace position="right" />
           <Header />
-          <main className="pb-20 md:pb-0">
+          <main className="pb-20 md:pb-0 2xl:pl-[180px] 2xl:pr-[180px]">
             <AppRouter />
           </main>
           <FloatingNavigation />

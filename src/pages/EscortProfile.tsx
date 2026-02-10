@@ -1,728 +1,342 @@
 /**
- * Escort Profile Page
+ * Escort Profile Page (Galaxy Edition)
  * 
- * Detailed individual escort profile page with comprehensive information display.
- * Shows photo gallery, video content, bio, services, availability, rates, and contact options.
- * Implements VIP content locks and social proof elements for premium profiles.
- * 
- * @module pages/EscortProfile
- * @category Pages - Public
- * 
- * Features:
- * - High-resolution photo gallery with fullscreen lightbox viewer
- * - Photo carousel with navigation arrows and counter
- * - Video content gallery with thumbnail previews
- * - Fullscreen video player modal with playback controls
- * - Complete bio and personal description
- * - Services offered with detailed descriptions
- * - Hourly, overnight, and custom rate displays
- * - Real-time availability status
- * - Verified badge and profile badges
- * - Review section with ratings and testimonials
- * - Recommendation and booking statistics
- * - Contact buttons (call, message, WhatsApp)
- * - Add to favorites functionality
- * - Responsive design for mobile and desktop
- * - VIP content locks for premium information
- * 
- * Profile Sections:
- * - Header: Photo, name, rating, verification badges
- * - Gallery: Photo lightbox, video gallery with modal player
- * - About: Bio, personality description, languages
- * - Services: Full service menu with pricing
- * - Availability: Schedule display
- * - Reviews: Client testimonials and ratings
- * - Contact: Multiple contact methods
- * 
- * @example
- * ```tsx
- * // Route: /escort/:id
- * // Route: /profile/:escortId
- * <EscortProfile />
- * ```
+ * "Deep Space Luxury" temasına uygun, ultra-modern ve detaylı profil sayfası.
+ * Dinamik içerik kısıtlama, glassmorphism ve premium animasyonlar içerir.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  MapPin, Star, Heart, CheckCircle2, MessageCircle, 
+  Phone, ArrowLeft, Share2, Shield, Clock, Ruler, 
+  Weight, Palette, Eye, Info, Crown, Play, X,
+  ExternalLink, Calendar, Languages
+} from 'lucide-react';
+
+// Domain & Service
+import { ListingProfile } from '@/types/domain';
+import { listingService } from '@/services/listingService';
+
+// UI Components
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import {
-  MapPin, Phone, MessageCircle, Star, Eye, Calendar, ArrowLeft,
-  Crown, CheckCircle2, Heart, Clock, User, Ruler, Weight,
-  Palette, Eye as EyeIcon, Sparkles, Shield, Info, AlertTriangle,
-  Mail, Share2, Flag, ChevronLeft, ChevronRight, X, Lock, Play,
-  Video, LogIn, Edit, BarChart3
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { mockMasseuses, getVisiblePhotoCount, getVisibleVideoCount, VIEW_LIMITS, type UserRole } from '@/mockData';
-import { useAuth } from '@/contexts/AuthContext';
-import { getStoredRole } from '@/components/RoleSelector';
-import ContactLock, { ContactLockCompact } from '@/components/ContactLock';
-import PhotoGalleryEnhanced from '@/components/PhotoGalleryEnhanced';
-import { ReportEscortDialog } from '@/components/ReportEscortDialog';
 
 export default function EscortProfile() {
-  const { id } = useParams<{ id: string }>();
-  const { viewRole, isAuthenticated, user } = useAuth();
-  const userRole = getStoredRole();
-
-  const [selectedPhoto, setSelectedPhoto] = useState(0);
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const { slug } = useParams<{ slug: string }>();
+  const [profile, setProfile] = useState<ListingProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activePhoto, setActivePhoto] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showPhone, setShowPhone] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
-  // Escort profili görüntüleme kontrolü
-  // Escort kullanıcıları doğrudan kendi profillerini görebilir
-  // Müşteri kullanıcıları için giriş gerekli
-  const isEscortViewing = userRole === 'escort';
-  const requiresAuthForContact = !isAuthenticated && !isEscortViewing;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!slug) return;
+      setIsLoading(true);
+      try {
+        const data = await listingService.getListingBySlug(slug);
+        setProfile(data);
+      } catch (error) {
+        console.error("Profil yüklenirken hata:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [slug]);
 
-  // Mock data'dan profil bul
-  const profile = mockMasseuses.find(m => m.id === id);
-
-  if (!profile) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="card-premium p-16 text-center max-w-2xl mx-auto">
-          <AlertTriangle className="w-20 h-20 mx-auto mb-6 text-muted-foreground/30" />
-          <h3 className="text-3xl font-bold mb-3">Profil Bulunamadı</h3>
-          <p className="text-muted-foreground mb-8 text-lg">
-            Aradığınız profil bulunamadı veya kaldırılmış olabilir.
-          </p>
-          <Link href="/escorts">
-            <Button size="lg" className="bg-gradient-to-r from-primary to-accent">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Kataloga Dön
-            </Button>
-          </Link>
-        </Card>
+      <div className="min-h-screen bg-[#020205] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Fallback değerler
-  const displayProfile = {
-    ...profile,
-    avatar: profile.profilePhoto || 'https://via.placeholder.com/150',
-    name: profile.displayName,
-    location: `${profile.city}, ${profile.district}`,
-    bio: 'Merhaba! Ben kaliteli zaman geçirmeyi seven, bakımlı ve zarif bir bayanım. ' +
-      'Güler yüzlü ve samimi tavırlarımla sizleri rahat ettirmeyi hedefliyorum. ' +
-      'Temizliğe ve hijyene önem veriyorum.',
-    phone: '+90 555 123 4567',
-    whatsapp: '+90 555 123 4567',
-    services: ['Masaj', 'Eşlik Hizmeti', 'Akşam Yemeği', 'Etkinliklere Katılım', 'Gezi Turu'],
-    languages: ['Türkçe', 'İngilizce'],
-    availableDays: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
-    availableHours: '10:00 - 22:00',
-    hairColor: 'Kahverengi',
-    eyeColor: 'Kahverengi',
-    bodyType: 'Atletik',
-    viewCount: Math.floor(Math.random() * 500) + 100
-  };
-
-  // Profilin toplam fotoğraf ve video sayıları
-  const totalPhotos = profile.photos?.length || 1;
-  const totalVideos = profile.videos?.length || 0;
-
-  // Kullanıcının görebileceği fotoğraf ve video sayıları
-  const visiblePhotoCount = useMemo(
-    () => getVisiblePhotoCount(totalPhotos, viewRole),
-    [totalPhotos, viewRole]
-  );
-  const visibleVideoCount = useMemo(
-    () => getVisibleVideoCount(totalVideos, viewRole),
-    [totalVideos, viewRole]
-  );
-
-  // Görüntülenebilir fotoğraflar
-  const visiblePhotos = profile.photos?.slice(0, visiblePhotoCount) || [displayProfile.avatar];
-
-  // Görüntülenebilir videolar
-  const visibleVideos = profile.videos?.slice(0, visibleVideoCount) || [];
-
-  // Kilitli içerik var mı?
-  const hasLockedPhotos = totalPhotos > visiblePhotoCount;
-  const hasLockedVideos = totalVideos > visibleVideoCount;
-
-  // Mevcut limitler
-  const currentLimits = VIEW_LIMITS[viewRole];
-  const canViewAllPhotos = !hasLockedPhotos;
-  const canViewAllVideos = !hasLockedVideos;
-
-  const nextPhoto = () => {
-    if (selectedPhoto < visiblePhotos.length - 1) {
-      setSelectedPhoto(prev => prev + 1);
-    }
-  };
-  const prevPhoto = () => {
-    if (selectedPhoto > 0) {
-      setSelectedPhoto(prev => prev - 1);
-    }
-  };
-
-  const physicalFeatures = [
-    { label: 'Yaş', value: displayProfile.age, icon: User },
-    { label: 'Boy', value: `${displayProfile.height} cm`, icon: Ruler },
-    { label: 'Kilo', value: `${displayProfile.weight} kg`, icon: Weight },
-    { label: 'Saç Rengi', value: displayProfile.hairColor, icon: Palette },
-    { label: 'Göz Rengi', value: displayProfile.eyeColor, icon: EyeIcon },
-    { label: 'Vücut Tipi', value: displayProfile.bodyType, icon: Sparkles },
-  ];
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#020205] flex flex-col items-center justify-center p-4">
+        <h2 className="text-3xl font-bold text-white mb-4 font-orbitron">Profil Bulunamadı</h2>
+        <Link href="/escorts">
+          <Button variant="outline" className="border-white/10 text-gray-400">
+            Kataloğa Geri Dön
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/escorts">
-              <Button variant="ghost" size="lg" className="hover:text-primary">
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                Geri Dön
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              {/* Escort-specific actions */}
-              {isEscortViewing && (
-                <>
-                  <Link href="/escort/dashboard/private">
-                    <Button variant="outline" size="sm" className="hidden sm:flex">
-                      <Shield className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/escort/dashboard/analytics">
-                    <Button variant="outline" size="sm" className="hidden sm:flex">
-                      <BarChart3 className="w-4 h-4 mr-2" />
-                      Analitik
-                    </Button>
-                  </Link>
-                  <Button variant="outline" size="sm" className="hidden sm:flex">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Düzenle
-                  </Button>
-                </>
+    <div className="min-h-screen bg-[#020205] text-white pb-32">
+      {/* --- HERO SECTION --- */}
+      <div className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
+        {/* Background Blur Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={profile.coverImage} 
+            className="w-full h-full object-cover blur-2xl opacity-30 scale-110" 
+            alt="Background blur"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020205]/80 to-[#020205]" />
+        </div>
+
+        <div className="container mx-auto px-4 h-full relative z-10 flex flex-col justify-end pb-12">
+          <Link href="/escorts">
+            <motion.button 
+              whileHover={{ x: -5 }}
+              className="absolute top-8 left-4 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" /> Geri Dön
+            </motion.button>
+          </Link>
+
+          <div className="flex flex-col md:flex-row gap-8 items-end">
+            {/* Main Profile Photo */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative group cursor-pointer"
+              onClick={() => setShowVideo(true)}
+            >
+              <div className="w-48 h-64 md:w-64 md:h-80 rounded-[32px] overflow-hidden border-2 border-white/20 shadow-2xl relative">
+                <img 
+                  src={profile.coverImage} 
+                  className="w-full h-full object-cover" 
+                  alt={profile.displayName} 
+                />
+                {profile.thumbnailVideo && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                      <Play className="w-6 h-6 text-white fill-white" />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {profile.verificationStatus === 'verified' && (
+                <div className="absolute -bottom-4 -right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg border-4 border-[#020205]">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
               )}
-              <Button variant="outline" size="icon" onClick={() => setIsFavorite(!isFavorite)} aria-label={isFavorite ? "Favorilerden çıkar" : "Favorilere ekle"}>
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-              </Button>
-              <Button variant="outline" size="icon" aria-label="Profili paylaş">
-                <Share2 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setIsReportDialogOpen(true)}
-                title="İhbar Et"
-                aria-label="Profili ihbar et"
-              >
-                <Flag className="w-5 h-5" />
-              </Button>
+            </motion.div>
+
+            {/* Profile Brief Info */}
+            <div className="flex-1 space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-4xl md:text-6xl font-black font-orbitron tracking-tight text-white">
+                  {profile.displayName}
+                </h1>
+                <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 px-3 py-1">
+                  {profile.age} Yaş
+                </Badge>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-6 text-gray-400">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-purple-400" />
+                  <span>{profile.city}, {profile.district}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                  <span className="font-bold text-white">{profile.rating}</span>
+                  <span className="text-sm">({profile.reviewCount} Yorum)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-blue-400" />
+                  <span>{profile.viewCount} Görüntülenme</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {profile.services.slice(0, 4).map(s => (
+                  <span key={s} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
+                    {s}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* View Role Banner - Show when user has limited access */}
-      {!canViewAllPhotos && (
-        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-b border-amber-500/30">
-          <div className="container py-3">
-            <div className="flex items-center justify-center gap-3">
-              <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
-                {currentLimits.label} olarak {visiblePhotoCount} fotoğraf görebilirsiniz.
-              </span>
-              <Link href="/vip">
-                <Button size="sm" variant="outline" className="h-7 text-xs border-amber-500/50 hover:bg-amber-500/10">
-                  <Crown className="w-3 h-3 mr-1" />
-                  VIP'e Geç
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="container py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Photos */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Main Photo */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <Card className="card-premium overflow-hidden group">
-                  <div className="aspect-[4/3] relative bg-gradient-to-br from-primary/10 to-accent/10">
-                    <img
-                      src={visiblePhotos[selectedPhoto]}
-                      alt={displayProfile.name}
-                      className="w-full h-full object-cover cursor-pointer"
-                      onClick={() => setIsGalleryOpen(true)}
-                    />
-
-                    {/* Navigation Arrows */}
-                    {visiblePhotos.length > 1 && (
-                      <>
-                          <button
-                            onClick={prevPhoto}
-                            disabled={selectedPhoto === 0}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                            aria-label="Önceki fotoğraf"
-                          >
-                            <ChevronLeft className="w-6 h-6" />
-                          </button>
-                        <button
-                          onClick={nextPhoto}
-                          disabled={selectedPhoto === visiblePhotos.length - 1}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Sonraki fotoğraf"
-                        >
-                          <ChevronRight className="w-6 h-6" />
-                        </button>
-                      </>
-                    )}
-
-                    {/* Photo Counter with lock status */}
-                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/70 text-white text-sm">
-                      {selectedPhoto + 1} / {hasLockedPhotos ? `${visiblePhotoCount}+` : totalPhotos}
-                      {hasLockedPhotos && <Lock className="w-3 h-3 inline ml-1 text-amber-400" />}
-                    </div>
-
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                      {displayProfile.isVip && (
-                        <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-lg animate-pulse px-3 py-1">
-                          <Crown className="w-4 h-4 mr-1" />
-                          VIP
-                        </Badge>
-                      )}
-                      {displayProfile.isVerifiedByAdmin && (
-                        <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg px-3 py-1">
-                          <CheckCircle2 className="w-4 h-4 mr-1" />
-                          Onaylı
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-
-              {/* Thumbnail Grid with Lock Overlays */}
-              <div className="grid grid-cols-5 gap-2">
-                {visiblePhotos.map((photo, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedPhoto(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${selectedPhoto === index
-                      ? 'border-primary shadow-lg scale-105'
-                      : 'border-border/50 hover:border-primary/50'
-                      }`}
+      {/* --- CONTENT GRID --- */}
+      <div className="container mx-auto px-4 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* Left Column: Media & Info */}
+          <div className="lg:col-span-8 space-y-12">
+            
+            {/* Gallery Section */}
+            <section>
+              <h2 className="text-2xl font-bold font-orbitron mb-6 flex items-center gap-2">
+                <Star className="w-6 h-6 text-amber-500" /> GALAKSİ GALERİSİ
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { url: profile.coverImage, id: 'cover' }, 
+                  ...profile.gallery
+                ].map((item, idx) => (
+                  <motion.div 
+                    key={idx}
+                    whileHover={{ scale: 1.05 }}
+                    className="aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 cursor-pointer bg-white/5"
                   >
-                    <img
-                      src={photo}
-                      alt={`Photo ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                    <img src={item.url || (item as any)} className="w-full h-full object-cover" alt={`Gallery ${idx}`} />
+                  </motion.div>
                 ))}
-
-                {/* Locked Photo Thumbnails */}
-                {hasLockedPhotos && [...Array(Math.min(5, totalPhotos - visiblePhotoCount))].map((_, index) => (
-                  <div
-                    key={`locked-${index}`}
-                    className="aspect-square rounded-lg overflow-hidden border-2 border-border/50 relative bg-muted/20 group cursor-pointer"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-black/40 flex items-center justify-center">
-                      <Lock className="w-6 h-6 text-amber-400" />
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/80">
-                      <Link href="/vip">
-                        <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
-                          <Crown className="w-4 h-4 mr-1" />
-                          Aç
-                        </Button>
-                      </Link>
-                    </div>
+                {profile.tier === 'standard' && (
+                  <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-purple-900/20 to-black border border-dashed border-white/20 flex flex-col items-center justify-center p-6 text-center group">
+                    <Crown className="w-10 h-10 text-amber-500 mb-3 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs text-gray-400 mb-4">Daha fazla içerik görmek için VIP üyeliğe geçin.</p>
+                    <Button variant="outline" className="border-amber-500/50 text-amber-400 text-[10px] h-8">YÜKSELT</Button>
                   </div>
-                ))}
+                )}
               </div>
+            </section>
 
-              {/* Videos Section */}
-              {totalVideos > 0 && (
-                <Card className="card-premium">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Video className="w-5 h-5 text-primary" />
-                      Videolar
-                      <span className="text-sm font-normal text-muted-foreground">
-                        ({hasLockedVideos ? `${visibleVideoCount}/${totalVideos}+` : `${totalVideos}/${totalVideos}`})
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {visibleVideos.length > 0 ? (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {visibleVideos.map((video, index) => (
-                          <div
-                            key={index}
-                            className="relative aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group"
-                            onClick={() => setSelectedVideo(index)}
-                          >
-                            <video
-                              src={video}
-                              className="w-full h-full object-cover"
-                              poster={profile.photos?.[0] || displayProfile.avatar}
-                            />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
-                              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Play className="w-8 h-8 text-white fill-white ml-1" />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Lock className="w-12 h-12 mx-auto mb-3 text-amber-500/50" />
-                        <p className="text-muted-foreground mb-4">
-                          Videoları görüntülemek için üye olmalısınız.
-                        </p>
-                        <Link href="/login">
-                          <Button className="bg-gradient-to-r from-primary to-accent">
-                            Giriş Yap
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
+            {/* Details Tabs */}
+            <Tabs defaultValue="about" className="w-full">
+              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl w-full flex justify-between md:justify-start">
+                <TabsTrigger value="about" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-purple-600">Hakkında</TabsTrigger>
+                <TabsTrigger value="services" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-purple-600">Servisler</TabsTrigger>
+                <TabsTrigger value="details" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-purple-600">Özellikler</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="about" className="mt-8 space-y-6">
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+                  <h3 className="text-xl font-bold mb-4 text-purple-300">Biyografi</h3>
+                  <p className="text-gray-400 leading-relaxed italic text-lg">
+                    "{profile.biography || "Benimle galakside bir yolculuğa çıkmaya hazır mısınız? Sizin için buradayım."}"
+                  </p>
+                </div>
+              </TabsContent>
 
-                    {/* Locked Videos */}
-                    {hasLockedVideos && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {[...Array(Math.min(3, totalVideos - visibleVideoCount))].map((_, index) => (
-                          <div
-                            key={`locked-video-${index}`}
-                            className="relative aspect-video rounded-lg overflow-hidden bg-muted/20 border border-dashed border-border/50 group"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 flex items-center justify-center">
-                              <div className="text-center">
-                                <Lock className="w-8 h-8 mx-auto mb-2 text-amber-500" />
-                                <p className="text-xs text-muted-foreground px-2">Kilitli</p>
-                              </div>
-                            </div>
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/80">
-                              <Link href="/vip">
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
-                                  <Crown className="w-4 h-4 mr-1" />
-                                  VIP'e Geç
-                                </Button>
-                              </Link>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+              <TabsContent value="services" className="mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {profile.services.map(service => (
+                    <div key={service} className="flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-purple-500/50 transition-colors">
+                      <div className="w-2 h-2 rounded-full bg-purple-500" />
+                      <span className="text-gray-200">{service}</span>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
 
-              {/* Details Tabs */}
-              <Card className="card-premium">
-                <CardContent className="p-6">
-                  <Tabs defaultValue="about" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="about">Hakkında</TabsTrigger>
-                      <TabsTrigger value="services">Hizmetler</TabsTrigger>
-                      <TabsTrigger value="reviews">Yorumlar</TabsTrigger>
-                    </TabsList>
+              <TabsContent value="details" className="mt-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  {[
+                    { icon: Ruler, label: 'Boy', value: profile.height ? `${profile.height} cm` : 'Gizli' },
+                    { icon: Weight, label: 'Kilo', value: profile.weight ? `${profile.weight} kg` : 'Gizli' },
+                    { icon: Palette, label: 'Saç', value: profile.hairColor || 'Belirtilmedi' },
+                    { icon: Eye, label: 'Göz', value: profile.eyeColor || 'Belirtilmedi' },
+                    { icon: Languages, label: 'Diller', value: profile.languages.join(', ') },
+                    { icon: Calendar, label: 'Kayıt', value: '2024' },
+                  ].map((feat, i) => (
+                    <div key={i} className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <feat.icon className="w-5 h-5 text-purple-500 mb-2" />
+                      <div className="text-xs text-gray-500 mb-1">{feat.label}</div>
+                      <div className="font-bold text-white">{feat.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
 
-                    <TabsContent value="about" className="space-y-6 mt-6">
-                      {/* Bio */}
-                      <div>
-                        <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-                          <Info className="w-5 h-5 text-primary" />
-                          Hakkımda
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">{displayProfile.bio}</p>
-                      </div>
+          </div>
 
-                      <Separator />
-
-                      {/* Physical Features */}
-                      <div>
-                        <h3 className="font-bold text-lg mb-4">Fiziksel Özellikler</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {physicalFeatures.map((feature) => {
-                            const Icon = feature.icon;
-                            return (
-                              <div key={feature.label} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                                <div className="p-2 rounded-lg bg-primary/10">
-                                  <Icon className="w-4 h-4 text-primary" />
-                                </div>
-                                <div>
-                                  <div className="text-xs text-muted-foreground">{feature.label}</div>
-                                  <div className="font-semibold">{feature.value}</div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Languages */}
-                      <>
-                        <Separator />
-                        <div>
-                          <h3 className="font-bold text-lg mb-3">Konuşulan Diller</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {displayProfile.languages.map((lang) => (
-                              <Badge key={lang} variant="secondary" className="px-3 py-1">{lang}</Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </>
-                    </TabsContent>
-
-                    <TabsContent value="services" className="space-y-6 mt-6">
-                      <div>
-                        <h3 className="font-bold text-lg mb-4">Sunulan Hizmetler</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          {displayProfile.services.map((service) => (
-                            <div key={service} className="flex items-center gap-2 p-3 rounded-lg border border-border/50 hover:border-primary/50 transition-colors">
-                              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                              <span className="text-sm">{service}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Availability */}
-                      <>
-                        <Separator />
-                        <div>
-                          <h3 className="font-bold text-lg mb-3">Müsaitlik</h3>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                              <Calendar className="w-5 h-5 text-primary" />
-                              <div>
-                                <div className="text-sm text-muted-foreground">Çalışma Günleri</div>
-                                <div className="font-semibold">{displayProfile.availableDays.join(', ')}</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                              <Clock className="w-5 h-5 text-primary" />
-                              <div>
-                                <div className="text-sm text-muted-foreground">Çalışma Saatleri</div>
-                                <div className="font-semibold">{displayProfile.availableHours}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    </TabsContent>
-
-                    <TabsContent value="reviews" className="mt-6">
-                      <div className="text-center py-12">
-                        <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-                        <h3 className="text-xl font-bold mb-2">Henüz Yorum Yok</h3>
-                        <p className="text-muted-foreground">Bu profil için henüz değerlendirme yapılmamış.</p>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column - Contact & Info */}
-            <div className="space-y-6">
-              {/* Profile Header */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+          {/* Right Column: Contact Sticky Panel */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-32 space-y-6">
+              
+              {/* Pricing & Contact Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-[#0a0a0f] border border-white/10 rounded-[32px] p-8 shadow-2xl relative overflow-hidden"
               >
-                <Card className="card-premium">
-                  <CardContent className="p-6">
-                    <h1 className="text-3xl font-bold mb-3">{displayProfile.name}</h1>
+                {/* Glow Effect */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 blur-[80px] rounded-full" />
+                
+                <div className="mb-8">
+                  <div className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-2">Başlangıç Ücreti</div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-black text-white">
+                      {profile.rates?.hourly || '---'}
+                    </span>
+                    <span className="text-gray-500 text-xl">{profile.rates?.currency || 'TRY'} / saat</span>
+                  </div>
+                </div>
 
-                    <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                      <MapPin className="w-4 h-4 text-primary" />
-                      <span>{displayProfile.location}</span>
-                    </div>
+                <div className="space-y-4">
+                  <Button className="w-full py-8 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-black text-lg shadow-lg shadow-green-900/20 group">
+                    <MessageCircle className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                    WHATSAPP
+                  </Button>
+                  
+                  <Button className="w-full py-8 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-lg shadow-lg shadow-purple-900/40 group">
+                    <Phone className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                    ARAMA YAP
+                  </Button>
+                </div>
 
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-5 h-5 text-sky-500 fill-sky-500" />
-                        <span className="font-bold">{displayProfile.rating || 5.0}</span>
-                        <span className="text-sm text-muted-foreground">(128 yorum)</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Eye className="w-4 h-4" />
-                        {displayProfile.viewCount} görüntülenme
-                      </div>
-                    </div>
-
-                    <Separator className="my-4" />
-
-                    {/* Price */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-                      <div className="text-sm text-muted-foreground mb-1">Saatlik Ücret</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                          ₺{displayProfile.hourlyRate}
-                        </span>
-                        <span className="text-muted-foreground">/saat</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              {/* Contact Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Card className="card-premium">
-                  <CardHeader>
-                    <CardTitle className="text-lg">İletişim</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Contact Lock Component */}
-                    <ContactLock
-                      contact={{
-                        phone: displayProfile.phone,
-                        whatsapp: displayProfile.whatsapp,
-                      }}
-                      isLocked={requiresAuthForContact}
-                      isVip={user?.membership === 'vip'}
-                      lockMessage="İletişim Bilgileri Kilidi"
-                    />
-
-                    {/* Additional Actions - Only visible when unlocked */}
-                    {!requiresAuthForContact && (
-                      <div className="mt-4 grid grid-cols-2 gap-2">
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Mail className="w-4 h-4 mr-2" />
-                          Mesaj
-                        </Button>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          Randevu
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <div className="mt-8 pt-8 border-t border-white/10 flex flex-col gap-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Müsaitlik Durumu</span>
+                    <span className="text-green-400 flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                      ŞİMDİ MÜSAİT
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">Güvenlik Skoru</span>
+                    <span className="text-blue-400 flex items-center gap-1.5 font-bold">
+                      <Shield className="w-4 h-4" /> %98
+                    </span>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Safety Warning */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="card-premium border-amber-500/20 bg-amber-500/5">
-                  <CardContent className="p-4">
-                    <div className="flex gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-semibold text-amber-700 dark:text-amber-400 mb-1">Güvenlik Uyarısı</p>
-                        <p className="text-amber-600 dark:text-amber-300 text-xs leading-relaxed">
-                          Görüşme öncesi kimlik doğrulaması yapın. Ön ödeme talep eden kişilere güvenmeyin.
-                          Güvenliğiniz için halka açık yerlerde buluşun.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6">
+                <div className="flex gap-4">
+                  <Info className="w-6 h-6 text-amber-500 flex-shrink-0" />
+                  <div className="text-xs text-amber-200/60 leading-relaxed">
+                    <span className="font-bold text-amber-500 block mb-1 uppercase tracking-tighter">Güvenlik Hatırlatması</span>
+                    Lütfen ödemeyi görüşme sırasında elden yapın. Ön ödeme talep eden profillere karşı dikkatli olun. Güvenliğiniz bizim için önemli.
+                  </div>
+                </div>
+              </div>
 
-              {/* Upgrade CTA for non-VIP users */}
-              {!canViewAllPhotos && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Card className="card-premium bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/30">
-                    <CardContent className="p-6 text-center">
-                      <Crown className="w-12 h-12 mx-auto mb-4 text-amber-500" />
-                      <h3 className="text-xl font-bold mb-2">VIP'e Geçin</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Tüm {totalPhotos} fotoğrafı ve {totalVideos} videoyu sınırsız görüntüleyin.
-                      </p>
-                      <Link href="/vip">
-                        <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg">
-                          <Crown className="w-4 h-4 mr-2" />
-                          VIP Üyelik Al
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Fullscreen Gallery Modal - Enhanced */}
-      <PhotoGalleryEnhanced
-        photos={visiblePhotos.map((url, index) => ({
-          id: `photo-${index}`,
-          url,
-          caption: displayProfile.name,
-          views: Math.floor(Math.random() * 500) + 100,
-          likes: Math.floor(Math.random() * 100) + 20,
-          isPrimary: index === 0,
-        }))}
-        initialIndex={selectedPhoto}
-        isOpen={isGalleryOpen}
-        onClose={() => setIsGalleryOpen(false)}
-        canEdit={isEscortViewing}
-        showShare={true}
-        showDownload={canViewAllPhotos}
-      />
-
-      {/* Video Modal */}
-      {selectedVideo !== null && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
-          <button
-            onClick={() => setSelectedVideo(null)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-            aria-label="Videoyu kapat"
+      {/* --- VIDEO MODAL --- */}
+      <AnimatePresence>
+        {showVideo && profile.thumbnailVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
           >
-            <X className="w-6 h-6" />
-          </button>
-
-          <div className="w-full max-w-4xl">
-            <video
-              src={visibleVideos[selectedVideo]}
-              controls
-              autoPlay
-              className="w-full rounded-lg shadow-2xl"
-              poster={profile.photos?.[0] || displayProfile.avatar}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Report Dialog */}
-      <ReportEscortDialog
-        open={isReportDialogOpen}
-        onOpenChange={setIsReportDialogOpen}
-        escortId={displayProfile.id}
-        escortName={displayProfile.name}
-        escortPhoto={displayProfile.avatar}
-      />
+            <button 
+              onClick={() => setShowVideo(false)}
+              className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors"
+            >
+              <X className="w-10 h-10" />
+            </button>
+            <div className="w-full max-w-4xl aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+              <video src={profile.thumbnailVideo} controls autoPlay className="w-full h-full object-cover" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

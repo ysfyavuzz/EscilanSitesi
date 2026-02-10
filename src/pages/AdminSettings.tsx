@@ -159,7 +159,7 @@ export default function AdminSettings() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Masaj Ajans"
+                  defaultValue="Escilan Escort"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
@@ -169,7 +169,7 @@ export default function AdminSettings() {
                 </label>
                 <input
                   type="url"
-                  defaultValue="https://masajajans.com"
+                  defaultValue="https://escilan.com"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function AdminSettings() {
                 </label>
                 <textarea
                   rows={3}
-                  defaultValue="Türkiye'nin en iyi masaj ajansı"
+                  defaultValue="Türkiye'nin en iyi escort ilan platformu"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
@@ -216,7 +216,7 @@ export default function AdminSettings() {
                 </label>
                 <input
                   type="email"
-                  placeholder="noreply@masajajans.com"
+                  placeholder="noreply@escilan.com"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>

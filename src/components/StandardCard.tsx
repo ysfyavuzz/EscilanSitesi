@@ -1,479 +1,186 @@
 /**
- * StandardCard Component
+ * StandardCard Component (Cosmic Galaxy Edition)
  * 
- * Standard escort profile card for catalog listings.
- * Shows essential information with hover effects and responsive design.
- * 
- * @module components/StandardCard
- * @category Components - Cards
- * 
- * Features:
- * - Escort profile photo display
- * - Key information (name, location, rating, price)
- * - Verification badges
- * - Online status indicator
- * - Trust level visualization
- * - Quick action buttons (favorite, message, book)
- * - Responsive image loading
- * - Hover animations
- * - Stats preview (bookings, reviews, response rate)
- * 
- * Displayed Information:
- * - Profile photo
- * - Display name
- * - Age (optional)
- * - City and district
- * - Hourly rate
- * - Average rating
- * - Review count
- * - Verification status
- * - Online/offline status
- * - Last seen timestamp
- * 
- * @example
- * ```tsx
- * <StandardCard
- *   id="escort-123"
- *   displayName="Ayşe Y."
- *   city="Istanbul"
- *   district="Şişli"
- *   hourlyRate={500}
- *   rating={4.8}
- *   isVerified={true}
- *   profilePhoto="https://..."
- * />
- * ```
+ * Dinamik grid yapısına (Tetris Layout) uygun, interaktif profil kartı.
+ * "Deep Space Luxury" temasıyla uyumlu.
  */
 
-import React from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
-import {
-  MapPin, Star, Heart, CheckCircle2, Flame,
-  Calendar, MessageCircle, Shield, Clock, Circle,
-  Award, TrendingUp, Users
+import { 
+  MapPin, Star, Heart, CheckCircle2, Flame, 
+  MessageCircle, Eye, Play, Shield 
 } from "lucide-react";
-import { calculateTrustLevel } from '@/types/reviews';
+import { ListingProfile, StandardCardProps } from '@/types/domain';
 
-/**
- * Escort statistics interface
- */
-interface EscortStats {
-  totalBookings: number;
-  totalReviews: number;
-  averageRating: number;
-  responseRate: number; // percentage
-  responseTime: number; // minutes
-  completedBookings: number;
-  cancelledBookings: number;
-  noShowBookings: number;
-}
-
-interface StandardCardProps {
-  escort: any;
-  stats?: EscortStats;
-  type?: 'verified' | 'boost' | 'normal';
-}
-
-// Geçici usePerformance hook
-function usePerformance() {
-  return { isLowPowerMode: false };
-}
-
-// Güvenilirlik hesaplama
-function calculateReliabilityScore(stats?: EscortStats): number {
-  if (!stats || stats.totalBookings === 0) return 50; // Yeni üyeler için varsayılan
-
-  const completedRate = stats.completedBookings / stats.totalBookings;
-  const cancelledRate = stats.cancelledBookings / stats.totalBookings;
-  const noShowRate = stats.noShowBookings / stats.totalBookings;
-  const reviewRate = stats.totalReviews / stats.totalBookings;
-  const ratingBonus = (stats.averageRating - 3) * 0.1; // 3-5 yıldız arası bonus
-
-  let score = 50; // Başlangıç
-  score += completedRate * 30; // Tamamlanan randevular +30
-  score -= cancelledRate * 20; // İptal randevular -20
-  score -= noShowRate * 30; // Gelmeme -30
-  score += reviewRate * 10; // Yorum oranı +10
-  score += ratingBonus * 10; // Yıldız bonusu +10 max
-
-  return Math.min(100, Math.max(0, Math.round(score)));
-}
-
-// Online durum hesaplama
-function getOnlineStatus(escort: any): {
-  isOnline: boolean;
-  lastSeen?: Date;
-  statusText: string;
-  statusColor: string;
-} {
-  // Gerçek uygulamada bu veri veritabanından gelir
-  const now = new Date();
-  const lastSeen = escort.lastSeen ? new Date(escort.lastSeen) : new Date(now.getTime() - Math.random() * 3600000 * 24); // Rastgele son görülme
-
-  const diffMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
-
-  if (diffMinutes < 5) {
-    return {
-      isOnline: true,
-      lastSeen,
-      statusText: 'Çevrimiçi',
-      statusColor: 'text-green-500'
-    };
-  } else if (diffMinutes < 60) {
-    return {
-      isOnline: false,
-      lastSeen,
-      statusText: `${Math.floor(diffMinutes)} dk önce`,
-      statusColor: 'text-amber-500'
-    };
-  } else if (diffMinutes < 1440) { // 24 saat
-    return {
-      isOnline: false,
-      lastSeen,
-      statusText: `${Math.floor(diffMinutes / 60)} saat önce`,
-      statusColor: 'text-orange-500'
-    };
-  } else {
-    return {
-      isOnline: false,
-      lastSeen,
-      statusText: `${Math.floor(diffMinutes / 1440)} gün önce`,
-      statusColor: 'text-gray-500'
-    };
-  }
-}
-
-// Güvenilirlik renk ve ikon
-function getReliabilityConfig(score: number) {
-  if (score >= 90) {
-    return {
-      color: 'text-green-600',
-      bg: 'bg-green-500/10',
-      border: 'border-green-500/30',
-      icon: '🏆',
-      label: 'Mükemmel'
-    };
-  } else if (score >= 75) {
-    return {
-      color: 'text-blue-600',
-      bg: 'bg-blue-500/10',
-      border: 'border-blue-500/30',
-      icon: '⭐',
-      label: 'Güvenilir'
-    };
-  } else if (score >= 60) {
-    return {
-      color: 'text-amber-600',
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/30',
-      icon: '📈',
-      label: 'İyi'
-    };
-  } else if (score >= 40) {
-    return {
-      color: 'text-orange-600',
-      bg: 'bg-orange-500/10',
-      border: 'border-orange-500/30',
-      icon: '⚠️',
-      label: 'Orta'
-    };
-  } else {
-    return {
-      color: 'text-red-600',
-      bg: 'bg-red-500/10',
-      border: 'border-red-500/30',
-      icon: '⚠️',
-      label: 'Düşük'
-    };
-  }
-}
-
-export const StandardCard = React.memo(function StandardCard({ escort, stats, type = 'normal' }: StandardCardProps) {
-  const { isLowPowerMode } = usePerformance();
-  const isVerified = escort.isVerifiedByAdmin || type === 'verified';
-  const isBoost = type === 'boost';
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const springConfig = isLowPowerMode ? { stiffness: 40, damping: 15 } : { stiffness: 120, damping: 25 };
-  const mouseXSpring = useSpring(x, springConfig);
-  const mouseYSpring = useSpring(y, springConfig);
-
-  const rotateRange = isLowPowerMode ? ["0deg", "0deg"] : isBoost ? ["8deg", "-8deg"] : ["5deg", "-5deg"];
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], rotateRange);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], rotateRange);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  const frameClass = isBoost ? 'boost-frame' : isVerified ? 'verified-frame' : 'normal-card-3d';
-  const glowClass = isBoost ? 'boost-card-glow' : isVerified ? 'verified-card-glow' : 'normal-card-glow';
-
-  // Hesaplamalar
-  const reliabilityScore = calculateReliabilityScore(stats);
-  const reliabilityConfig = getReliabilityConfig(reliabilityScore);
-  const onlineStatus = getOnlineStatus(escort);
-
-  // Boost kartları için daha büyük boyut
-  const aspectRatio = isBoost ? "aspect-[3/4.5]" : "aspect-[3/4.2]";
+export const StandardCard = React.memo(function StandardCard({ 
+  profile, 
+  onQuickView, 
+  showVideoOnHover = true 
+}: StandardCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Tetris Grid için boyut sınıfları
+  const spanClasses = {
+    '1x1': 'col-span-1 row-span-1',
+    '2x1': 'col-span-2 row-span-1',
+    '2x2': 'col-span-2 row-span-2',
+    '4x1': 'col-span-4 row-span-1', // Geniş banner tarzı
+    '6x1': 'col-span-6 row-span-1',
+  }[profile.gridSpan || '1x1'];
 
   return (
     <motion.div
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={`relative w-full ${aspectRatio} group cursor-pointer ${isBoost ? 'scale-105 z-10' : ''}`}
+      layoutId={`card-${profile.id}`}
+      className={`relative group cursor-pointer ${spanClasses}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
     >
-      <Link href={`/escort/${escort.id}`}>
-        <Card className={`w-full h-full ${frameClass} overflow-hidden rounded-2xl bg-card border-white/5 ${isBoost ? 'shadow-xl ring-2 ring-orange-500/50' : ''}`}>
-          <CardContent className="p-0 h-full relative">
-            {/* Glow Effect */}
-            <div className={glowClass} />
-            {/* Boost pulsing glow */}
-            {isBoost && (
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10 pointer-events-none animate-pulse" />
+      <div className={`
+        h-full w-full overflow-hidden rounded-[24px] relative 
+        transition-all duration-500 border border-white/5
+        bg-[#0a0a0f] 
+        ${isHovered ? 'shadow-[0_0_30px_rgba(138,43,226,0.3)] border-purple-500/30 translate-y-[-4px]' : 'shadow-xl'}
+      `}>
+        
+        {/* --- MEDIA LAYER --- */}
+        <div className="relative h-full w-full">
+          {/* Video Preview */}
+          {showVideoOnHover && isHovered && profile.thumbnailVideo && (
+            <div className="absolute inset-0 z-10 animate-in fade-in duration-500">
+              <video 
+                src={profile.thumbnailVideo} 
+                autoPlay 
+                muted 
+                loop 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20" />
+            </div>
+          )}
+
+          {/* Main Image */}
+          <img
+            src={profile.coverImage}
+            alt={profile.displayName}
+            className={`w-full h-full object-cover transition-transform duration-700 
+                       ${isHovered ? 'scale-110 blur-[2px]' : 'scale-100'}`}
+            loading="lazy"
+          />
+
+          {/* Overlay Gradient (Bottom-Up) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020205] via-transparent to-black/30 opacity-90" />
+
+          {/* --- TOP BADGES --- */}
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
+            {profile.isBoosted && (
+              <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 text-black font-black px-2 py-0.5 text-[10px] border-0 shadow-lg shadow-amber-500/20">
+                <Flame className="w-3 h-3 mr-1" /> VIP
+              </Badge>
             )}
+            {profile.verificationStatus === 'verified' && (
+              <Badge className="bg-blue-500/20 backdrop-blur-md text-blue-200 border border-blue-500/30 px-2 py-0.5 text-[10px]">
+                <CheckCircle2 className="w-3 h-3 mr-1 text-blue-400" /> ONAYLI
+              </Badge>
+            )}
+          </div>
 
-            {/* Image Section */}
-            <div className="relative aspect-[3/3.5] overflow-hidden">
-              {escort.profilePhoto ? (
-                <img
-                  src={escort.profilePhoto}
-                  alt={escort.displayName}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center">
-                  <Heart className="w-10 h-10 text-muted-foreground/20" />
-                </div>
-              )}
+          {/* --- TOP RIGHT STATUS --- */}
+          <div className="absolute top-3 right-3 z-20">
+            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full backdrop-blur-md border border-white/10 ${profile.isOnline ? 'bg-green-900/30' : 'bg-gray-900/30'}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${profile.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+              <span className="text-[9px] font-bold text-white uppercase tracking-wider">
+                {profile.isOnline ? 'Online' : 'Offline'}
+              </span>
+            </div>
+          </div>
 
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-
-              {/* Badges */}
-              <div className="absolute top-3 left-3 flex flex-col gap-2" style={{ transform: "translateZ(20px)" }}>
-                {isBoost && (
-                  <Badge className="bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 text-white border-0 shadow-2xl text-xs font-black px-3 py-1.5 animate-bounce">
-                    <Flame className="w-4 h-4 mr-1 animate-pulse" /> ⚡ BOOST
-                  </Badge>
+          {/* --- HOVER ACTIONS --- */}
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="absolute inset-0 flex items-center justify-center gap-3 z-30 bg-black/40 backdrop-blur-[2px]"
+              >
+                {/* Favori */}
+                <button className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 transition-all group/btn">
+                  <Heart className="w-5 h-5 text-white group-hover/btn:fill-white" />
+                </button>
+                
+                {/* Hızlı Bakış (Quick View) */}
+                {onQuickView && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onQuickView(profile);
+                    }}
+                    className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                    title="Hızlı Bakış"
+                  >
+                    <Eye className="w-7 h-7 text-black" />
+                  </button>
                 )}
-                {isVerified && (
-                  <Badge className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0 shadow-lg text-[10px] font-bold">
-                    <CheckCircle2 className="w-3 h-3 mr-1" /> ONAYLI
-                  </Badge>
-                )}
-                {/* Online Status Badge */}
-                <Badge
-                  variant="secondary"
-                  className={`${onlineStatus.isOnline ? 'bg-green-500' : 'bg-gray-500'} text-white border-0 shadow-lg text-[10px] font-bold`}
-                >
-                  <div className={`w-1.5 h-1.5 rounded-full ${onlineStatus.isOnline ? 'bg-white animate-pulse' : 'bg-gray-300'} mr-1`} />
-                  {onlineStatus.statusText}
-                </Badge>
-              </div>
+                
+                {/* Mesaj */}
+                <button className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-green-500 hover:border-green-500 transition-all">
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {/* Price */}
-              <div className="absolute bottom-2 left-2" style={{ transform: "translateZ(15px)" }}>
-                <div className="text-white font-bold text-base">
-                  ₺{escort.hourlyRate}
-                  <span className="text-[9px] font-normal opacity-70 ml-1">/S</span>
+          {/* --- CONTENT INFO --- */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+            {/* İsim ve Lokasyon */}
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <h3 className="text-lg font-bold text-white leading-tight font-orbitron group-hover:text-amber-400 transition-colors">
+                  {profile.displayName}
+                </h3>
+                <div className="flex items-center text-xs text-gray-400 mt-1">
+                  <MapPin className="w-3 h-3 mr-1 text-purple-400" />
+                  {profile.city}, {profile.district}
                 </div>
               </div>
-
-              {/* Reliability Score - Top Right */}
-              <div className="absolute top-3 right-3" style={{ transform: "translateZ(20px)" }}>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${reliabilityConfig.bg} ${reliabilityConfig.border} backdrop-blur-sm`}>
-                  <span className="text-sm">{reliabilityConfig.icon}</span>
-                  <span className={`text-xs font-black ${reliabilityConfig.color}`}>{reliabilityScore}%</span>
-                </div>
+              
+              {/* Rating */}
+              <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg border border-white/10 backdrop-blur-sm">
+                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                <span className="text-xs font-bold text-white">{profile.rating}</span>
               </div>
             </div>
 
-            {/* Info Section */}
-            <div className="p-3" style={{ transform: "translateZ(10px)" }}>
-              <h3 className="font-bold text-sm mb-0.5 group-hover:text-primary transition-colors truncate">
-                {escort.displayName}
-              </h3>
-              <div className="flex items-center text-[10px] text-muted-foreground mb-1.5">
-                <MapPin className="w-2.5 h-2.5 mr-1 text-primary" />
-                {escort.city}, {escort.district}
-              </div>
-
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-1 mb-1.5 pb-1.5 border-b border-white/5">
-                {/* Bookings */}
-                <div className="text-center p-0.5 rounded bg-primary/5">
-                  <Calendar className="w-2.5 h-2.5 mx-auto mb-0.5 text-primary" />
-                  <p className="text-[9px] font-bold">{stats?.totalBookings || 0}</p>
-                </div>
-
-                {/* Reviews */}
-                <div className="text-center p-0.5 rounded bg-amber-500/5">
-                  <MessageCircle className="w-2.5 h-2.5 mx-auto mb-0.5 text-amber-500" />
-                  <p className="text-[9px] font-bold">{stats?.totalReviews || 0}</p>
-                </div>
-
-                {/* Rating */}
-                <div className="text-center p-0.5 rounded bg-green-500/5">
-                  <Star className="w-2.5 h-2.5 mx-auto mb-0.5 text-green-500 fill-green-500" />
-                  <p className="text-[9px] font-bold">{stats?.averageRating?.toFixed(1) || '5.0'}</p>
-                </div>
-              </div>
-
-              {/* Bottom Row */}
-              <div className="flex items-center justify-between">
-                {/* Reliability Bar */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <Shield className="w-2.5 h-2.5 text-primary" />
-                    <span className="text-[9px] font-semibold text-primary">Güven</span>
-                  </div>
-                  <div className="h-1 bg-muted rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${reliabilityScore}%` }}
-                      transition={{ duration: 1, delay: 0.2 }}
-                      className={`h-full rounded-full ${
-                        reliabilityScore >= 90 ? 'bg-green-500' :
-                        reliabilityScore >= 75 ? 'bg-blue-500' :
-                        reliabilityScore >= 60 ? 'bg-amber-500' :
-                        reliabilityScore >= 40 ? 'bg-orange-500' :
-                        'bg-red-500'
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                {/* Last Seen */}
-                <div className="flex items-center gap-1 ml-2">
-                  <Clock className={`w-2.5 h-2.5 ${onlineStatus.statusColor}`} />
-                  <span className={`text-[9px] ${onlineStatus.statusColor}`}>
-                    {onlineStatus.isOnline ? 'Aktif' : 'Görüldü'}
+            {/* Fiyat ve Badge */}
+            <div className="flex items-center justify-between pt-3 border-t border-white/10">
+              {profile.rates ? (
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Saatlik</span>
+                  <span className="text-lg font-black text-white">
+                    {profile.rates.hourly} <span className="text-xs font-normal text-gray-400">{profile.rates.currency}</span>
                   </span>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
-  );
-});
-
-export default StandardCard;
-
-// Stats Tooltip Component
-export const StatsTooltip = React.memo(function StatsTooltip({ stats }: { stats: EscortStats }) {
-  const reliabilityScore = calculateReliabilityScore(stats);
-  const completionRate = stats.totalBookings > 0
-    ? Math.round((stats.completedBookings / stats.totalBookings) * 100)
-    : 0;
-
-  return (
-    <Card className="w-64">
-      <CardContent className="p-4">
-        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">
-          <Award className="w-4 h-4 text-primary" />
-          Detaylı İstatistikler
-        </h4>
-
-        <div className="space-y-3">
-          {/* Reliability Score */}
-          <div className="p-3 bg-primary/10 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold">Güvenilirlik Skoru</span>
-              <span className="text-lg font-black text-primary">%{reliabilityScore}</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${
-                  reliabilityScore >= 90 ? 'bg-green-500' :
-                  reliabilityScore >= 75 ? 'bg-blue-500' :
-                  reliabilityScore >= 60 ? 'bg-amber-500' :
-                  'bg-orange-500'
-                }`}
-                style={{ width: `${reliabilityScore}%` }}
-              />
+              ) : (
+                <div className="text-xs text-gray-500">Fiyat sorunuz</div>
+              )}
+              
+              {profile.verificationStatus === 'verified' && (
+                <div className="text-[10px] text-green-400 flex items-center gap-1 font-medium">
+                  <Shield className="w-3 h-3" />
+                  Güvenilir
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Completion Rate */}
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Tamamlama Oranı</span>
-            <span className="font-bold text-green-600">%{completionRate}</span>
-          </div>
-
-          <div className="h-px bg-border" />
-
-          {/* Detailed Stats */}
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Toplam Randevu</span>
-              <span className="font-bold">{stats.totalBookings}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Tamamlandı</span>
-              <span className="font-bold text-green-600">{stats.completedBookings}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">İptal</span>
-              <span className="font-bold text-orange-600">{stats.cancelledBookings}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Gelmedi</span>
-              <span className="font-bold text-red-600">{stats.noShowBookings}</span>
-            </div>
-          </div>
-
-          <div className="h-px bg-border" />
-
-          {/* Review Stats */}
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Toplam Yorum</span>
-              <span className="font-bold">{stats.totalReviews}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Ortalama Puan</span>
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                <span className="font-bold">{stats.averageRating.toFixed(1)}</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Yanıt Oranı</span>
-              <span className="font-bold text-blue-600">%{stats.responseRate}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Ort. Yanıt Süresi</span>
-              <span className="font-bold">{stats.responseTime} dk</span>
-            </div>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </motion.div>
   );
 });

@@ -133,7 +133,7 @@ export function CosmicNav() {
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-24 right-4 left-4 z-50 md:hidden
-                       card-cosmic rounded-2xl p-4 
+                       glass-panel rounded-2xl p-4 
                        border border-amber-500/20
                        max-w-sm mx-auto"
           >

@@ -1,365 +1,205 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Html, Text } from '@react-three/drei';
+import * as THREE from 'three';
 import { useTheme } from '@/contexts/ThemeContext';
 
-const nebulaImg = '/nebula-overlay.png';
-
-interface Star {
-  id: number | string;
-  left: string;
-  top: string;
-  size?: number;
-  duration?: string;
-  delay?: string;
-  opacity?: number;
-  isPrimary?: boolean;
-  color?: string;
-  glow?: string;
-  scale?: number;
-  angle?: number;
-}
-
-interface Nebula {
+// --- TİPLER VE VERİ ---
+interface PlanetData {
   id: string;
-  left: string;
-  top: string;
-  scale: number;
-  opacity: number;
-  duration: string;
-}
-
-interface Explosion {
-  id: string;
-  left: string;
-  top: string;
-  scale: number;
+  name: string;
+  description: string;
   color: string;
+  path: string;
+  size: number;
 }
 
-export const SpaceBackground: React.FC = () => {
-  const { actualTheme } = useTheme();
+const PLANETS: PlanetData[] = [
+  { id: 'escorts', name: 'KEŞFET', description: 'İlanlar Dünyası', color: '#00BFFF', path: '/escorts', size: 4 },
+  { id: 'escort-login', name: 'İŞ ORTAKLIĞI', description: 'Escort & Model Paneli', color: '#FFD700', path: '/login-escort', size: 3.8 },
+  { id: 'ai', name: 'AI GIRLFRIEND', description: 'Yapay Zeka Aşkı', color: '#A020F0', path: '#', size: 3.5 },
+  { id: 'sexting', name: 'MARS CHAT', description: 'Canlı Sexting', color: '#FF4500', path: '/messages', size: 3.5 },
+  { id: 'market', name: 'MARKET', description: 'Puan & Üyelik', color: '#32CD32', path: '/pricing', size: 3 },
+  { id: 'confessions', name: 'İTİRAFLAR', description: 'Anonim Hikayeler', color: '#FF69B4', path: '/blog', size: 3 },
+  { id: 'profile', name: 'ÜS (BASE)', description: 'Profil & Ayarlar', color: '#B0C4DE', path: '/settings', size: 3.2 },
+];
 
-  // Initialize stars using lazy state initialization to render once/stable
-  const [stars] = useState<Star[]>(() => {
-    const starCount = 300; // Background stars
-    const backgroundStars = Array.from({ length: starCount }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      size: Math.random() < 0.1 ? 3 : Math.random() < 0.4 ? 2 : 1, 
-      duration: `${Math.random() * 3 + 2}s`,
-      delay: `${Math.random() * 2}s`,
-      opacity: Math.random() * 0.7 + 0.3,
-      isPrimary: Math.random() > 0.8,
-      color: Math.random() > 0.7 ? 'bg-yellow-200' : 'bg-white', 
-      glow: Math.random() > 0.9 ? 'shadow-[0_0_8px_rgba(255,255,200,0.8)]' : '' 
-    }));
+// --- BİLEŞENLER ---
 
-    // "Half Peach" Constellation (Center Screen)
-    const peachStars: Star[] = [];
-    const centerX = 50; // %
-    const centerY = 50; // %
-    const radius = 15; // % of screen width approx
-    const peachStarCount = 120; // Density for the shape
+const Planet = ({ 
+  data, 
+  isActive, 
+  onClick, 
+  position 
+}: { 
+  data: PlanetData; 
+  isActive: boolean; 
+  onClick: () => void;
+  position: [number, number, number];
+}) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
+  const [entering, setEntering] = useState(false); // Giriş animasyonu state'i
 
-    for (let i = 0; i < peachStarCount; i++) {
-        const angle = Math.random() * Math.PI; // 0 to PI (Upper half)
-        const r = Math.sqrt(Math.random()) * radius; // Uniform distribution in circle
-        
-        // Adjust x,y to center
-        const x = centerX + (r * Math.cos(angle)) * 0.6; // Scale X slightly (narrower)
-        const y = centerY - (r * Math.sin(angle)) * 0.6; // Upwards
-        
-        peachStars.push({
-            id: `peach-${i}`,
-            left: `${x}%`,
-            top: `${y}%`,
-            size: Math.random() * 1.5 + 1.5, // Slightly larger pixels
-            duration: `${Math.random() * 2 + 1}s`,
-            delay: `${Math.random()}s`,
-            opacity: Math.random() * 0.8 + 0.2,
-            isPrimary: true,
-            color: 'bg-orange-300', // Peach color
-            glow: 'shadow-[0_0_6px_rgba(255,160,122,0.8)]' // Peach glow
-        });
+  // Sürekli dönme animasyonu (Kendi ekseninde)
+  useFrame((state, delta) => {
+    if (meshRef.current) {
+      // Normal dönüş
+      meshRef.current.rotation.y += delta * 0.2;
+      
+      // Giriş yapılıyorsa hızlı dönme ve büyüme efekti
+      if (entering) {
+        meshRef.current.rotation.y += delta * 5; // Çok hızlı dön
+        meshRef.current.scale.lerp(new THREE.Vector3(5, 5, 5), delta * 2); // Büyü
+      } else if (isActive) {
+        // Aktifse hafifçe puls (nefes alma) efekti
+        const scale = data.size + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1).multiplyScalar(scale / data.size), 0.1);
+      } else {
+        // Pasifse normal boyuta dön
+        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+      }
     }
-
-    return [...backgroundStars, ...peachStars];
   });
 
-  const [shootingStars, setShootingStars] = useState<Star[]>([]);
-  const [nebulas, setNebulas] = useState<Nebula[]>([]); // cosmic images
-  const [explosions, setExplosions] = useState<Explosion[]>([]);
-  
-  // Generate 'ZUHRE' constellation points (Right side, Diagonal) - Lazy Initialized
-  const [zuhreStars] = useState<Star[]>(() => {
-    const points: {x: number, y: number}[] = [];
-    const startX = 65; // Right side
-    const startY = 10; // Top
-    const charW = 4;   // Width of char
-    const charH = 5;   // Height of char
-    const gap = 3;     // Spacing between chars
+  const handleEnter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (data.path === '#') {
+      alert("Bu gezegen henüz keşfedilmedi! (Yakında)");
+      return;
+    }
     
-    // Helper to add point with jitter
-    const addPoint = (x: number, y: number) => {
-        const jitterX = (Math.random() - 0.5) * 0.5;
-        const jitterY = (Math.random() - 0.5) * 0.5;
-        points.push({ x: x + jitterX, y: y + jitterY });
-    };
-    
-    // Line drawer helper
-    const line = (x1: number, y1: number, x2: number, y2: number, density = 3) => {
-        for (let i = 0; i <= density; i++) {
-            const t = i / density;
-            addPoint(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t);
-        }
-    };
-
-    let currentBaseX = startX;
-    let currentBaseY = startY;
-
-    const drawChar = (char: string, baseX: number, baseY: number) => {
-        // Z
-        if (char === 'Z') {
-            line(baseX, baseY, baseX + charW, baseY, 3);
-            line(baseX + charW, baseY, baseX, baseY + charH, 4);
-            line(baseX, baseY + charH, baseX + charW, baseY + charH, 3);
-        }
-        // U
-        if (char === 'U') {
-            line(baseX, baseY, baseX, baseY + charH, 4);
-            line(baseX, baseY + charH, baseX + charW, baseY + charH, 3);
-            line(baseX + charW, baseY + charH, baseX + charW, baseY, 4);
-        }
-        // H
-        if (char === 'H') {
-            line(baseX, baseY, baseX, baseY + charH, 4);
-            line(baseX + charW, baseY, baseX + charW, baseY + charH, 4);
-            line(baseX, baseY + charH/2, baseX + charW, baseY + charH/2, 2);
-        }
-        // R
-        if (char === 'R') {
-            line(baseX, baseY, baseX, baseY + charH, 4);
-            line(baseX, baseY, baseX + charW, baseY, 3);
-            line(baseX + charW, baseY, baseX + charW, baseY + charH/2, 2);
-            line(baseX + charW, baseY + charH/2, baseX, baseY + charH/2, 3);
-            line(baseX + 1, baseY + charH/2, baseX + charW, baseY + charH, 3);
-        }
-        // E
-        if (char === 'E') {
-            line(baseX, baseY, baseX, baseY + charH, 4);
-            line(baseX, baseY, baseX + charW, baseY, 3);
-            line(baseX, baseY + charH/2, baseX + charW - 1, baseY + charH/2, 2);
-            line(baseX, baseY + charH, baseX + charW, baseY + charH, 3);
-        }
-    };
-
-    ['Z', 'U', 'H', 'R', 'E'].forEach((char) => {
-        drawChar(char, currentBaseX, currentBaseY);
-        currentBaseX += charW + gap;
-        currentBaseY += 2; // Slight diagonal step down
-    });
-
-    return points.map((p, i) => ({
-        id: `zuhre-${i}`,
-        left: `${p.x}%`,
-        top: `${p.y}%`,
-        delay: `${Math.random() * 0.5}s`
-    }));
-  });
-
-  const [showZuhre, setShowZuhre] = useState(false);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    // Cycle: Show every 40s for 5s
-    const cycle = () => {
-        // Wait 40s then show
-        timer = setTimeout(() => {
-            setShowZuhre(true);
-            setTimeout(() => {
-                setShowZuhre(false);
-                cycle(); // Recursive loop
-            }, 5000);
-        }, 40000);
-    };
-    
-    // Start first cycle
-    cycle();
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle shooting stars with varied frequency and style
-  useEffect(() => {
-    const spawnShootingStar = () => {
-        const id = Date.now();
-        const angle = Math.random() * 360; // Random angle
-        
-        setShootingStars(prev => [...prev, {
-            id,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            scale: Math.random() * 0.5 + 1.2, // Larger/Longer
-            angle: angle,
-            color: Math.random() > 0.5 ? 'via-yellow-200' : 'via-white', // 50% Yellow, 50% White
-            duration: Math.random() * 1 + 2 + 's' // 2-3s duration
-        }]);
-        setTimeout(() => setShootingStars(prev => prev.filter(s => s.id !== id)), 4000);
-        
-        // Schedule next star between 60s and 80s
-        const nextTime = Math.random() * 20000 + 60000; 
-        setTimeout(spawnShootingStar, nextTime);
-    };
-
-    // Occasional Cosmic Nebula Images (Floating in background)
-    const nebulaInterval = setInterval(() => {
-        const id = Date.now() + 'nebula';
-        setNebulas(prev => [...prev, {
-            id,
-            left: `${Math.random() * 60 + 20}%`, // Central area
-            top: `${Math.random() * 60 + 20}%`,
-            scale: Math.random() * 0.5 + 0.8, 
-            opacity: Math.random() * 0.3 + 0.2, // Subtle opacity
-            duration: Math.random() * 10 + 20 + 's', // Long duration
-        }]);
-        setTimeout(() => setNebulas(prev => prev.filter(n => n.id !== id)), 25000);
-    }, 15000); // Every 15 seconds
-
-    // Distant Galaxy Explosions (Supernovas)
-    const explosionInterval = setInterval(() => {
-        const id = Date.now() + 'boom';
-        setExplosions(prev => [...prev, {
-            id,
-            left: `${Math.random() * 90}%`,
-            top: `${Math.random() * 80}%`,
-            scale: Math.random() * 0.5 + 0.5,
-            color: Math.random() > 0.5 ? 'cyan' : 'purple', 
-        }]);
-        setTimeout(() => setExplosions(prev => prev.filter(e => e.id !== id)), 2000); 
-    }, 4000);
-
-    // Initial start for Shooting Stars
-    const timer = setTimeout(spawnShootingStar, 5000);
-
-    return () => {
-        clearTimeout(timer);
-        clearInterval(nebulaInterval);
-        clearInterval(explosionInterval);
-    };
-  }, []);
-
-  // Mapping actualTheme to the celestial logic
-  // Light -> Celestial (Ice/Sunset), Dark -> Cosmic (Deep Space)
-  const isCelestial = actualTheme === 'light';
-  
-  // Sunset/Sunrise Gradient vs Deep Space Night
-  const gradientClass = isCelestial 
-    ? 'from-indigo-950 via-purple-900 to-orange-500' // Deep Sunset (Dark sky to bright horizon)
-    : 'from-black via-slate-950 to-slate-900'; // Deep Space (Dark Mode)
+    setEntering(true);
+    // Animasyon bitince yönlendir
+    setTimeout(() => {
+      window.location.href = data.path;
+    }, 800);
+  };
 
   return (
-    <div className={`fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] ${gradientClass} transition-colors duration-1000`}>
+    <group position={position}>
+      <mesh
+        ref={meshRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <sphereGeometry args={[data.size, 32, 32]} />
+        <meshStandardMaterial 
+          color={data.color} 
+          emissive={isActive ? data.color : '#000000'}
+          emissiveIntensity={isActive ? 0.5 : 0}
+          roughness={0.7}
+          metalness={0.3}
+        />
+      </mesh>
+
+      {/* Gezegen Etiketi (Her zaman görünür ama pasifken sönük) */}
+      <Html position={[0, data.size + 1, 0]} center distanceFactor={15} style={{ pointerEvents: 'none' }}>
+        <div className={`transition-all duration-500 flex flex-col items-center ${isActive ? 'opacity-100 scale-110' : 'opacity-40 scale-75'}`}>
+          <div className="font-bold text-white text-lg drop-shadow-md whitespace-nowrap bg-black/50 px-3 rounded-full border border-white/10">
+            {data.name}
+          </div>
+        </div>
+      </Html>
+
+      {/* Aktif Gezegen İçin Aksiyon Butonu (Gezegenin altında belirir) */}
+      {isActive && !entering && (
+        <Html position={[0, -data.size - 1.5, 0]} center zIndexRange={[100, 0]}>
+          <button
+            onClick={handleEnter}
+            className="px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/50 
+                       text-white font-bold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)]
+                       transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
+          >
+            GİRİŞ YAP
+          </button>
+          <div className="text-center mt-2 text-xs text-gray-300 bg-black/40 px-2 py-1 rounded">
+            {data.description}
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+};
+
+const Carousel = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const groupRef = useRef<THREE.Group>(null);
+  const radius = 22; // Gezegenlerin merkeze uzaklığı
+
+  // Hedef dönüş açısını hesapla
+  // Her gezegen 360 / n derece aralıkla dizilir.
+  // Aktif gezegenin açısını 0'a (kameranın karşısına) getirmek için grubu ters yöne döndürürüz.
+  const anglePerPlanet = (Math.PI * 2) / PLANETS.length;
+  const targetRotationY = -activeIndex * anglePerPlanet;
+
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      // Grubu hedef açıya doğru yumuşakça döndür (Lerp)
+      // Quaternion kullanarak en kısa yolu bulmak daha iyidir ama basit Y dönüşü şimdilik yeterli
       
-      {/* Base overlay for texture */}
-      <div className="absolute inset-0 bg-noise opacity-[0.02] mix-blend-overlay z-10"></div>
+      // Açıyı normalize et (Dönüşün en kısa yoldan olması için)
+      let currentY = groupRef.current.rotation.y;
+      
+      // Mevcut açı ile hedef açı arasındaki farkı optimize et
+      // Bu, 0'dan 360'a geçerken ters dönmesini engeller
+      // (Basit implementasyon: Şimdilik direkt lerp kullanıyoruz, tam turda hafif glitch olabilir ama çalışır)
+      
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(currentY, targetRotationY, delta * 3);
+    }
+  });
 
-      {/* --- NEBULAS --- */}
-      <div className={`absolute top-[40%] right-[0%] w-[800px] h-[800px] rounded-full blur-[120px] opacity-20 animate-pulse-slow mix-blend-screen transition-colors duration-1000 
-        ${isCelestial ? 'bg-pink-600' : 'bg-indigo-900'}
-      `}></div>
+  return (
+    <group ref={groupRef}>
+      {PLANETS.map((planet, index) => {
+        const angle = index * anglePerPlanet;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius;
 
-      {/* Stars (Yellow & White) */}
-      {stars.map((star) => (
-        <div
-          key={star.id}
-          className={`absolute rounded-full animate-twinkle ${star.color} ${star.glow}`}
-          style={{
-            left: star.left,
-            top: star.top,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
-            opacity: star.opacity,
-            animationDuration: star.duration,
-            animationDelay: star.delay,
-          }}
-        ></div>
-      ))}
+        return (
+          <Planet
+            key={planet.id}
+            data={planet}
+            position={[x, 0, z]}
+            isActive={index === activeIndex}
+            onClick={() => setActiveIndex(index)}
+          />
+        );
+      })}
+    </group>
+  );
+};
 
-      {/* Shooting Stars (Rare, Long, Colored) */}
-      {shootingStars.map((star) => (
-        <div
-            key={star.id}
-            className="absolute origin-left"
-            style={{
-                left: star.left,
-                top: star.top,
-                transform: `rotate(${star.angle}deg)`,
-                zIndex: 10
-            }}
-        >
-            <div 
-                className={`h-[2px] w-[300px] bg-gradient-to-r from-transparent ${star.color} to-transparent opacity-0 animate-shooting-star`}
-                style={{
-                    transformOrigin: 'left center',
-                    animationDuration: star.duration
-                }}
-            ></div>
-        </div>
-      ))}
+export const SpaceBackground: React.FC = () => {
+  return (
+    <div className="fixed inset-0 z-0 overflow-hidden bg-black select-none">
+      <Canvas camera={{ position: [0, 5, 38], fov: 50 }}>
+        <Suspense fallback={null}>
+          <color attach="background" args={['#020205']} />
+          
+          {/* Işıklandırma */}
+          <ambientLight intensity={0.3} />
+          <pointLight position={[0, 20, 10]} intensity={1.5} color="#ffffff" />
+          <pointLight position={[0, -20, -10]} intensity={0.5} color="#4b0082" />
 
-      {/* Distant Galaxy Explosions */}
-      {explosions.map((exp) => (
-        <div
-          key={exp.id}
-          className="absolute animate-explode opacity-0"
-          style={{
-            left: exp.left,
-            top: exp.top,
-            transform: `scale(${exp.scale})`
-          }}
-        >
-            {/* Core Flash */}
-            <div className={`w-2 h-2 rounded-full blur-[1px] bg-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}></div>
-            {/* Expanding Ring */}
-            <div className={`w-8 h-8 rounded-full border-2 ${exp.color === 'cyan' ? 'border-cyan-400' : 'border-purple-400'} blur-[2px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}></div>
-            {/* Cross Flare */}
-             <div className={`w-12 h-[1px] ${exp.color === 'cyan' ? 'bg-cyan-200' : 'bg-purple-200'} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}></div>
-             <div className={`w-[1px] h-12 ${exp.color === 'cyan' ? 'bg-cyan-200' : 'bg-purple-200'} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}></div>
-        </div>
-      ))}
+          {/* Carousel Sistemi */}
+          <Carousel />
 
-      {/* 'ZUHRE' Constellation Text */}
-      {showZuhre && zuhreStars.map((star) => (
-        <div
-            key={star.id}
-            className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_8px_white] animate-zuhre"
-            style={{
-                left: star.left,
-                top: star.top,
-                animationDelay: star.delay
-            }}
-        ></div>
-      ))}
+          {/* Arka Plan Efektleri */}
+          <Stars radius={150} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+        </Suspense>
+      </Canvas>
 
-      {/* Cosmic Nebula Images (Floating) */}
-      {nebulas.map((nebula) => (
-        <div
-          key={nebula.id}
-          className="absolute animate-nebula-float pointer-events-none mix-blend-screen"
-          style={{
-            left: nebula.left,
-            top: nebula.top,
-            width: '400px',
-            opacity: nebula.opacity,
-            transform: `translate(-50%, -50%) scale(${nebula.scale})`,
-            animationDuration: nebula.duration
-          }}
-        >
-             <img src={nebulaImg} alt="Cosmic Nebula" className="w-full h-auto opacity-80 blur-[20px]" />
-        </div>
-      ))}
-
-      {/* Subtle Grid Overlay for Tech Feel */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]"></div>
+      {/* Mobil Kullanıcılar İçin İpucu */}
+      <div className="absolute bottom-20 left-0 right-0 text-center pointer-events-none md:hidden">
+        <span className="text-white/30 text-xs px-4 py-2 bg-black/20 rounded-full backdrop-blur-sm">
+          Gezegenlere dokunarak döndür
+        </span>
+      </div>
     </div>
   );
 };
