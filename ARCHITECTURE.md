@@ -1,343 +1,88 @@
-# Escort Platform - Sistem Mimarisi
+# Proje Mimarisi: Escilan Platformu
 
-> Kapsamlı teknik mimari ve kullanıcı rolleri dokümantasyonu.
+Bu doküman, Escilan projesinin teknik mimarisini, kullanılan teknolojileri ve klasör yapısını detaylı bir şekilde açıklamaktadır.
 
----
+## 1. Genel Bakış
 
-## 🏗️ Genel Bakış
+Proje, modern bir **monorepo-benzeri** yapıya sahip, tam yığın (full-stack) bir TypeScript uygulamasıdır. Frontend (Vite + React) ve Backend (Node.js + tRPC) aynı proje altında geliştirilmiştir ve Docker ile kolayca canlıya alınabilir.
 
-Escort Platform, üç ana kullanıcı türünü (Müşteri, Escort, Admin) ayrı sistemlerle yöneten modern bir web uygulamasıdır.
+- **Frontend**: Vite tarafından derlenen, React tabanlı, yüksek performanslı bir Tek Sayfa Uygulaması (SPA).
+- **Backend**: Node.js üzerinde çalışan, tRPC ile type-safe bir API sunan, Express tabanlı sunucu.
+- **Veritabanı**: PostgreSQL, Drizzle ORM ile yönetilir.
+- **Canlıya Alma (Deployment)**: Docker, Docker Compose ve Nginx (Reverse Proxy olarak) kullanılarak yapılır.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ESCORT PLATFORM                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│   ┌─────────────┐    ┌─────────────┐    ┌──────────────┐         │
-│   │   MÜŞTERİ   │    │   ESCORT    │    │    ADMIN     │         │
-│   │   PORTAL    │    │   PORTAL    │    │   PANEL      │         │
-│   └──────┬──────┘    └──────┬──────┘    └──────┬───────┘         │
-│          │                   │                  │                 │
-│   ┌──────▼──────────────────▼──────────────────▼───────┐         │
-│   │                    AUTH LAYER                       │         │
-│   │              (JWT + Role-Based Access)              │         │
-│   └──────────────────────┬──────────────────────────────┘         │
-│                          │                                        │
-│   ┌──────────────────────▼──────────────────────────────┐         │
-│   │                   API LAYER (tRPC)                   │         │
-│   └──────────────────────┬──────────────────────────────┘         │
-│                          │                                        │
-│   ┌──────────────────────▼──────────────────────────────┐         │
-│   │              DATABASE (Supabase/Postgres)            │         │
-│   └─────────────────────────────────────────────────────┘         │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
-```
+## 2. Teknoloji Stack'i
 
----
+- **Dil**: TypeScript (Tüm projede)
+- **Frontend**:
+    - **Framework**: React 18
+    - **Derleyici**: Vite
+    - **Routing**: Wouter
+    - **Styling**: Tailwind CSS
+    - **UI Bileşenleri**: Radix UI, `shadcn/ui` (uyarlanmış)
+    - **Animasyon**: Framer Motion
+- **Backend**:
+    - **Runtime**: Node.js
+    - **Web Server**: Express.js
+    - **API Framework**: tRPC (Type-safe API katmanı)
+    - **Veritabanı ORM**: Drizzle ORM
+    - **Kimlik Doğrulama**: JWT (JSON Web Tokens) & `bcryptjs`
+- **Veritabanı**: PostgreSQL
+- **Deployment**:
+    - **Konteynerleştirme**: Docker & Docker Compose
+    - **Web Sunucusu / Reverse Proxy**: Nginx
 
-## 👥 Kullanıcı Rolleri
-
-### 1. Müşteri (Customer)
-
-**Kayıt ve Giriş:**
-
-- `/register`, `/register-client`, `/signup` → Müşteri kaydı
-- `/login`, `/login-client` → Müşteri girişi
-
-**Erişilebilir Sayfalar:**
-
-| Sayfa | Route | Açıklama |
-|-------|-------|----------|
-| Ana Sayfa | `/` | Featured escort'lar, arama |
-| İlan Listesi | `/escorts`, `/catalog` | Escort arama ve filtreleme |
-| Escort Profili | `/escort/:id` | Escort detay sayfası |
-| Favorilerim | `/favorites` | Favori escort'lar |
-| Mesajlar | `/messages` | Message inbox |
-| Randevularım | `/appointments` | Randevu yönetimi |
-| Dashboard | `/dashboard` | Müşteri paneli |
-
-**Özellikler:**
-
-- ✅ Escort profillerini görüntüleme
-- ✅ Favorilere ekleme
-- ✅ Mesaj gönderme
-- ✅ Randevu talebi
-- ✅ Değerlendirme yazma
-- ✅ VIP üyelik satın alma
-- ✅ Sadakat puanı kazanma
-
----
-
-### 2. Escort
-
-**Kayıt ve Giriş:**
-
-- `/register-escort` → Escort kaydı
-- `/login-escort` → Escort girişi
-
-**Erişilebilir Sayfalar:**
-
-| Sayfa | Route | Açıklama |
-|-------|-------|----------|
-| Dashboard | `/escort/dashboard` | Ana kontrol paneli |
-| Private Dashboard | `/escort/private-dashboard` | Özel panel |
-| Analytics | `/escort/analytics` | İstatistikler |
-| Market | `/escort/market` | Boost ve VIP paketleri |
-| Mesajlar | `/messages` | Müşteri mesajları |
-| Randevular | `/appointments` | Randevu yönetimi |
-
-**Özellikler:**
-
-- ✅ Profil oluşturma ve düzenleme
-- ✅ Fotoğraf yükleme
-- ✅ Fiyat belirleme
-- ✅ Hizmet türü seçimi
-- ✅ Çalışma saatleri ayarlama
-- ✅ Mesaj alma ve yanıtlama
-- ✅ Randevu onaylama/reddetme
-- ✅ Gelir takibi
-- ✅ Boost paketleri
-- ✅ VIP üyelik
-
----
-
-### 3. Admin
-
-**Giriş:**
-
-- Admin hesabı özel olarak oluşturulur
-- Rol: `admin`
-
-**Erişilebilir Sayfalar:**
-
-| Sayfa | Route | Açıklama |
-|-------|-------|----------|
-| Dashboard | `/admin/dashboard` | Ana yönetim paneli |
-| Onaylar | `/admin/approvals` | Onay bekleyenler |
-| Monitoring | `/admin/monitoring` | Canlı izleme |
-| Reports | `/admin/reports` | Raporlar |
-
-**Admin Panel Sekmeleri (12 adet):**
-
-1. **Genel Bakış** - Platform istatistikleri, KPI'lar
-2. **Kullanıcılar** - Müşteri/Escort yönetimi
-3. **İlanlar** - İlan onay/red/silme
-4. **Değerlendirmeler** - Yorum moderasyonu
-5. **Şikayetler** - Kullanıcı şikayetleri
-6. **Ayarlar** - Site ayarları
-7. **Tema** - Görsel özelleştirme
-8. **Vitrin** - Featured escort'lar
-9. **Medya** - Fotoğraf onay kuyruğu
-10. **Sayfalar** - CMS sayfa yönetimi
-11. **Navigasyon** - Menü düzenleme
-12. **Üyeler** - VIP/Boost yönetimi
-
-**Yetkiler:**
-
-- ✅ Tüm kullanıcıları görüntüleme
-- ✅ Kullanıcı yasaklama/askıya alma
-- ✅ İlan onaylama/reddetme
-- ✅ Fotoğraf onaylama
-- ✅ Yorum moderasyonu
-- ✅ Şikayet yönetimi
-- ✅ Site ayarları
-- ✅ Finansal raporlar
-- ✅ Sistem logları
-
----
-
-## 🔐 Authentication Flow
+## 3. Klasör Yapısı
 
 ```
-┌──────────────────┐
-│    Kullanıcı     │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐         ┌──────────────────┐
-│   Login/Register │─────────▶│   AuthContext    │
-└──────────────────┘         └────────┬─────────┘
-                                      │
-         ┌────────────────────────────┼────────────────────────────┐
-         │                            │                            │
-         ▼                            ▼                            ▼
-┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│  role: 'user'    │    │  role: 'escort'  │    │  role: 'admin'   │
-│  Müşteri Portal  │    │  Escort Portal   │    │  Admin Panel     │
-└──────────────────┘    └──────────────────┘    └──────────────────┘
+/
+├── api/                  # Vercel gibi serverless ortamlar için tRPC handler
+├── drizzle/              # Drizzle ORM migration ve seed dosyaları
+├── public/               # Statik dosyalar (favicon, robots.txt)
+├── src/
+│   ├── components/       # Paylaşılan React bileşenleri (UI, Layout vb.)
+│   ├── contexts/         # React Context'leri (Auth, Theme vb.)
+│   ├── drizzle/          # Veritabanı şeması (schema.ts) ve istemci (db.ts)
+│   ├── hooks/            # Özel React hook'ları (useChat vb.)
+│   ├── lib/              # Yardımcı fonksiyonlar ve tRPC istemcisi (utils.ts, trpc.ts)
+│   ├── pages/            # Ana sayfa bileşenleri ve rotalar
+│   │   ├── customer/     # Müşteri paneli sayfaları
+│   │   ├── dashboard/    # Escort paneli sayfaları
+│   │   └── App.tsx       # Ana yönlendirici (Router)
+│   ├── server/           # Backend kodu
+│   │   ├── routers/      # tRPC router'ları (auth, escort, appointment vb.)
+│   │   ├── context.ts    # tRPC context'i (veritabanı bağlantısı içerir)
+│   │   ├── router.ts     # Ana tRPC router ve middleware'ler
+│   │   └── server.ts     # Express sunucusunun giriş noktası (entry point)
+│   ├── services/         # (Artık kullanılmıyor) Mock servisler
+│   └── types/            # Global TypeScript tipleri
+├── .env.example          # Gerekli ortam değişkenleri için şablon
+├── Dockerfile            # Backend uygulamasını paketleyen Docker dosyası
+├── docker-compose.yml    # Veritabanı, API ve Nginx'i yöneten Compose dosyası
+├── nginx.conf            # Nginx için reverse proxy konfigürasyonu
+├── package.json          # Proje bağımlılıkları ve script'leri
+└── tsconfig.json         # TypeScript ana konfigürasyonu
+└── tsconfig.server.json  # TypeScript backend derleme konfigürasyonu
 ```
 
-### JWT Token Yapısı
+## 4. Mimari Akışı
 
-```typescript
-{
-  id: string,
-  email: string,
-  name: string,
-  role: 'user' | 'escort' | 'admin',
-  membership?: 'basic' | 'gold' | 'platinum' | 'diamond',
-  isVerified: boolean,
-  exp: number
-}
-```
+### 4.1. Geliştirme (Local) Ortamı
 
----
+1.  Geliştirici, `docker-compose up` komutunu çalıştırarak PostgreSQL veritabanını başlatır.
+2.  `npm run dev` komutu ile Vite geliştirme sunucusu (frontend) ve Node.js backend sunucusu (nodemon ile) aynı anda çalışır.
+3.  Frontend, tarayıcıda `localhost:5173`'te, backend ise `localhost:3000`'de hizmet verir.
+4.  Frontend, `localhost:3000/trpc` adresindeki tRPC API'sine istek atar.
 
-## 📁 Klasör Yapısı
+### 4.2. Canlı (Production) Ortamı (VPS)
 
-```
-src/
-├── components/           # UI Bileşenleri
-│   ├── ui/               # Radix UI primitives
-│   ├── Header.tsx        # Global header
-│   ├── Footer.tsx        # Global footer
-│   ├── FloatingNavigation.tsx
-│   └── ...
-│
-├── pages/                # Sayfa Bileşenleri
-│   ├── App.tsx           # Ana router
-│   │
-│   ├── # Genel Sayfalar
-│   ├── Home.tsx
-│   ├── Catalog.tsx
-│   ├── EscortProfile.tsx
-│   │
-│   ├── # Auth Sayfaları
-│   ├── ClientLogin.tsx   # Müşteri giriş
-│   ├── ClientRegister.tsx
-│   ├── EscortLogin.tsx   # Escort giriş
-│   ├── EscortRegister.tsx
-│   │
-│   ├── # Müşteri Sayfaları
-│   ├── CustomerDashboard.tsx
-│   ├── MyFavorites.tsx
-│   ├── MyAppointments.tsx
-│   ├── Messages.tsx
-│   │
-│   ├── # Escort Sayfaları
-│   ├── EscortDashboard.tsx
-│   ├── EscortPrivateDashboard.tsx
-│   ├── EscortAnalyticsDashboard.tsx
-│   ├── EscortMarket.tsx
-│   │
-│   ├── # Admin Sayfaları
-│   ├── AdminDashboard.tsx  # 2344 satır, 12 sekme
-│   ├── AdminApprovals.tsx
-│   ├── AdminRealTimeMonitoring.tsx
-│   ├── AdminReports.tsx
-│   │
-│   └── # Legal Sayfalar
-│       ├── TermsOfService.tsx
-│       ├── PrivacyPolicy.tsx
-│       ├── CookiePolicy.tsx
-│       ├── KVKK.tsx
-│       └── Safety.tsx
-│
-├── contexts/             # React Context'ler
-│   ├── AuthContext.tsx   # JWT Authentication
-│   ├── ThemeContext.tsx  # Dark/Light mode
-│   └── NotificationContext.tsx
-│
-├── hooks/                # Custom React Hooks
-│   ├── useAdminData.ts   # Admin data fetching
-│   ├── useAdminActions.ts # Admin mutations
-│   └── ...
-│
-├── lib/                  # Utilities
-│   ├── email/            # Email service
-│   ├── payment/          # İyzico integration
-│   ├── security/         # Security utils
-│   └── trpc.ts           # tRPC client
-│
-├── types/                # TypeScript Types
-│   ├── admin.ts
-│   ├── payment.ts
-│   └── ...
-│
-└── utils/                # Helper Functions
-    └── security.ts       # XSS, validation
+1.  `docker-compose up -d --build` komutu çalıştırılır.
+2.  **`db` servisi**: PostgreSQL veritabanını bir Docker konteynerinde başlatır. Veriler, sunucuda kalıcı bir `volume`'da saklanır.
+3.  **`api` servisi**: `Dockerfile`'ı kullanarak Node.js backend'ini derler, optimize eder ve bir konteyner içinde başlatır. Bu konteyner sadece kendi ağı (`escilan_network`) içinden erişilebilirdir.
+4.  **`nginx` servisi**: Dış dünyaya açılan kapıdır (Port 80 ve 443).
+    - `https://yourdomain.com/` adresine gelen istekleri, derlenmiş frontend dosyalarının (`/dist`) bulunduğu klasöre yönlendirir.
+    - `https://yourdomain.com/api/*` adresine gelen istekleri, `api` servisine (backend) proxy'ler.
+    - `https://yourdomain.com/ws` WebSocket bağlantılarını `api` servisine yönlendirir.
+    - Let's Encrypt (Certbot) ile SSL sertifikalarını yönetir ve HTTPS trafiği sağlar.
 
-```
-
----
-
-## 🔄 Route Koruması
-
-### DashboardAuthGuard Kullanımı
-
-```tsx
-// Admin sayfası örneği
-export function AdminDashboard() {
-  return (
-    <DashboardAuthGuard requiredRole="admin">
-      {/* Admin içeriği */}
-    </DashboardAuthGuard>
-  );
-}
-
-// Escort sayfası örneği
-export function EscortDashboard() {
-  return (
-    <DashboardAuthGuard requiredRole="escort">
-      {/* Escort içeriği */}
-    </DashboardAuthGuard>
-  );
-}
-
-// Müşteri sayfası örneği
-export function MyFavorites() {
-  return (
-    <DashboardAuthGuard requiredRole="user">
-      {/* Müşteri içeriği */}
-    </DashboardAuthGuard>
-  );
-}
-```
-
----
-
-## 📊 Veritabanı Şeması
-
-### Ana Tablolar
-
-| Tablo | Açıklama |
-|-------|----------|
-| `users` | Tüm kullanıcılar (role field ile ayrım) |
-| `escort_profiles` | Escort profil bilgileri |
-| `escort_photos` | Escort fotoğrafları |
-| `appointments` | Randevular |
-| `conversations` | Mesaj konuşmaları |
-| `messages` | Mesajlar |
-| `reviews` | Değerlendirmeler |
-| `favorites` | Favori escort'lar |
-| `subscriptions` | VIP üyelikler |
-| `payments` | Ödeme kayıtları |
-| `notifications` | Bildirimler |
-| `reports` | Şikayet raporları |
-
----
-
-## 🛡️ Güvenlik Katmanları
-
-1. **Authentication** - JWT token doğrulama
-2. **Authorization** - Role-based access control
-3. **Input Validation** - Sanitization, XSS koruması
-4. **Rate Limiting** - API flood koruması
-5. **CSP Headers** - Content Security Policy
-6. **HTTPS** - SSL/TLS şifreleme
-
----
-
-## 📈 Performans Optimizasyonları
-
-- React.memo() - Header, Footer, Cards
-- Lazy loading - Tüm route'lar
-- Manual chunks - Vendor ayrımı
-- Code splitting - Bundle %72 küçültme
-- Image optimization - Lazy loading
-- Virtual scrolling - Uzun listeler
-
----
-
-*Son Güncelleme: Ocak 2026*
+Bu yapı, projenin hem geliştirme hem de canlıya alma süreçlerini standart, ölçeklenebilir ve güvenli hale getirir.

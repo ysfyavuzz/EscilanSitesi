@@ -1,138 +1,79 @@
 /**
- * tRPC React Client Module (trpc.tsx)
- * 
- * React-specific tRPC client setup with Query Client provider.
- * Handles client-side communication with the tRPC backend.
- * Provides React hooks and context provider for tRPC queries and mutations.
- * 
+ * tRPC Client Module
+ *
+ * Configures the tRPC client for making type-safe API calls from the frontend.
+ * Integrates with React Query for data fetching and caching.
+ *
  * @module lib/trpc
- * @category Library - API
- * 
- * Features:
- * - tRPC React client initialization
- * - Query Client with optimized default options
- * - HTTP batch link for efficient API calls
- * - Authentication header injection
- * - Server-side rendering (SSR) client support
- * - React context provider component
- * 
- * Default Query Options:
- * - staleTime: 60 seconds
- * - refetchOnWindowFocus: disabled
- * 
- * Client Initialization:
- * - Browser: Single QueryClient instance reused across renders
- * - Server: New QueryClient created per request
- * 
- * @example
- * ```typescript
- * import { TRPCProvider, useTRPC } from '@/lib/trpc';
- * 
- * // Wrap app with provider
- * export function App() {
- *   return (
- *     <TRPCProvider>
- *       <YourApp />
- *     </TRPCProvider>
- *   );
- * }
- * 
- * // Use tRPC in components
- * function MyComponent() {
- *   const trpc = useTRPC();
- *   const { data, isLoading } = trpc.catalog.list.useQuery();
- *   
- *   return <div>{data?.length} escorts found</div>;
- * }
- * ```
- * 
- * @typedef {import('@/routers').AppRouter} AppRouter
+ * @category Library - API Client
  */
 
-import { useState, useEffect } from 'react';
-import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '@/routers';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
+import React, { useState } from "react";
+import { createTRPCReact } from "@trpc/react-query";
+import { httpBatchLink } from "@trpc/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { AppRouter } from "../server";
+import { supabase } from "./supabase";
 
-// Create tRPC client for React
+/**
+ * Create tRPC React hooks
+ * These hooks provide type-safe API calls throughout the app
+ */
 export const trpc = createTRPCReact<AppRouter>();
 
-// Create Query Client
-let browserQueryClient: QueryClient | undefined = null;
-
-function getQueryClient() {
-  if (typeof window === 'undefined') {
-    // Server: always create a new client
-    return new QueryClient();
+/**
+ * Get API URL based on environment
+ */
+function getBaseUrl() {
+  if (typeof window !== "undefined") {
+    // Browser should use relative URL
+    return "";
   }
+  // SSR should use absolute URL
+  return `http://localhost:${process.env.PORT ?? 3000}`;
+}
 
-  // Browser: create a client once and reuse
-  if (!browserQueryClient) {
-    browserQueryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 60 * 1000, // 1 minute
-          refetchOnWindowFocus: false,
+/**
+ * tRPC Provider Component
+ * Wraps the application with tRPC and React Query providers
+ */
+export function TRPCProvider({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 1000, // 5 seconds
+            retry: 1,
+          },
         },
-      },
-    });
-  }
+      }),
+  );
 
-  return browserQueryClient;
-}
-
-// tRPC Provider Props
-interface TRPCProviderProps {
-  children: React.ReactNode;
-}
-
-// tRPC Provider Component
-export function TRPCProvider({ children }: TRPCProviderProps) {
-  const [queryClient] = useState(() => getQueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: '/api/trpc',
-          // You can add headers here
-          headers: () => {
-            const token = localStorage.getItem('auth-token');
+          url: `${getBaseUrl()}/api/trpc`,
+          // Add auth token from Supabase to requests
+          async headers() {
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
             return {
-              authorization: token ? `Bearer ${token}` : undefined,
+              authorization: session?.access_token
+                ? `Bearer ${session.access_token}`
+                : "",
             };
           },
         }),
       ],
-    })
+    }),
   );
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </trpc.Provider>
   );
 }
-
-// Hook to use tRPC
-export function useTRPC() {
-  return trpc;
-}
-
-// Server-side tRPC client (for SSR/SSG)
-export function createSSRClient() {
-  return trpc.createClient({
-    links: [
-      httpBatchLink({
-        url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/trpc',
-      }),
-    ],
-  });
-}
-
-// Example usage:
-// const utils = trpc.useContext();
-// const { data, isLoading, error } = trpc.escort.list.useQuery();
-// const mutate = trpc.escort.create.useMutation();

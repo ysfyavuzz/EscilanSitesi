@@ -16,6 +16,8 @@ import {
   Camera, Crop, SlidersHorizontal, Eye, EyeOff, Save, Upload, Sparkles
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import FileUpload from '@/components/FileUpload';
+import { uploadMultipleFiles } from '@/services/mockUploadService';
 
 // Mock AI İşleme Fonksiyonu (Gerçek AI backend API'ye bağlanacak)
 const mockProcessImage = (
@@ -137,15 +139,31 @@ export default function ImageEditor() {
           {/* Sol Panel: Kontroller */}
           <div className="md:col-span-1 bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="image-upload" className="text-gray-300 flex items-center gap-2 mb-2">
-                <Upload className="w-4 h-4" /> Görsel Yükle
-              </Label>
-              <Input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="bg-white/5 border-white/10 text-white file:text-purple-400 file:bg-white/10 file:border-none file:mr-4 file:py-2 file:px-4 file:rounded-xl hover:file:bg-white/20"
+              <FileUpload
+                onUpload={async (files) => {
+                  try {
+                    const results = await uploadMultipleFiles(files);
+                    // İlk başarılı yüklenen dosyanın URL'sini kullan
+                    const firstSuccessfulUpload = results.find(r => r.success);
+                    if (firstSuccessfulUpload?.fileUrl) {
+                      setOriginalImage(firstSuccessfulUpload.fileUrl);
+                      // Reset processing options for new image
+                      setImageProcessingOptions({
+                        faceMaskingEnabled: false,
+                        blurBackground: false,
+                        customMaskId: 'none',
+                        brightnessAdjustment: 0,
+                        contrastAdjustment: 0,
+                      });
+                    }
+                    alert('Dosyalar başarıyla yüklendi!');
+                  } catch (error) {
+                    alert('Dosya yükleme sırasında hata oluştu.');
+                    console.error('Dosya yükleme hatası:', error);
+                  }
+                }}
+                maxFiles={1} // Sadece bir görsel yüklenmesine izin ver
+                allowedFileTypes={['image/*']}
               />
             </div>
 

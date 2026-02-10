@@ -116,7 +116,7 @@ const CUSTOMER_ACTIONS: DashboardAction[] = [
     title: 'Mesajlar',
     description: 'Escortlar ile konuşun',
     icon: MessageSquare,
-    href: '/messages',
+    href: '/customer/messages',
     color: 'bg-purple-500/10 text-purple-600',
     badge: 5,
   },
@@ -124,15 +124,22 @@ const CUSTOMER_ACTIONS: DashboardAction[] = [
     title: 'Değerlendirmelerim',
     description: 'Yaptığınız değerlendirmeleri görün',
     icon: Star,
-    href: '/reviews',
+    href: '/customer/reviews',
     color: 'bg-yellow-500/10 text-yellow-600',
   },
   {
     title: 'Analitik',
     description: 'Aktivite ve harcama istatistikleri',
     icon: BarChart3,
-    href: '/analytics',
+    href: '/customer/analytics',
     color: 'bg-green-500/10 text-green-600',
+  },
+  {
+    title: 'Şikayetlerim',
+    description: 'Yaptığınız şikayetleri takip edin',
+    icon: Shield,
+    href: '/customer/complaints',
+    color: 'bg-orange-500/10 text-orange-600',
   },
 ];
 

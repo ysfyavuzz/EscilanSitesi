@@ -31,9 +31,13 @@ const EscortLogin = lazy(() => import("@/pages/EscortLogin"));
 const ClientLogin = lazy(() => import("@/pages/ClientLogin"));
 const EscortRegister = lazy(() => import("@/pages/EscortRegister"));
 const ClientRegister = lazy(() => import("@/pages/ClientRegister"));
-const MyFavorites = lazy(() => import("@/pages/MyFavorites"));
-const Messages = lazy(() => import("@/pages/Messages"));
-const MyAppointments = lazy(() => import("@/pages/MyAppointments"));
+const CustomerFavorites = lazy(() => import("@/pages/customer/CustomerFavorites"));
+const CustomerMessages = lazy(() => import("@/pages/customer/CustomerMessages"));
+const CustomerAppointments = lazy(() => import("@/pages/customer/CustomerAppointments"));
+const CustomerReviews = lazy(() => import("@/pages/customer/CustomerReviews"));
+const CustomerComplaints = lazy(() => import("@/pages/customer/CustomerComplaints"));
+const CustomerAnalytics = lazy(() => import("@/pages/customer/CustomerAnalytics"));
+const CustomerDashboard = lazy(() => import("@/pages/customer/CustomerDashboard"));
 const EscortDashboard = lazy(() => import("@/pages/dashboard/EscortDashboard")); // Update path
 const EscortMarket = lazy(() => import("@/pages/EscortMarket"));
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
@@ -54,7 +58,6 @@ const PaymentResult = lazy(() => import("@/pages/PaymentResult"));
 const VerificationCenter = lazy(() => import("@/pages/VerificationCenter"));
 const Blog = lazy(() => import("@/pages/Blog"));
 const GuestCatalog = lazy(() => import("@/pages/GuestCatalog"));
-const CustomerDashboard = lazy(() => import("@/pages/CustomerDashboard"));
 const EscortPrivateDashboard = lazy(() => import("@/pages/EscortPrivateDashboard"));
 const EscortAnalyticsDashboard = lazy(() => import("@/pages/EscortAnalyticsDashboard"));
 const MembershipUpgrade = lazy(() => import("@/pages/MembershipUpgrade"));
@@ -63,8 +66,6 @@ const RealTimeMessaging = lazy(() => import("@/pages/RealTimeMessaging"));
 const VideoCallPage = lazy(() => import("@/pages/VideoCallPage"));
 const AdminRealTimeMonitoring = lazy(() => import("@/pages/AdminRealTimeMonitoring"));
 const AdminReports = lazy(() => import("@/pages/AdminReports"));
-const Analytics = lazy(() => import("@/pages/Analytics"));
-const Reviews = lazy(() => import("@/pages/Reviews"));
 const Login = lazy(() => import("@/pages/Login"));
 const AdminPanel = lazy(() => import("@/pages/AdminPanel"));
 const AdminComplaints = lazy(() => import("@/pages/AdminComplaints"));
@@ -108,18 +109,26 @@ function AppRouter() {
         <Route path="/register" component={ClientRegister} />
         <Route path="/signup" component={ClientRegister} />
 
-        {/* Dashboards */}
+        {/* Customer Panel */}
         <Route path="/dashboard" component={CustomerDashboard} />
-        <Route path="/favorites" component={MyFavorites} />
-        <Route path="/messages" component={Messages} />
-        <Route path="/appointments" component={MyAppointments} />
+        <Route path="/favorites" component={CustomerFavorites} />
+        <Route path="/messages" component={CustomerMessages} />
+        <Route path="/appointments" component={CustomerAppointments} />
+        <Route path="/reviews" component={CustomerReviews} />
+        <Route path="/reports" component={CustomerComplaints} />
+        <Route path="/customer/settings" component={CustomerSettings} />
+        <Route path="/customer/notifications" component={CustomerNotifications} />
+        <Route path="/customer/history" component={CustomerHistory} />
+        <Route path="/customer/wallet" component={CustomerWallet} />
+        <Route path="/customer/analytics" component={CustomerAnalytics} />
         
         {/* Escort Panel */}
-        <Route path="/dashboard" component={EscortDashboard} /> {/* Ana Dashboard */}
+        <Route path="/escort/dashboard" component={EscortDashboard} /> {/* Ana Dashboard */}
         <Route path="/dashboard/profile" component={ProfileEditor} />
         <Route path="/dashboard/schedule" component={ScheduleManager} />
         <Route path="/dashboard/interactions" component={InteractionsCenter} />
         <Route path="/dashboard/image-editor" component={ImageEditor} />
+
         {/* <Route path="/escort/market" component={EscortMarket} /> */} {/* Henüz DashboardLayout'a entegre değil */}
         {/* <Route path="/escort/dashboard/private" component={EscortPrivateDashboard} /> */}
         {/* <Route path="/escort/dashboard/analytics" component={EscortAnalyticsDashboard} /> */}

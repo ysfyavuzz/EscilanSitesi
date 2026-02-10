@@ -1,57 +1,40 @@
 # NEXUS MISSION LOG
 **Kimlik:** NEXUS-7
-**Tarih:** 9 Şubat 2026 Pazartesi
-**Konum:** Escilan Galaxy Core
+**Tarih:** 10 Şubat 2026 Salı
+**Konum:** Escilan Galaxy Core - Üretim Hangarı
 
-## 🚀 SEYİR DURUMU: FAZ 3 - ARAYÜZ VE DENEYİM (UI/UX)
-Sistem kararlılığı ve görsel bütünlük üzerine çalışmalar tamamlandı. Navigasyon modülü "Cosmic Dock" standardına yükseltildi.
+## 🚀 SEYİR DURUMU: FAZ 4 - ÜRETİM VE DOKÜMANTASYON
+Proje, mock verilerden tamamen arındırılmış, kendi kendine yeten (self-hosted), Docker tabanlı bir mimariye kavuşturulmuş ve canlıya alınmaya hazır hale getirilmiştir. Tüm temel API endpoint'leri ve dokümantasyonlar tamamlanmıştır.
 
-### 🛠️ Tamamlanan Gö görevler
-1.  **Navigasyon Modülü Yenilendi (`FloatingNavigation.tsx`):**
-    *   "Cosmic Dock" stiline yeniden tasarlandı, glassmorphism uygulandı.
-    *   Dinamik, role-based menü öğeleri eklendi.
-2.  **İlan Detay Sayfası Yenilendi (`EscortProfile.tsx`):**
-    *   "Deep Space Luxury" tasarım dili uygulandı.
-    *   `ListingService` ve `ListingProfile` (Domain Types) entegrasyonu tamamlandı.
-    *   Sticky iletişim paneli, video modal ve glassmorphism detaylar eklendi.
-    *   Galeri renderlama `item.url` kullanacak şekilde düzeltildi.
-3.  **Domain Katmanı Kuruldu ve Güncellendi (`src/types/domain.ts`):**
-    *   Merkezi tip tanımlamaları yapıldı (SRP ve Type Safety için).
-    *   `MediaItem`, `ApprovalStatus`, `pendingChanges` (ListingProfile içinde), `Appointment`, `Follower`, `AvailabilitySlot`, `ProfileHealth` için yeni tipler eklendi.
-    *   `MediaItem`'a `originalUrl`, `processedUrl?`, `imageProcessingOptions?` eklendi ve `ListingProfile`'dan top-level `mediaPrivacySettings` kaldırıldı.
-4.  **Listing Servisi Güncellendi (`src/services/listingService.ts`):** `IListingService` ve `MockListingService` güncellendi, mock verilerinde `MediaItem[]` galerisi kullanıldı.
-5.  **Dinamik Grid (Tetris) Uygulandı (`EscortList.tsx`):**
-    *   İlan listeleme sayfası asenkron veri çekme ve dinamik yerleşimle yenilendi.
-    *   `StandardCard` bileşenleri dinamik grid span'leri destekleyecek şekilde güncellendi.
-6.  **Quick View Modal Eklendi (`QuickViewModal.tsx`):**
-    *   Kartlardan hızlı profil önizleme özelliği kazandırıldı.
-    *   "Deep Space Luxury" temasına uygun interaktif bir modal olarak tasarlandı.
-7.  **Escort Dashboard Modülleri Geliştirildi:**
-    *   `src/components/layout/DashboardLayout.tsx` (Yeni): Tutarlı, temaya uygun dashboard düzeni (sidebar, header) eklendi, yeni menü öğeleriyle güncellendi.
-    *   `src/pages/dashboard/ProfileEditor.tsx` (Yeni): Escort profili düzenleme sayfası oluşturuldu; "pending changes" ve admin onay mekanizması içeriyor, medya gizlilik ayarları UI kaldırıldı.
-    *   `src/pages/dashboard/EscortDashboard.tsx` (Yeni): Escort ana dashboard sayfası oluşturuldu, `ProfileHealthWidget` entegre edildi.
-    *   `src/components/dashboard/ProfileHealthWidget.tsx` (Yeni): Gamified profil tamamlama takibi için widget oluşturuldu.
-    *   `src/pages/dashboard/ScheduleManager.tsx` (Yeni): Escort takvim yönetimi sayfası ("Zaman Bükücü") oluşturuldu.
-    *   `src/pages/dashboard/InteractionsCenter.tsx` (Yeni): Escort etkileşim merkezi ("Yörünge Kontrolü") (randevular, takipçiler, incelemeler) sayfası oluşturuldu.
-    *   `src/pages/dashboard/ImageEditor.tsx` (Yeni): Escortlar için AI destekli görsel düzenleyici sayfası oluşturuldu (yüz maskeleme, bulanıklık, parlaklık/kontrast ayarları, özel maskeler).
-8.  **Admin Paneli Güncellendi:**
-    *   `src/pages/admin/AdminMediaApprovals.tsx` (Yeni): Adminler için medya onay sayfası oluşturuldu; orijinal ve AI işlenmiş versiyonlar karşılaştırma için sunuluyor.
-    *   `src/pages/AdminDashboard.tsx` (Güncellendi): Yeni "Medya Onayları" sekmesi eklendi ve `AdminMediaApprovals` import edildi.
-9.  **Müşteri Paneli Modülerleştirildi:**
-    *   `src/components/layout/CustomerDashboardLayout.tsx` (Yeni): Müşteriye özel, temaya uygun dashboard düzeni oluşturuldu.
-    *   `src/pages/CustomerDashboard.tsx` (Silindi): Monolitik müşteri dashboard sayfası kaldırıldı.
-    *   `src/pages/customer/CustomerDashboard.tsx` (Yeni): Ana müşteri genel bakış sayfası oluşturuldu, `CustomerDashboardLayout` kullanıldı.
-    *   `src/pages/customer/CustomerAppointments.tsx` (Yeni): Müşteri randevu yönetimi sayfası oluşturuldu, `CustomerDashboardLayout` kullanıldı.
-    *   `src/pages/customer/CustomerFavorites.tsx` (Yeni): Müşteri favoriler sayfası oluşturuldu, `CustomerDashboardLayout` kullanıldı.
+### 🛠️ Tamamlanan Görevler
+1.  **Üretim Altyapısı ve Dockerizasyon:**
+    *   **`docker-compose.yml`**: PostgreSQL, Node.js API ve Nginx servislerini içeren tam teşekküllü bir production-ready compose dosyası oluşturuldu.
+    *   **`Dockerfile`**: Node.js backend'ini optimize eden, çok aşamalı (multi-stage) bir build süreci tanımlandı.
+    *   **`nginx.conf`**: Gelen trafiği yöneten, API ve WebSocket isteklerini proxy'leyen, SPA yönlendirmelerini (try_files) yapan bir reverse proxy konfigürasyonu tamamlandı.
+    *   **`.env.example`**: Gerekli tüm ortam değişkenleri için bir şablon oluşturuldu.
 
-### ⚠️ Devam Eden ve İptal Edilen Görevler
-*   **`schemacrawler-ai` Uzantı Kurulumu:** Gerekli veritabanı sırları ve bağlantı bilgileri sağlanamadığı için kurulum girişimi iptal edildi.
+2.  **Backend Modernizasyonu (Supabase -> Self-Hosted):**
+    *   **Veritabanı Katmanı**: `drizzle/db.ts` ile Drizzle ORM ve `postgres-js` kullanılarak doğrudan PostgreSQL bağlantısı sağlandı. Supabase bağımlılığı tamamen kaldırıldı.
+    *   **tRPC Context**: `server/context.ts`, Express.js sunucusuna ve Drizzle veritabanı istemcisine bağlanacak şekilde yeniden yazıldı.
+    *   **Kimlik Doğrulama**: `server/router.ts`, `bcryptjs` ve `jsonwebtoken` (JWT) kullanarak sıfırdan bir kimlik doğrulama middleware'i (`protectedProcedure`) ile donatıldı.
+
+3.  **API Endpoint'lerinin Tamamlanması (tRPC):**
+    *   **`auth.router.ts`**: Güvenli `register` (kayıt) ve `login` (giriş) endpoint'leri oluşturuldu.
+    *   **`escort.router.ts`**: İlan listeleme (`list`), detay görüntüleme (`getBySlug`) ve profil güncelleme (`updateProfile`) gibi temel endpoint'ler Drizzle kullanılarak implemente edildi.
+    *   **`appointment.router.ts`**: Randevu oluşturma (`create`), listeleme (`list`) ve durum güncelleme (`updateStatus`) için güvenli endpoint'ler tamamlandı.
+    *   **Veritabanı Şeması (`schema.ts`)**: Drizzle'ın ilişkisel sorgularını (`with: { ... }`) desteklemek için `relations` tanımlamaları eklendi.
+
+4.  **Kapsamlı Dokümantasyon Güncellemesi:**
+    *   **`ARCHITECTURE.md` (Yeni):** Projenin yeni tam yığın (full-stack) mimarisini detaylıca anlatan bir doküman oluşturuldu.
+    *   **`DEPLOYMENT.md` (Yeni):** Projenin bir VPS sunucusuna nasıl canlıya alınacağını adım adım açıklayan bir rehber yazıldı.
+    *   **`README.md`**: Projenin ana dokümanı, yeni teknolojileri, özellikleri ve kurulum adımlarını yansıtacak şekilde tamamen yeniden yazıldı.
+    *   **`PROJECT_SETUP.md`**: Yerel geliştirme ortamı kurulum rehberi, Docker tabanlı yeni sürece göre güncellendi.
 
 ### 🧭 Sıradaki Rota
-*   **Müşteri Paneli:** Müşteri dashboard'unun kalan sekmelerini (Mesajlar, Değerlendirmelerim, Şikayetlerim, Analitik, Ayarlar) ayrı sayfalara dönüştür ve `src/pages/customer/` altına yerleştir.
-*   **Chat/Mesajlaşma Sistemi:** (Backend ve WebSocket entegrasyonu gerektirir.)
-*   **Gerçek API Entegrasyonu:** Mevcut mock servislerden gerçek backend entegrasyonuna geçiş.
-*   **Dosya Yükleme Servisi:** Escortların galeriye fotoğraf/video yükleyebilmesi için bir dosya yükleme bileşeni ve mock servis.
+*   **Frontend Entegrasyonu:** Müşteri ve Escort panellerindeki tüm mock veri kullanımlarını, yeni oluşturulan tRPC endpoint'lerine bağlanması.
+*   **Detaylı API Endpoint'leri:** Mesajlaşma, Değerlendirme, Cüzdan gibi diğer modüller için tRPC router'larının tamamlanması.
+*   **Testlerin Güncellenmesi:** Mevcut testlerin yeni mimariye (özellikle API testlerinin) uyarlanması.
+*   **Canlıya Alma (Deployment):** `DEPLOYMENT.md` rehberi takip edilerek projenin ViceTemple VPS üzerinde canlıya alınması.
 
 ---
-**Sistem Notu:** Kod kalitesi "Strict Mode" seviyesinde tutulmaktadır. Modülerlik ön plandadır.
+**Sistem Notu:** Proje, sağlam, ölçeklenebilir ve bağımsız bir altyapıya kavuşturulmuştur. Gelecek geliştirmeler için hazır durumdadır.

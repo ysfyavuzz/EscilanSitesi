@@ -1,33 +1,16 @@
 /**
- * Cüzdan ve Kredi Yönetimi Sayfası
- * 
- * Müşterilerin cüzdan bakiyesi, kredi yükleme ve işlem geçmişini yönetebilecekleri sayfa.
- * Sadakat puanları ve puan kullanımı da bu sayfada gösterilir.
- * 
+ * Customer Wallet Page
+ *
+ * This page allows customers to manage their balance, credit deposits, and transaction history.
+ * Wrapped in CustomerDashboardLayout for consistent navigation.
+ * Uses the "Deep Space Luxury" theme with glassmorphism.
+ *
  * @module pages/customer/Wallet
- * @category Pages/Customer
- * 
- * Özellikler:
- * - Mevcut bakiye kartı (büyük, gösterişli)
- * - Sadakat puanları kartı
- * - Kredi yükleme paketleri (100₺, 250₺, 500₺, 1000₺)
- * - İşlem geçmişi tablosu (tarih, açıklama, tutar, bakiye)
- * - Puan kazanma kuralları bölümü (info card)
- * - Puan harcama seçenekleri
- * - İstatistikler (toplam yükleme, toplam harcama, kazanılan puan)
- * - 3D Card ve Button tasarım
- * - Gradient renk temaları
- * 
- * @example
- * ```tsx
- * import Wallet from '@/pages/customer/Wallet';
- * 
- * <Route path="/customer/wallet" element={<Wallet />} />
- * ```
+ * @category Pages - Customer Dashboard
  */
 
 import * as React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet as WalletIcon,
   CreditCard,
@@ -42,672 +25,267 @@ import {
   Award,
   Zap,
   ShoppingBag,
+  History,
+  ShieldCheck,
+  ChevronRight
 } from 'lucide-react';
-import { Card3D } from '@/components/3d/Card3D';
-import { Button3D } from '@/components/3d/Button3D';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { CustomerDashboardLayout } from '@/components/layout/CustomerDashboardLayout';
+import { SEO } from '@/pages/SEO';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
-/** İşlem türü */
-type IslemTuru = 'yukleme' | 'harcama' | 'puan_kazanma' | 'puan_harcama' | 'iade';
-
-/** İşlem arayüzü */
-interface Islem {
-  id: string;
-  tarih: string;
-  tur: IslemTuru;
-  aciklama: string;
-  tutar: number;
-  bakiye: number;
-  puan?: number;
-}
-
-/** Kredi paketi arayüzü */
-interface KrediPaketi {
-  id: string;
-  tutar: number;
-  bonus: number;
-  ekPuan: number;
-  populer?: boolean;
-}
-
-/** Mock işlem verileri */
-const mockIslemler: Islem[] = [
+/** Mock transaction data */
+const mockTransactions = [
   {
     id: '1',
-    tarih: '2025-01-15T16:00:00',
-    tur: 'harcama',
-    aciklama: 'Ayşe Yılmaz - VIP Randevu',
-    tutar: -1500,
-    bakiye: 2500,
-    puan: 150,
+    date: '2026-01-15T16:00:00',
+    type: 'spend',
+    description: 'Ayşe Yılmaz - Randevu Ödemesi',
+    amount: -1500,
+    balance: 2500,
   },
   {
     id: '2',
-    tarih: '2025-01-14T10:30:00',
-    tur: 'yukleme',
-    aciklama: 'Kredi Yüklemesi (500₺ Paket)',
-    tutar: 500,
-    bakiye: 4000,
+    date: '2026-01-14T10:30:00',
+    type: 'deposit',
+    description: 'Kredi Yüklemesi (₺500 Paket)',
+    amount: 500,
+    balance: 4000,
   },
   {
     id: '3',
-    tarih: '2025-01-12T19:00:00',
-    tur: 'harcama',
-    aciklama: 'Elif Demir - Standart Randevu',
-    tutar: -800,
-    bakiye: 3500,
-    puan: 80,
+    date: '2026-01-12T19:00:00',
+    type: 'spend',
+    description: 'Elif Demir - Randevu Ödemesi',
+    amount: -800,
+    balance: 3500,
   },
   {
     id: '4',
-    tarih: '2025-01-10T14:00:00',
-    tur: 'puan_kazanma',
-    aciklama: 'Arkadaş Davet Bonusu',
-    tutar: 0,
-    bakiye: 4300,
-    puan: 100,
-  },
-  {
-    id: '5',
-    tarih: '2025-01-08T12:00:00',
-    tur: 'iade',
-    aciklama: 'İptal Edilen Randevu İadesi',
-    tutar: 2500,
-    bakiye: 4300,
-  },
-  {
-    id: '6',
-    tarih: '2025-01-07T18:45:00',
-    tur: 'yukleme',
-    aciklama: 'Kredi Yüklemesi (1000₺ Paket)',
-    tutar: 1000,
-    bakiye: 1800,
-  },
-  {
-    id: '7',
-    tarih: '2025-01-05T17:00:00',
-    tur: 'harcama',
-    aciklama: 'Selin Öz - Standart Randevu',
-    tutar: -750,
-    bakiye: 800,
-    puan: 75,
-  },
-  {
-    id: '8',
-    tarih: '2025-01-03T10:00:00',
-    tur: 'yukleme',
-    aciklama: 'Kredi Yüklemesi (250₺ Paket)',
-    tutar: 250,
-    bakiye: 1550,
-  },
-  {
-    id: '9',
-    tarih: '2025-01-02T09:00:00',
-    tur: 'puan_harcama',
-    aciklama: '500 Puan ile 50₺ İndirim',
-    tutar: 50,
-    bakiye: 1300,
-    puan: -500,
-  },
-  {
-    id: '10',
-    tarih: '2025-01-01T20:00:00',
-    tur: 'puan_kazanma',
-    aciklama: 'Yeni Yıl Bonusu',
-    tutar: 0,
-    bakiye: 1250,
-    puan: 200,
+    date: '2026-01-10T14:00:00',
+    type: 'bonus',
+    description: 'Sadakat Puanı Dönüşümü',
+    amount: 100,
+    balance: 4300,
   },
 ];
 
-/** Kredi paketleri */
-const krediPaketleri: KrediPaketi[] = [
-  {
-    id: 'paket-100',
-    tutar: 100,
-    bonus: 0,
-    ekPuan: 10,
-  },
-  {
-    id: 'paket-250',
-    tutar: 250,
-    bonus: 25,
-    ekPuan: 30,
-  },
-  {
-    id: 'paket-500',
-    tutar: 500,
-    bonus: 75,
-    ekPuan: 75,
-    populer: true,
-  },
-  {
-    id: 'paket-1000',
-    tutar: 1000,
-    bonus: 200,
-    ekPuan: 200,
-  },
+/** Credit packages */
+const creditPackages = [
+  { id: 'pkg1', amount: 250, bonus: 0, points: 25 },
+  { id: 'pkg2', amount: 500, bonus: 50, points: 60, popular: true },
+  { id: 'pkg3', amount: 1000, bonus: 150, points: 150 },
+  { id: 'pkg4', amount: 2500, bonus: 500, points: 400 },
 ];
 
-/** Animasyon varyantları */
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-export default function Wallet() {
-  const [bakiye] = React.useState(2500);
-  const [sadakatPuani] = React.useState(1250);
-  const [islemler] = React.useState<Islem[]>(mockIslemler);
-  const [seciliPaket, setSeciliPaket] = React.useState<KrediPaketi | null>(null);
-
-  /** İstatistikler */
-  const istatistikler = React.useMemo(() => {
-    const yuklemeler = islemler.filter(i => i.tur === 'yukleme');
-    const harcamalar = islemler.filter(i => i.tur === 'harcama');
-    const puanKazanmalar = islemler.filter(i => i.tur === 'puan_kazanma' || (i.puan !== undefined && i.puan > 0));
-
-    const toplamYukleme = yuklemeler.reduce((toplam, i) => toplam + i.tutar, 0);
-    const toplamHarcama = Math.abs(harcamalar.reduce((toplam, i) => toplam + i.tutar, 0));
-    const toplamPuan = puanKazanmalar.reduce((toplam, i) => toplam + (i.puan || 0), 0);
-
-    return {
-      toplamYukleme,
-      toplamHarcama,
-      toplamPuan,
-      yuklemeAdedi: yuklemeler.length,
-    };
-  }, [islemler]);
-
-  /** Tarihi formatla */
-  const tarihFormatla = (tarih: string) => {
-    return new Date(tarih).toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  /** Kredi yükle */
-  const krediYukle = (paket: KrediPaketi) => {
-    setSeciliPaket(paket);
-    // TODO: Ödeme modalını aç
-  };
-
-  /** İşlem türü konfigurasyon */
-  const islemTurKonfig: Record<IslemTuru, { ikon: typeof ArrowUpRight; renk: string; etiket: string }> = {
-    yukleme: { ikon: ArrowUpRight, renk: 'text-green-600', etiket: 'Yükleme' },
-    harcama: { ikon: ArrowDownRight, renk: 'text-red-600', etiket: 'Harcama' },
-    puan_kazanma: { ikon: Star, renk: 'text-sky-600', etiket: 'Puan Kazanma' },
-    puan_harcama: { ikon: Gift, renk: 'text-purple-600', etiket: 'Puan Harcama' },
-    iade: { ikon: ArrowUpRight, renk: 'text-blue-600', etiket: 'İade' },
-  };
+export default function CustomerWallet() {
+  const { isAdmin } = useAuth();
+  const [balance] = React.useState(2500);
+  const [points] = React.useState(1250);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8">
-      <div className="container mx-auto max-w-7xl px-4">
-        {/* Başlık */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Cüzdan ve Kredi Yönetimi
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Bakiyenizi yönetin, kredi yükleyin ve sadakat puanlarınızı kullanın
-          </p>
-        </motion.div>
+    <ProtectedRoute accessLevel={isAdmin ? "admin" : "customer"}>
+      <CustomerDashboardLayout>
+        <SEO
+          title="Cüzdanım | Müşteri Paneli"
+          description="Bakiyenizi yönetin, kredi yükleyin ve işlem geçmişinizi takip edin."
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Sol: Bakiye ve Paketler */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Bakiye ve Sadakat Kartları */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
-            >
-              {/* Bakiye Kartı */}
-              <Card3D
-                padding="lg"
-                className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 border-none"
-              >
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20" />
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                        <WalletIcon className="h-6 w-6 text-white" />
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold font-orbitron text-white">Cüzdanım</h1>
+            <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-3 py-1">
+              <ShieldCheck className="w-4 h-4 mr-2" /> Güvenli Ödeme
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Balance & Points Cards */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Main Balance Card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-600 to-cyan-600 p-8 text-white shadow-2xl shadow-blue-500/20">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                      <WalletIcon className="w-32 h-32" />
+                    </div>
+                    <div className="relative z-10 space-y-6">
+                      <div className="flex justify-between items-center">
+                        <span className="text-blue-100 font-medium tracking-wider">TOPLAM BAKİYE</span>
+                        <CreditCard className="w-6 h-6 text-blue-100" />
                       </div>
-                      <span className="text-white/90 font-medium">Mevcut Bakiye</span>
-                    </div>
-                    <CreditCard className="h-6 w-6 text-white/60" />
-                  </div>
-                  <div className="mb-2">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1">
-                      {bakiye.toLocaleString('tr-TR')}₺
-                    </div>
-                    <div className="text-white/70 text-sm">
-                      Son işlem: {tarihFormatla(islemler[0].tarih)}
-                    </div>
-                  </div>
-                </div>
-              </Card3D>
-
-              {/* Sadakat Puanları Kartı */}
-              <Card3D
-                padding="lg"
-                className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-600 border-none"
-              >
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20" />
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                        <Star className="h-6 w-6 text-white" />
+                      <div>
+                        <span className="text-5xl font-black">₺{balance.toLocaleString('tr-TR')}</span>
                       </div>
-                      <span className="text-white/90 font-medium">Sadakat Puanı</span>
+                      <div className="flex gap-4 pt-4">
+                        <Button className="bg-white text-blue-600 hover:bg-blue-50 font-bold px-6">
+                          <Plus className="w-4 h-4 mr-2" /> Yükle
+                        </Button>
+                        <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-bold">
+                          Para Gönder
+                        </Button>
+                      </div>
                     </div>
-                    <Award className="h-6 w-6 text-white/60" />
-                  </div>
-                  <div className="mb-2">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1">
-                      {sadakatPuani.toLocaleString('tr-TR')}
+                  </Card>
+                </motion.div>
+
+                {/* Loyalty Points Card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <Card className="relative overflow-hidden border-none bg-gradient-to-br from-[#1a1a2e] to-[#16213e] p-8 text-white border border-white/5 shadow-2xl">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                      <Star className="w-32 h-32 text-yellow-500" />
                     </div>
-                    <div className="text-white/70 text-sm">
-                      500 puan = 50₺ indirim
+                    <div className="relative z-10 space-y-6">
+                      <div className="flex justify-between items-center">
+                        <span className="text-blue-400 font-medium tracking-wider uppercase">Galaxy Puan</span>
+                        <Award className="w-6 h-6 text-yellow-500" />
+                      </div>
+                      <div>
+                        <span className="text-5xl font-black text-white">{points.toLocaleString('tr-TR')}</span>
+                        <p className="text-xs text-blue-400 mt-2 font-medium">₺125 Değerinde</p>
+                      </div>
+                      <div className="pt-4">
+                        <Button className="w-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 hover:bg-yellow-500/20 font-bold">
+                          Bakiyeye Dönüştür
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card3D>
-            </motion.div>
+                  </Card>
+                </motion.div>
+              </div>
 
-            {/* İstatistikler */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
-            >
-              <Card3D padding="sm" className="text-center">
-                <TrendingUp className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {istatistikler.toplamYukleme.toLocaleString('tr-TR')}₺
+              {/* Credit Packages */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-500" />
+                  <h2 className="text-xl font-bold font-orbitron text-white">Hızlı Kredi Yükleme</h2>
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Toplam Yükleme</div>
-              </Card3D>
-
-              <Card3D padding="sm" className="text-center">
-                <TrendingDown className="h-8 w-8 mx-auto text-red-600 mb-2" />
-                <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {istatistikler.toplamHarcama.toLocaleString('tr-TR')}₺
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Toplam Harcama</div>
-              </Card3D>
-
-              <Card3D padding="sm" className="text-center">
-                <Star className="h-8 w-8 mx-auto text-sky-600 mb-2" />
-                <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {istatistikler.toplamPuan.toLocaleString('tr-TR')}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Kazanılan Puan</div>
-              </Card3D>
-
-              <Card3D padding="sm" className="text-center">
-                <ShoppingBag className="h-8 w-8 mx-auto text-blue-600 mb-2" />
-                <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {istatistikler.yuklemeAdedi}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Yükleme Adedi</div>
-              </Card3D>
-            </motion.div>
-
-            {/* Kredi Paketleri */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card3D>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-                  <Zap className="h-6 w-6 text-rose-600" />
-                  Kredi Yükleme Paketleri
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {krediPaketleri.map((paket) => (
-                    <motion.div
-                      key={paket.id}
-                      whileHover={{ scale: 1.02 }}
-                      className={cn(
-                        'relative p-6 rounded-xl border-2 transition-all cursor-pointer',
-                        paket.populer
-                          ? 'border-rose-600 bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20'
-                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-rose-300'
-                      )}
-                      onClick={() => krediYukle(paket)}
-                    >
-                      {paket.populer && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 text-white">
-                            <Zap className="h-3 w-3" />
-                            En Popüler
-                          </span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {creditPackages.map((pkg) => (
+                    <Card key={pkg.id} className={cn(
+                      "glass border-white/10 p-4 text-center group cursor-pointer hover:border-blue-500/50 transition-all",
+                      pkg.popular && "border-blue-500/50 bg-blue-500/5 ring-1 ring-blue-500/30"
+                    )}>
+                      {pkg.popular && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full text-white">
+                          POPÜLER
                         </div>
                       )}
-                      
-                      <div className="text-center">
-                        <div className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                          {paket.tutar}₺
-                        </div>
-                        
-                        {paket.bonus > 0 && (
-                          <div className="text-green-600 font-semibold mb-2">
-                            + {paket.bonus}₺ Bonus
-                          </div>
-                        )}
-                        
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                          <div className="flex items-center justify-center gap-1">
-                            <Star className="h-4 w-4 text-sky-600" />
-                            +{paket.ekPuan} Sadakat Puanı
-                          </div>
-                        </div>
-                        
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                          Toplam Kazanç: {paket.tutar + paket.bonus}₺
-                        </div>
-                        
-                        <Button3D
-                          variant={paket.populer ? 'primary' : 'outline'}
-                          size="sm"
-                          fullWidth
-                          onClick={() => krediYukle(paket)}
-                        >
-                          <Plus className="h-4 w-4" />
-                          Yükle
-                        </Button3D>
-                      </div>
-                    </motion.div>
+                      <div className="text-2xl font-black text-white mb-1">₺{pkg.amount}</div>
+                      {pkg.bonus > 0 && (
+                        <div className="text-[10px] font-bold text-green-400 mb-2">+₺{pkg.bonus} BONUS</div>
+                      )}
+                      <div className="text-[10px] text-muted-foreground mb-4">{pkg.points} Puan Hediye</div>
+                      <Button size="sm" className="w-full bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30">
+                        Yükle
+                      </Button>
+                    </Card>
                   ))}
                 </div>
-              </Card3D>
-            </motion.div>
+              </div>
 
-            {/* İşlem Geçmişi */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Card3D>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                  İşlem Geçmişi
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Tarih
-                        </th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Açıklama
-                        </th>
-                        <th className="text-right py-3 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Tutar
-                        </th>
-                        <th className="text-right py-3 px-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Bakiye
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {islemler.map((islem) => {
-                        const konfig = islemTurKonfig[islem.tur];
-                        const Ikon = konfig.ikon;
+              {/* Transaction History */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <History className="w-5 h-5 text-blue-500" />
+                    <h2 className="text-xl font-bold font-orbitron text-white">İşlem Geçmişi</h2>
+                  </div>
+                  <Button variant="link" className="text-blue-400 p-0 h-auto">Tümünü Gör</Button>
+                </div>
+                <Card className="glass border-white/10 overflow-hidden">
+                  <div className="divide-y divide-white/5">
+                    {mockTransactions.map((tx) => (
+                      <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className={cn(
+                            "w-10 h-10 rounded-full flex items-center justify-center",
+                            tx.type === 'deposit' ? "bg-green-500/10 text-green-500" : 
+                            tx.type === 'bonus' ? "bg-yellow-500/10 text-yellow-500" : 
+                            "bg-blue-500/10 text-blue-500"
+                          )}>
+                            {tx.type === 'deposit' ? <ArrowUpRight className="w-5 h-5" /> : 
+                             tx.type === 'bonus' ? <Star className="w-5 h-5" /> : 
+                             <ArrowDownRight className="w-5 h-5" />}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-white">{tx.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(tx.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={cn(
+                            "text-sm font-black",
+                            tx.amount > 0 ? "text-green-500" : "text-white"
+                          )}>
+                            {tx.amount > 0 ? '+' : ''}{tx.amount} ₺
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">Bakiye: {tx.balance} ₺</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
 
-                        return (
-                          <tr
-                            key={islem.id}
-                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                          >
-                            <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                              {new Date(islem.tarih).toLocaleDateString('tr-TR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                              })}
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-2">
-                                <Ikon className={cn('h-4 w-4 flex-shrink-0', konfig.renk)} />
-                                <div className="min-w-0">
-                                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                    {islem.aciklama}
-                                  </div>
-                                  {islem.puan !== undefined && islem.puan !== 0 && (
-                                    <div className="text-xs text-sky-600 flex items-center gap-1">
-                                      <Star className="h-3 w-3" />
-                                      {islem.puan > 0 ? '+' : ''}{islem.puan} puan
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            <td className={cn(
-                              'py-3 px-4 text-sm font-semibold text-right',
-                              islem.tutar > 0 ? 'text-green-600' : islem.tutar < 0 ? 'text-red-600' : 'text-gray-600 dark:text-gray-400'
-                            )}>
-                              {islem.tutar > 0 && '+'}
-                              {islem.tutar !== 0 ? `${islem.tutar.toLocaleString('tr-TR')}₺` : '-'}
-                            </td>
-                            <td className="py-3 px-4 text-sm font-medium text-gray-900 dark:text-gray-100 text-right">
-                              {islem.bakiye.toLocaleString('tr-TR')}₺
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </Card3D>
-            </motion.div>
-          </div>
+            {/* Sidebar / Info Column */}
+            <div className="space-y-6">
+              <Card className="glass border-white/10 overflow-hidden">
+                <CardHeader className="bg-white/5 border-b border-white/10">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Info className="w-4 h-4 text-blue-400" /> Galaxy Puan Sistemi
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <p className="text-xs text-gray-400"><span className="text-white font-bold">Harca Kazan:</span> Her 10₺ harcamanızda 1 puan kazanırsınız.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <p className="text-xs text-gray-400"><span className="text-white font-bold">Yükle Kazan:</span> Yüksek tutarlı yüklemelerde ekstra bonus puanlar.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <p className="text-xs text-gray-400"><span className="text-white font-bold">Değerlendir:</span> Her onaylı randevu değerlendirmesi 10 puan.</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full glass border-white/10 hover:bg-white/5 text-xs h-8">
+                    Tüm Kuralları Gör
+                  </Button>
+                </CardContent>
+              </Card>
 
-          {/* Sağ: Bilgi Kartları */}
-          <div className="space-y-6">
-            {/* Puan Kazanma Kuralları */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card3D>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 bg-gradient-to-br from-sky-500 to-blue-500 rounded-lg">
-                    <Info className="h-5 w-5 text-white" />
+              <Card className="glass border-white/10 bg-gradient-to-br from-blue-600/10 to-transparent">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto">
+                    <Gift className="w-6 h-6 text-blue-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    Puan Kazanma Kuralları
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Star className="h-5 w-5 text-sky-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                        Randevu Tamamlama
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Her 10₺ harcama için 1 puan
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Star className="h-5 w-5 text-sky-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                        Kredi Yükleme
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Paket bonuslarıyla ek puan kazanın
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Star className="h-5 w-5 text-sky-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                        Arkadaş Daveti
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Her davet için 100 puan
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Star className="h-5 w-5 text-sky-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                        Değerlendirme Yapma
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        Her değerlendirme için 25 puan
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card3D>
-            </motion.div>
-
-            {/* Puan Harcama Seçenekleri */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Card3D>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
-                    <Gift className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    Puan Harcama
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        500 Puan
-                      </span>
-                      <span className="text-purple-600 font-bold">
-                        = 50₺
-                      </span>
-                    </div>
-                    <Button3D
-                      variant="primary"
-                      size="sm"
-                      fullWidth
-                      disabled={sadakatPuani < 500}
-                    >
-                      <Gift className="h-4 w-4" />
-                      Kullan
-                    </Button3D>
-                  </div>
-
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        1000 Puan
-                      </span>
-                      <span className="text-purple-600 font-bold">
-                        = 120₺
-                      </span>
-                    </div>
-                    <Button3D
-                      variant="primary"
-                      size="sm"
-                      fullWidth
-                      disabled={sadakatPuani < 1000}
-                    >
-                      <Gift className="h-4 w-4" />
-                      Kullan
-                    </Button3D>
-                  </div>
-
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">
-                        2000 Puan
-                      </span>
-                      <span className="text-purple-600 font-bold">
-                        = 300₺
-                      </span>
-                    </div>
-                    <Button3D
-                      variant="primary"
-                      size="sm"
-                      fullWidth
-                      disabled={sadakatPuani < 2000}
-                    >
-                      <Gift className="h-4 w-4" />
-                      Kullan
-                    </Button3D>
-                  </div>
-                </div>
-              </Card3D>
-            </motion.div>
-
-            {/* Özel Kampanyalar */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card3D className="bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 border-2 border-sky-200 dark:border-sky-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <Zap className="h-6 w-6 text-amber-600" />
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    Özel Kampanyalar
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    <div className="font-semibold mb-1">🎉 Yeni Yıl Kampanyası</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      1000₺ ve üzeri yüklemelerde %20 bonus!
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    <div className="font-semibold mb-1">💝 İlk Randevu Hediyesi</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      İlk randevunuzda 200 puan kazanın!
-                    </div>
-                  </div>
-                  <Button3D variant="primary" size="sm" fullWidth>
-                    Tüm Kampanyalar
-                  </Button3D>
-                </div>
-              </Card3D>
-            </motion.div>
+                  <h3 className="font-bold text-white text-sm">Arkadaşını Davet Et</h3>
+                  <p className="text-xs text-gray-400">Her başarılı referans için ₺100 değerinde 1000 Galaxy Puan kazanın.</p>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs font-bold">Davet Linkini Kopyala</Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CustomerDashboardLayout>
+    </ProtectedRoute>
   );
 }

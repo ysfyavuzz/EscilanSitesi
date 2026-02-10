@@ -1,15 +1,25 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { storage } from '@/lib/utils';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  supabase,
+  signIn,
+  signUp,
+  signOut,
+  getCurrentUser,
+  refreshSession,
+  updateUserMetadata,
+  type SupabaseUser,
+} from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 // Types
 export interface User {
-  id: string | number;
+  id: string;
   name?: string;
   email: string;
-  role: 'user' | 'escort' | 'admin' | 'client';
+  role: "customer" | "escort" | "admin";
   avatar?: string;
   verified?: boolean;
-  membership?: 'standard' | 'vip' | 'premium';
+  membership?: "standard" | "vip" | "premium";
   hasCustomerAccount?: boolean;
   hasEscortAccount?: boolean;
   // Super Admin Yetkileri
@@ -45,20 +55,21 @@ export interface AdminPermissions {
 
 interface AuthContextValue {
   user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
   isEscort: boolean;
   // Rol bazlı görüntüleme limitleri için
-  viewRole: 'guest' | 'user' | 'premium' | 'vip';
+  viewRole: "guest" | "user" | "premium" | "vip";
   // Kullanıcının rolü (customer, escort, admin)
-  userRole: 'customer' | 'escort' | 'admin' | null;
+  userRole: "customer" | "escort" | "admin" | null;
   // Admin Yetkileri
   permissions: AdminPermissions | null;
   hasPermission: (permission: keyof AdminPermissions) => boolean;
   canAccessAnySection: boolean;
-  login: (emailOrUser: string | User, password?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (data: RegisterData) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
@@ -90,280 +101,189 @@ interface RegisterData {
   name: string;
   email: string;
   password: string;
-  role?: 'user' | 'escort';
+  role?: "customer" | "escort";
 }
-
-const AUTH_STORAGE_KEY = 'auth-user';
-const TOKEN_STORAGE_KEY = 'auth-token';
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Mock authentication service - replace with actual API calls
-const authService = {
-  async login(email: string, password: string): Promise<{ user: User; token: string }> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+/**
+ * Convert Supabase User to App User
+ */
+function convertSupabaseUser(supabaseUser: SupabaseUser): User {
+  const metadata = supabaseUser.user_metadata || {};
+  const role = metadata.role || "customer";
+  const isSuperAdmin = metadata.isSuperAdmin === true || role === "admin";
 
-    // Mock response - replace with actual API call
-    // Super Admin - sınırsız yetkiler
-    if (email === 'admin@example.com' && password === 'admin') {
-      return {
-        user: {
-          id: 'admin-1',
-          name: 'Super Admin',
-          email: 'admin@example.com',
-          role: 'admin',
-          verified: true,
-          isSuperAdmin: true,
-          permissions: SUPER_ADMIN_PERMISSIONS,
-        },
-        token: 'mock-admin-token',
-      };
-    }
-
-    // Regular Admin
-    if (email === 'moderator@example.com' && password === 'moderator') {
-      return {
-        user: {
-          id: 'mod-1',
-          name: 'Moderator',
-          email: 'moderator@example.com',
-          role: 'admin',
-          verified: true,
-          isSuperAdmin: false,
-          permissions: {
-            canCreateListings: false,
-            canEditListings: true,
-            canDeleteListings: false,
-            canApproveListings: true,
-            canViewAllUsers: true,
-            canEditUsers: false,
-            canDeleteUsers: false,
-            canBanUsers: true,
-            canViewAllMessages: true,
-            canModerateMessages: true,
-            canManageAds: false,
-            canEditContent: true,
-            canManageBanner: false,
-            canViewAnalytics: true,
-            canExportData: false,
-            canManageSettings: false,
-            canManagePayments: false,
-          },
-        },
-        token: 'mock-moderator-token',
-      };
-    }
-
-    if (email === 'escort@example.com' && password === 'escort') {
-      return {
-        user: {
-          id: 'escort-1',
-          name: 'Ayşe Y.',
-          email: 'escort@example.com',
-          role: 'escort',
-          verified: true,
-          membership: 'vip',
-        },
-        token: 'mock-escort-token',
-      };
-    }
-
-    // Mock user login
-    return {
-      user: {
-        id: 'user-1',
-        name: 'Ahmet Y.',
-        email: email,
-        role: 'user',
-      },
-      token: 'mock-user-token',
-    };
-  },
-
-  async register(data: RegisterData): Promise<{ user: User; token: string }> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Mock response - replace with actual API call
-    return {
-      user: {
-        id: `user-${Date.now()}`,
-        name: data.name,
-        email: data.email,
-        role: data.role || 'user',
-        verified: false,
-      },
-      token: `mock-token-${Date.now()}`,
-    };
-  },
-
-  async refreshToken(token: string): Promise<string> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Mock response - replace with actual API call
-    return `refreshed-token-${Date.now()}`;
-  },
-
-  async verifyToken(token: string): Promise<User | null> {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Mock response - replace with actual API call
-    if (token.startsWith('mock-admin-token')) {
-      return {
-        id: 'admin-1',
-        name: 'Admin',
-        email: 'admin@example.com',
-        role: 'admin',
-        verified: true,
-      };
-    }
-
-    if (token.startsWith('mock-escort-token')) {
-      return {
-        id: 'escort-1',
-        name: 'Ayşe Y.',
-        email: 'escort@example.com',
-        role: 'escort',
-        verified: true,
-        membership: 'vip',
-      };
-    }
-
-    if (token.startsWith('mock-user-token')) {
-      return {
-        id: 'user-1',
-        name: 'Ahmet Y.',
-        email: 'user@example.com',
-        role: 'user',
-      };
-    }
-
-    return null;
-  },
-};
+  return {
+    id: supabaseUser.id,
+    name: metadata.name || supabaseUser.email?.split("@")[0],
+    email: supabaseUser.email!,
+    role,
+    avatar: metadata.avatar,
+    verified: supabaseUser.email_confirmed_at != null,
+    membership: metadata.membership || "standard",
+    hasCustomerAccount: metadata.hasCustomerAccount,
+    hasEscortAccount: metadata.hasEscortAccount,
+    isSuperAdmin,
+    permissions: isSuperAdmin ? SUPER_ADMIN_PERMISSIONS : metadata.permissions,
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Kullanıcının görüntüleme rolünü hesapla
-  const viewRole = user?.membership === 'vip' ? 'vip'
-    : user?.membership === 'premium' ? 'premium'
-    : user ? 'user'
-    : 'guest';
-
-  // Initialize auth state from storage
+  // Initialize auth state from Supabase
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const storedUser = storage.get<User>(AUTH_STORAGE_KEY);
-        const storedToken = storage.get<string>(TOKEN_STORAGE_KEY);
-
-        if (storedUser && storedToken) {
-          // Verify token is still valid
-          const verifiedUser = await authService.verifyToken(storedToken);
-
-          if (verifiedUser) {
-            setUser(verifiedUser);
-          } else {
-            // Token is invalid, clear storage
-            storage.remove(AUTH_STORAGE_KEY);
-            storage.remove(TOKEN_STORAGE_KEY);
-          }
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-      } finally {
-        setIsLoading(false);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        setUser(convertSupabaseUser(session.user));
       }
-    };
+      setIsLoading(false);
+    });
 
-    initAuth();
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        setUser(convertSupabaseUser(session.user));
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (emailOrUser: string | User, password?: string) => {
-    // Support direct user object for testing
-    if (typeof emailOrUser === 'object') {
-      setUser(emailOrUser);
-      storage.set(AUTH_STORAGE_KEY, emailOrUser);
-      return;
+  /**
+   * Login with email and password
+   */
+  const login = async (email: string, password: string) => {
+    try {
+      const { session, user: supabaseUser } = await signIn(email, password);
+      setSession(session);
+      if (supabaseUser) {
+        setUser(convertSupabaseUser(supabaseUser));
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
-
-    const { user: loggedInUser, token } = await authService.login(emailOrUser, password!);
-
-    storage.set(AUTH_STORAGE_KEY, loggedInUser);
-    storage.set(TOKEN_STORAGE_KEY, token);
-
-    setUser(loggedInUser);
   };
 
-  const logout = () => {
-    storage.remove(AUTH_STORAGE_KEY);
-    storage.remove(TOKEN_STORAGE_KEY);
-    setUser(null);
+  /**
+   * Logout current user
+   */
+  const logout = async () => {
+    try {
+      await signOut();
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
   };
 
+  /**
+   * Register new user
+   */
   const register = async (data: RegisterData) => {
-    const { user: registeredUser, token } = await authService.register(data);
+    try {
+      const { name, email, password, role = "customer" } = data;
 
-    storage.set(AUTH_STORAGE_KEY, registeredUser);
-    storage.set(TOKEN_STORAGE_KEY, token);
+      await signUp(email, password, {
+        name,
+        role,
+      });
 
-    setUser(registeredUser);
-  };
-
-  const updateProfile = async (data: Partial<User>) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const updatedUser = { ...user!, ...data };
-    storage.set(AUTH_STORAGE_KEY, updatedUser);
-    setUser(updatedUser);
-  };
-
-  const refreshToken = async () => {
-    const storedToken = storage.get<string>(TOKEN_STORAGE_KEY);
-
-    if (!storedToken) {
-      throw new Error('No token found');
+      // After signup, user needs to verify email
+      // Supabase will send verification email automatically if configured
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
     }
-
-    const newToken = await authService.refreshToken(storedToken);
-    storage.set(TOKEN_STORAGE_KEY, newToken);
   };
 
-  // userRole değerini hesapla
-  const userRole: 'customer' | 'escort' | 'admin' | null = user?.role === 'admin'
-    ? 'admin'
-    : user?.role === 'escort'
-      ? 'escort'
-      : user?.role === 'user'
-        ? 'customer'
-        : null;
+  /**
+   * Update user profile
+   */
+  const updateProfile = async (data: Partial<User>) => {
+    try {
+      if (!user) throw new Error("No user logged in");
 
-  // Admin yetkileri
+      // Update Supabase user metadata
+      await updateUserMetadata(data);
+
+      // Update local state
+      setUser({ ...user, ...data });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      throw error;
+    }
+  };
+
+  /**
+   * Refresh authentication token
+   */
+  const refreshToken = async () => {
+    try {
+      const newSession = await refreshSession();
+      if (newSession) {
+        setSession(newSession);
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          setUser(convertSupabaseUser(data.user));
+        }
+      }
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      throw error;
+    }
+  };
+
+  // Computed properties
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === "admin";
+  const isSuperAdmin = user?.isSuperAdmin === true;
+  const isEscort = user?.role === "escort";
+  const userRole = user?.role || null;
   const permissions = user?.permissions || null;
-  const isSuperAdmin = user?.isSuperAdmin || false;
 
-  // Belirli bir yetki kontrolü
+  // View role based on membership
+  const viewRole: "guest" | "user" | "premium" | "vip" = isAuthenticated
+    ? user.membership === "vip"
+      ? "vip"
+      : user.membership === "premium"
+        ? "premium"
+        : "user"
+    : "guest";
+
+  // Permission checker
   const hasPermission = (permission: keyof AdminPermissions): boolean => {
     if (isSuperAdmin) return true;
-    return permissions?.[permission] || false;
+    return permissions?.[permission] === true;
   };
 
-  // Herhangi bir bölüme erişim yetkisi (super admin için her bölüme erişim)
-  const canAccessAnySection = isSuperAdmin;
+  // Check if user can access any admin section
+  const canAccessAnySection =
+    isSuperAdmin ||
+    (permissions && Object.values(permissions).some((p) => p === true));
 
   const value: AuthContextValue = {
     user,
-    isAuthenticated: !!user,
+    session,
+    isAuthenticated,
     isLoading,
-    isAdmin: user?.role === 'admin',
+    isAdmin,
     isSuperAdmin,
-    isEscort: user?.role === 'escort',
+    isEscort,
     viewRole,
     userRole,
     permissions,
@@ -379,60 +299,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * Hook to use auth context
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
-
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return context;
 }
 
-// HOC to protect routes that require authentication
-export function withAuth<P extends object>(
-  Component: React.ComponentType<P>,
-  requiredRole?: 'user' | 'escort' | 'admin'
-) {
-  return function ProtectedComponent(props: P) {
-    const { isAuthenticated, isLoading, user } = useAuth();
+/**
+ * Hook to require authentication
+ */
+export function useRequireAuth() {
+  const { isAuthenticated, isLoading } = useAuth();
 
-    if (isLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Yükleniyor...</p>
-          </div>
-        </div>
-      );
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      // Redirect to login page
+      window.location.href = "/login";
     }
+  }, [isAuthenticated, isLoading]);
 
-    if (!isAuthenticated) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Giriş Gerekli</h2>
-            <p className="text-gray-600 mb-4">Bu sayfaya erişmek için giriş yapmalısınız.</p>
-            <a href="/login" className="text-pink-600 hover:underline">
-              Giriş Yap
-            </a>
-          </div>
-        </div>
-      );
+  return { isAuthenticated, isLoading };
+}
+
+/**
+ * Hook to require admin role
+ */
+export function useRequireAdmin() {
+  const { isAdmin, isLoading, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+      } else if (!isAdmin) {
+        window.location.href = "/";
+      }
     }
+  }, [isAdmin, isLoading, isAuthenticated]);
 
-    if (requiredRole && user?.role !== requiredRole) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Yetki Gerekli</h2>
-            <p className="text-gray-600">Bu sayfaya erişmek için gerekli yetkiye sahip değilsiniz.</p>
-          </div>
-        </div>
-      );
-    }
-
-    return <Component {...props} />;
-  };
+  return { isAdmin, isLoading };
 }

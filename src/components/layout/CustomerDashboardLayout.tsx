@@ -11,7 +11,7 @@ import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Heart, Calendar, MessageCircle, Settings, User, 
-  LogOut, Shield, Bell, Search, Star, Flag, DollarSign
+  LogOut, Shield, Bell, Search, Star, Flag, DollarSign, BarChart3
 } from 'lucide-react';
 
 interface CustomerDashboardLayoutProps {
@@ -28,7 +28,8 @@ export const CustomerDashboardLayout: React.FC<CustomerDashboardLayoutProps> = (
     { icon: MessageCircle, label: 'Mesajlar', href: '/messages' },
     { icon: Star, label: 'Değerlendirmelerim', href: '/reviews' },
     { icon: Flag, label: 'Şikayetlerim', href: '/reports' },
-    { icon: DollarSign, label: 'Ödemelerim', href: '/billing' },
+    { icon: DollarSign, label: 'Ödemelerim', href: '/customer/wallet' },
+    { icon: BarChart3, label: 'Analitik', href: '/customer/analytics' },
     { icon: User, label: 'Profil Ayarları', href: '/customer/settings' },
   ];
 

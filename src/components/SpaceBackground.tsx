@@ -147,9 +147,14 @@ const Carousel = () => {
       
       // Mevcut açı ile hedef açı arasındaki farkı optimize et
       // Bu, 0'dan 360'a geçerken ters dönmesini engeller
-      // (Basit implementasyon: Şimdilik direkt lerp kullanıyoruz, tam turda hafif glitch olabilir ama çalışır)
+      let currentY = groupRef.current.rotation.y;
+      let angleDiff = targetRotationY - currentY;
       
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(currentY, targetRotationY, delta * 3);
+      // En kısa dönüşü sağlamak için farkı -PI ile PI arasına getir
+      // Bu, 360 derecelik döngüde ileri veya geri doğru en kısa yolu bulur.
+      angleDiff = (angleDiff + Math.PI) % (Math.PI * 2) - Math.PI;
+      
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(currentY, currentY + angleDiff, delta * 3);
     }
   });
 

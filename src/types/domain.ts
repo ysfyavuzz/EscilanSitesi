@@ -1,21 +1,31 @@
 /**
  * DOMAIN TYPES & INTERFACES
- * 
+ *
  * Bu dosya, uygulamanın temel veri yapılarını ve tip tanımlarını içerir.
- * Single Responsibility Principle (SRP) gereği, veri modelleri burada tanımlanır 
+ * Single Responsibility Principle (SRP) gereği, veri modelleri burada tanımlanır
  * ve tüm uygulama tarafından buradan tüketilir.
  */
 
 // --- ENUMS & CONSTANTS ---
 
-export type UserRole = 'visitor' | 'member' | 'vip_member' | 'escort' | 'agency' | 'admin';
+export type UserRole =
+  | "visitor"
+  | "member"
+  | "vip_member"
+  | "escort"
+  | "agency"
+  | "admin";
 
-export type SubscriptionTier = 'standard' | 'gold' | 'diamond' | 'elite';
+export type SubscriptionTier = "standard" | "gold" | "diamond" | "elite";
 
-export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
+export type VerificationStatus =
+  | "unverified"
+  | "pending"
+  | "verified"
+  | "rejected";
 
 // Grid Sistemi için Span Tanımları (Tetris Layout)
-export type GridSpan = '1x1' | '2x1' | '2x2' | '4x1' | '6x1';
+export type GridSpan = "1x1" | "2x1" | "2x2" | "4x1" | "6x1";
 
 // --- CORE INTERFACES ---
 
@@ -31,13 +41,13 @@ export interface BaseProfile {
 }
 
 // Onay Durumu (Medya ve Profil Değişiklikleri için)
-export type ApprovalStatus = 'approved' | 'pending' | 'rejected';
+export type ApprovalStatus = "approved" | "pending" | "rejected";
 
 export interface MediaItem {
   id: string;
   originalUrl: string; // Yüklenen orijinal görselin URL'si
   processedUrl?: string; // AI tarafından işlenmiş görselin URL'si (bulanıklaştırılmış, maskeli vb.)
-  type: 'image' | 'video';
+  type: "image" | "video";
   status: ApprovalStatus;
   rejectionReason?: string; // Eğer reddedilirse nedeni
   // Bu medya öğesine özel işleme seçenekleri (eğer varsa)
@@ -49,38 +59,41 @@ export interface MediaItem {
     contrastAdjustment?: number;
   };
 }
-  services: string[];    // Sunulan hizmetler (tags)
-  languages: string[];   // Konuşulan diller
-  
+
+// İlan Profili (Escort/Agency)
+export interface ListingProfile extends BaseProfile {
+  services: string[]; // Sunulan hizmetler (tags)
+  languages: string[]; // Konuşulan diller
+
   // Fiziksel Özellikler
   height?: number; // cm
   weight?: number; // kg
   eyeColor?: string;
   hairColor?: string;
-  
+
   // Sistem Durumları
   tier: SubscriptionTier;
   verificationStatus: VerificationStatus;
-  isBoosted: boolean;    // Öne çıkarılmış mı?
-  gridSpan: GridSpan;    // Grid'deki boyutu
-  
+  isBoosted: boolean; // Öne çıkarılmış mı?
+  gridSpan: GridSpan; // Grid'deki boyutu
+
   // Bekleyen Değişiklikler (Staging Area)
-  pendingChanges?: Partial<ListingProfile>; 
-  
+  pendingChanges?: Partial<ListingProfile>;
+
   // İstatistikler
   rating: number;
   reviewCount: number;
   viewCount: number;
-  
+
   // İletişim (Gizlilik ayarlarına göre değişir)
   whatsapp?: string;
   phone?: string;
-  
+
   // Fiyatlandırma
   rates?: {
     hourly: number;
     daily?: number;
-    currency: 'TRY' | 'USD' | 'EUR';
+    currency: "TRY" | "USD" | "EUR";
   };
 }
 
@@ -98,7 +111,12 @@ export interface FilterOptions {
 // --- CRM & SOSYAL ARAYÜZLER ---
 
 // Randevu Durumu
-export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+export type AppointmentStatus =
+  | "pending"
+  | "confirmed"
+  | "completed"
+  | "cancelled"
+  | "no_show";
 
 // Randevu Kaydı
 export interface Appointment {
@@ -120,7 +138,7 @@ export interface Follower {
   userId: string;
   username: string;
   avatarUrl: string;
-  status: 'pending' | 'approved' | 'blocked'; // Onay mekanizması
+  status: "pending" | "approved" | "blocked"; // Onay mekanizması
   requestedAt: Date;
 }
 
@@ -128,7 +146,7 @@ export interface Follower {
 export interface AvailabilitySlot {
   dayOfWeek: number; // 0=Pazar, 1=Pazartesi...
   startTime: string; // "14:00"
-  endTime: string;   // "22:00"
+  endTime: string; // "22:00"
   isAvailable: boolean;
 }
 
@@ -138,7 +156,6 @@ export interface ProfileHealth {
   missingFields: string[]; // "bio", "video", "price"
   nextReward?: string; // "1 Günlük Vitrin Hakkı"
 }
-
 
 // Kart Bileşeni Props
 export interface StandardCardProps {
