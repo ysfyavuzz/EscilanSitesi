@@ -1,11 +1,20 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { users, escortProfiles, escortPhotos, customerProfiles } from '../drizzle/schema';
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+import * as schema from '../drizzle/schema';
 import { eq, desc, and, sql } from 'drizzle-orm';
 
-const connectionString = process.env.DATABASE_URL || '';
-const client = postgres(connectionString, { prepare: false });
-export const db = drizzle(client);
+const client = createClient({ 
+  url: 'file:local.db' 
+});
+
+export const db = drizzle(client, { schema });
+
+// Destructure tables for convenience
+export const { users, escortProfiles, escortPhotos, customerProfiles } = schema;
+
+/**
+ * Veritabanı yardımcı fonksiyonları (LibSQL/SQLite uyumlu)
+ */
 
 export async function getAllApprovedEscorts(limit: number = 50, offset: number = 0) {
   return await db
@@ -50,7 +59,7 @@ export async function getAllUsers(limit: number = 50, offset: number = 0) {
 
 export async function updateEscortStatus(profileId: number, status: string) {
   const isVerified = status === 'approved';
-  return await (db.update(escortProfiles) as any).set({ isVerifiedByAdmin: isVerified }).where(eq(escortProfiles.id, profileId));
+  return await db.update(escortProfiles).set({ isVerifiedByAdmin: isVerified }).where(eq(escortProfiles.id, profileId));
 }
 
 export async function getEscortProfileByUserId(userId: number) {
@@ -67,7 +76,7 @@ export async function getPendingEscorts() {
   return await db.select().from(escortProfiles).where(eq(escortProfiles.isVerifiedByAdmin, false));
 }
 
-// Mock functions to fix types
+// Mock/Helper functions
 export async function incrementViewCount(id: number) { return { success: true }; }
 export async function getUserFavorites(u: any, l: any, o: any) { return []; }
 export async function addFavorite(u: any, e: any) { return { success: true }; }
@@ -96,15 +105,10 @@ export async function createEscortProfile(d: any) { return { success: true }; }
 export async function addEscortPhoto(d: any) { return { success: true }; }
 export async function updateLastActive(id: number) { return { success: true }; }
 export async function getVipEscorts(l: number) { return []; }
-
-// Payment & Credits
 export async function getUserBalance(userId: number) { return 0; }
 export async function updateUserBalance(userId: number, balance: number) { return { success: true }; }
 export async function createCreditTransaction(data: any) { return { success: true }; }
 export async function getUserCredits(userId: number) { return 0; }
-
-// Appointments
 export async function getAppointmentsByUserId(userId: number) { return []; }
 
-export * from '../drizzle/schema';
-export { users, escortProfiles, escortPhotos, customerProfiles };
+export { schema };

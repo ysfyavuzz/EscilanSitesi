@@ -1,19 +1,13 @@
-/**
- * Drizzle Kit Configuration
- * 
- * Configuration for Drizzle ORM migrations and schema management.
- * Used for generating migrations and managing database schema.
- * 
- * @see {@link https://orm.drizzle.team/kit-docs/config-reference}
- */
-
 import type { Config } from 'drizzle-kit';
 
+/**
+ * Drizzle Kit Configuration - SQLite / LibSQL
+ */
 export default {
   schema: './src/drizzle/schema.ts',
-  out: './drizzle',
-  dialect: 'postgresql',
+  out: './drizzle/migrations',
+  dialect: 'sqlite',
   dbCredentials: {
-    url: process.env.DATABASE_URL || '',
+    url: 'file:local.db',
   },
 } satisfies Config;

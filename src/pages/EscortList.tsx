@@ -29,7 +29,7 @@ import { SEO } from '@/pages/SEO';
 export default function EscortList() {
   const [listings, setListings] = useState<ListingProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Quick View Modal State
   const [selectedProfile, setSelectedProfile] = useState<ListingProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,103 +58,126 @@ export default function EscortList() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020205] text-white">
-      <SEO 
-        title="Zuhre Planet | Seçkin İlanlar" 
-        description="Galaksinin en parlak yıldızlarını keşfedin." 
+    <div className="min-h-screen bg-transparent text-foreground">
+      <SEO
+        title="Zuhre Planet | Seçkin İlanlar"
+        description="Galaksinin en parlak yıldızlarını keşfedin."
       />
 
       {/* --- HERO HEADER --- */}
-      <div className="relative pt-32 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-[#020205] to-[#020205]" />
-        
+      <div className="relative pt-24 pb-12 md:pt-40 md:pb-20 overflow-hidden">
         {/* Animated Grid Background */}
-        <div className="absolute inset-0 opacity-20" 
-             style={{ 
-               backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', 
-               backgroundSize: '40px 40px' 
-             }} 
+        <div className="absolute inset-0 opacity-10 pointer-events-none"
+             style={{
+               backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
+               backgroundSize: '40px 40px'
+             }}
         />
 
         <div className="container relative z-10 mx-auto px-4">
-          <div className="flex flex-col items-center text-center mb-12">
-            <Badge className="mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20 backdrop-blur-md px-4 py-1.5">
-              <Sparkles className="w-4 h-4 mr-2" /> KEŞFET
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center text-center mb-12"
+          >
+            <Badge className="mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20 backdrop-blur-md px-4 py-1.5 uppercase tracking-widest text-[10px]">
+              <Sparkles className="w-3 h-3 mr-2" /> Kozmik Vitrin
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-black font-orbitron tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">
-              YILDIZLAR GEÇİDİ
+            <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-4 text-white uppercase italic">
+              Yıldızlar <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">Geçidi</span>
             </h1>
-            <p className="text-gray-400 text-lg max-w-2xl font-light">
-              Aradığınız deneyimi bulmak için galaksinin en seçkin profillerini inceleyin.
+            <p className="text-blue-100/40 text-sm md:text-lg max-w-2xl font-medium uppercase tracking-tight">
+              Aradığınız deneyimi bulmak için galaksinin en sekin profillerini inceleyin.
             </p>
-          </div>
+          </motion.div>
 
-          {/* --- FILTER BAR (Simplified) --- */}
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 max-w-5xl mx-auto shadow-2xl">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input 
-                  type="text" 
-                  placeholder="İsim, şehir veya özellik ara..." 
-                  className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-gray-600"
-                />
-              </div>
-              
-              <div className="h-8 w-px bg-white/10 hidden md:block" />
-              
-              <button className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/10 text-gray-300">
-                <MapPin className="w-4 h-4 text-purple-400" />
-                <span>İstanbul</span>
-                <ChevronDown className="w-4 h-4 opacity-50" />
-              </button>
+          {/* --- FILTER BAR --- */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 md:p-4 max-w-5xl mx-auto shadow-2xl"
+          >
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400/50" />
+              <input
+                type="text"
+                placeholder="İsim, şehir veya özellik ara..."
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-blue-100/20"
+              />
             </div>
 
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-purple-900/40">
+            <button className="flex items-center justify-between md:justify-start gap-3 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/10 text-blue-100/60 font-medium">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-400" />
+                <span>İstanbul</span>
+              </div>
+              <ChevronDown className="w-4 h-4 opacity-50" />
+            </button>
+
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white font-bold py-7 px-8 rounded-xl shadow-lg shadow-blue-900/40 transition-all active:scale-95">
               <Filter className="w-4 h-4 mr-2" />
               FİLTRELE
             </Button>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* --- LISTING GRID (TETRIS LAYOUT) --- */}
+      {/* --- LISTING GRID --- */}
       <div className="container mx-auto px-4 pb-32">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mb-4" />
-            <span className="text-gray-500 animate-pulse">Yıldızlar taranıyor...</span>
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
+              <div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin" />
+            </div>
+            <span className="mt-6 text-blue-400/40 font-black tracking-widest uppercase text-xs animate-pulse">Yıldızlar Taranıyor</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-[300px] gap-6 grid-flow-dense">
-            {listings.map((profile) => (
-              <StandardCard
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[340px] gap-4 md:gap-6 grid-flow-dense"
+          >
+            {listings.map((profile, index) => (
+              <motion.div
                 key={profile.id}
-                profile={profile}
-                onQuickView={handleQuickView}
-                showVideoOnHover={true}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <StandardCard
+                  profile={profile}
+                  onQuickView={handleQuickView}
+                  showVideoOnHover={true}
+                />
+              </motion.div>
             ))}
-            
+
             {/* Promo Card Inserted into Grid */}
-            <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 relative rounded-[24px] overflow-hidden group cursor-pointer border border-amber-500/30 bg-gradient-to-br from-amber-900/20 to-black">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+            <motion.div 
+              className="col-span-1 sm:col-span-2 lg:col-span-2 row-span-1 relative rounded-[32px] overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-900/40 via-purple-900/20 to-black shadow-2xl"
+              whileHover={{ scale: 0.98 }}
+            >
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30" />
               <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-8">
-                <Crown className="w-12 h-12 text-amber-400 mb-4 animate-bounce" />
-                <h3 className="text-2xl font-bold text-white mb-2 font-orbitron">VİTRİN SİZİN OLSUN</h3>
-                <p className="text-amber-200/80 mb-6">Profilinizi binlerce kişiye ulaştırın.</p>
-                <Button variant="outline" className="border-amber-500 text-amber-400 hover:bg-amber-500 hover:text-black transition-all">
+                <div className="p-4 bg-amber-500/20 rounded-full mb-6">
+                  <Crown className="w-10 h-10 text-amber-400 animate-pulse" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-3 tracking-tighter italic uppercase">VİTRİN SİZİN OLSUN</h3>
+                <p className="text-blue-100/40 mb-8 max-w-xs text-sm font-medium uppercase tracking-tighter">Profilinizi binlerce kişiye ulaştırın ve galakside parlayın.</p>
+                <Button className="bg-white text-black hover:bg-blue-400 hover:text-white transition-all font-black px-10 py-6 rounded-full"> 
                   Reklam Ver
                 </Button>
               </div>
-            </div>
+            </motion.div>
 
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* --- QUICK VIEW MODAL --- */}
-      <QuickViewModal 
+      <QuickViewModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         profile={selectedProfile}

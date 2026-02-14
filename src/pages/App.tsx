@@ -13,78 +13,18 @@ import { FloatingNavigation } from "@/components/FloatingNavigation";
 import { Header } from "@/components/Header";
 import { Route, Switch, useLocation } from "wouter";
 import NotFound from "@/pages/NotFound";
-import { SpaceBackground } from "@/components/SpaceBackground";
 import { StarryBackground } from "@/components/StarryBackground";
-import { AdSpace } from "@/components/AdSpace";
+import { SpaceBackground } from "@/components/SpaceBackground";
 
 // LAZY LOADED ROUTES
 const Home = lazy(() => import("@/pages/Home"));
 const Catalog = lazy(() => import("@/pages/Catalog"));
 const EscortList = lazy(() => import("@/pages/EscortList"));
 const EscortProfile = lazy(() => import("@/pages/EscortProfile"));
-const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
-const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
-const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
-const KVKK = lazy(() => import("@/pages/KVKK"));
-const Safety = lazy(() => import("@/pages/Safety"));
-const EscortLogin = lazy(() => import("@/pages/EscortLogin"));
-const ClientLogin = lazy(() => import("@/pages/ClientLogin"));
-const EscortRegister = lazy(() => import("@/pages/EscortRegister"));
-const ClientRegister = lazy(() => import("@/pages/ClientRegister"));
-const CustomerFavorites = lazy(() => import("@/pages/customer/CustomerFavorites"));
-const CustomerMessages = lazy(() => import("@/pages/customer/CustomerMessages"));
-const CustomerAppointments = lazy(() => import("@/pages/customer/CustomerAppointments"));
-const CustomerReviews = lazy(() => import("@/pages/customer/CustomerReviews"));
-const CustomerComplaints = lazy(() => import("@/pages/customer/CustomerComplaints"));
-const CustomerAnalytics = lazy(() => import("@/pages/customer/CustomerAnalytics"));
-const CustomerDashboard = lazy(() => import("@/pages/customer/CustomerDashboard"));
-const EscortDashboard = lazy(() => import("@/pages/dashboard/EscortDashboard")); // Update path
-const EscortMarket = lazy(() => import("@/pages/EscortMarket"));
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
-const AdminApprovals = lazy(() => import("@/pages/AdminApprovals"));
-const AdminMediaApprovals = lazy(() => import("@/pages/admin/AdminMediaApprovals")); // New
-const AdminListings = lazy(() => import("@/pages/AdminListings"));
-const AdminMedia = lazy(() => import("@/pages/AdminMedia"));
-const AdminFinancial = lazy(() => import("@/pages/AdminFinancial"));
-const AdminMessages = lazy(() => import("@/pages/AdminMessages"));
-const AdminAnalytics = lazy(() => import("@/pages/AdminAnalytics"));
-const AdminSecurity = lazy(() => import("@/pages/AdminSecurity"));
-const AdminNotifications = lazy(() => import("@/pages/AdminNotifications"));
-const AdminSettings = lazy(() => import("@/pages/AdminSettings"));
-const AdminUsers = lazy(() => import("@/pages/AdminUsers"));
-const Pricing = lazy(() => import("@/pages/Pricing"));
-const Contact = lazy(() => import("@/pages/Contact"));
-const PaymentResult = lazy(() => import("@/pages/PaymentResult"));
-const VerificationCenter = lazy(() => import("@/pages/VerificationCenter"));
-const Blog = lazy(() => import("@/pages/Blog"));
-const GuestCatalog = lazy(() => import("@/pages/GuestCatalog"));
-const EscortPrivateDashboard = lazy(() => import("@/pages/EscortPrivateDashboard"));
-const EscortAnalyticsDashboard = lazy(() => import("@/pages/EscortAnalyticsDashboard"));
-const MembershipUpgrade = lazy(() => import("@/pages/MembershipUpgrade"));
-const BillingDashboard = lazy(() => import("@/pages/BillingDashboard"));
-const RealTimeMessaging = lazy(() => import("@/pages/RealTimeMessaging"));
-const VideoCallPage = lazy(() => import("@/pages/VideoCallPage"));
-const AdminRealTimeMonitoring = lazy(() => import("@/pages/AdminRealTimeMonitoring"));
-const AdminReports = lazy(() => import("@/pages/AdminReports"));
 const Login = lazy(() => import("@/pages/Login"));
-const AdminPanel = lazy(() => import("@/pages/AdminPanel"));
-const AdminComplaints = lazy(() => import("@/pages/AdminComplaints"));
-const CustomerSettings = lazy(() => import("@/pages/customer/CustomerSettings"));
-const About = lazy(() => import("@/pages/general/About"));
-const FAQ = lazy(() => import("@/pages/general/FAQ"));
-const HowItWorks = lazy(() => import("@/pages/general/HowItWorks"));
-const SupportPage = lazy(() => import("@/pages/general/Support"));
-const ProfileEditor = lazy(() => import("@/pages/dashboard/ProfileEditor")); // Update path
-const ScheduleManager = lazy(() => import("@/pages/dashboard/ScheduleManager")); // New
-const InteractionsCenter = lazy(() => import("@/pages/dashboard/InteractionsCenter")); // New
-const ImageEditor = lazy(() => import("@/pages/dashboard/ImageEditor")); // New
-const EscortPhotos = lazy(() => import("@/pages/escort/PhotoManager"));
-const EscortCalendar = lazy(() => import("@/pages/escort/CalendarManager"));
-const EscortEarnings = lazy(() => import("@/pages/escort/EarningsReport"));
-const CustomerNotifications = lazy(() => import("@/pages/customer/Notifications"));
-const CustomerHistory = lazy(() => import("@/pages/customer/History"));
-const CustomerWallet = lazy(() => import("@/pages/customer/Wallet"));
-const ReportPage = lazy(() => import("@/pages/Report"));
+const CustomerDashboard = lazy(() => import("@/pages/customer/CustomerDashboard"));
+const EscortDashboard = lazy(() => import("@/pages/dashboard/EscortDashboard"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 
 function RouteLoading() {
   return <FullPageLoading message="Sayfa yükleniyor..." />;
@@ -97,97 +37,11 @@ function AppRouter() {
         <Route path="/" component={Home} />
         <Route path="/catalog" component={Catalog} />
         <Route path="/escorts" component={EscortList} />
-        <Route path="/guest-catalog" component={GuestCatalog} />
         <Route path="/escort/:id" component={EscortProfile} />
-        
-        {/* Auth */}
         <Route path="/login" component={Login} />
-        <Route path="/login-escort" component={EscortLogin} />
-        <Route path="/login-customer" component={ClientLogin} />
-        <Route path="/register-escort" component={EscortRegister} />
-        <Route path="/register-client" component={ClientRegister} />
-        <Route path="/register" component={ClientRegister} />
-        <Route path="/signup" component={ClientRegister} />
-
-        {/* Customer Panel */}
         <Route path="/dashboard" component={CustomerDashboard} />
-        <Route path="/favorites" component={CustomerFavorites} />
-        <Route path="/messages" component={CustomerMessages} />
-        <Route path="/appointments" component={CustomerAppointments} />
-        <Route path="/reviews" component={CustomerReviews} />
-        <Route path="/reports" component={CustomerComplaints} />
-        <Route path="/customer/settings" component={CustomerSettings} />
-        <Route path="/customer/notifications" component={CustomerNotifications} />
-        <Route path="/customer/history" component={CustomerHistory} />
-        <Route path="/customer/wallet" component={CustomerWallet} />
-        <Route path="/customer/analytics" component={CustomerAnalytics} />
-        
-        {/* Escort Panel */}
-        <Route path="/escort/dashboard" component={EscortDashboard} /> {/* Ana Dashboard */}
-        <Route path="/dashboard/profile" component={ProfileEditor} />
-        <Route path="/dashboard/schedule" component={ScheduleManager} />
-        <Route path="/dashboard/interactions" component={InteractionsCenter} />
-        <Route path="/dashboard/image-editor" component={ImageEditor} />
-
-        {/* <Route path="/escort/market" component={EscortMarket} /> */} {/* Henüz DashboardLayout'a entegre değil */}
-        {/* <Route path="/escort/dashboard/private" component={EscortPrivateDashboard} /> */}
-        {/* <Route path="/escort/dashboard/analytics" component={EscortAnalyticsDashboard} /> */}
-        {/* <Route path="/escort/photos" component={EscortPhotos} /> */}
-        {/* <Route path="/escort/calendar" component={EscortCalendar} /> */}
-        {/* <Route path="/escort/earnings" component={EscortEarnings} /> */}
-
-        {/* Admin Panel */}
+        <Route path="/escort/dashboard" component={EscortDashboard} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
-        <Route path="/admin/approvals" component={AdminApprovals} />
-        <Route path="/admin/media-approvals" component={AdminMediaApprovals} />
-        <Route path="/admin/panel" component={AdminPanel} />
-        <Route path="/admin/listings" component={AdminListings} />
-        <Route path="/admin/media" component={AdminMedia} />
-        <Route path="/admin/financial" component={AdminFinancial} />
-        <Route path="/admin/messages" component={AdminMessages} />
-        <Route path="/admin/analytics" component={AdminAnalytics} />
-        <Route path="/admin/security" component={AdminSecurity} />
-        <Route path="/admin/notifications" component={AdminNotifications} />
-        <Route path="/admin/settings" component={AdminSettings} />
-        <Route path="/admin/users" component={AdminUsers} />
-        <Route path="/admin/complaints" component={AdminComplaints} />
-        <Route path="/admin/real-time" component={AdminRealTimeMonitoring} />
-        <Route path="/admin/reports" component={AdminReports} />
-
-        {/* Customer Panel */}
-        <Route path="/customer/settings" component={CustomerSettings} />
-        <Route path="/customer/notifications" component={CustomerNotifications} />
-        <Route path="/customer/history" component={CustomerHistory} />
-        <Route path="/customer/wallet" component={CustomerWallet} />
-
-        {/* General */}
-        <Route path="/terms" component={TermsOfService} />
-        <Route path="/privacy" component={PrivacyPolicy} />
-        <Route path="/cookies" component={CookiePolicy} />
-        <Route path="/kvkk" component={KVKK} />
-        <Route path="/safety" component={Safety} />
-        <Route path="/pricing" component={Pricing} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/about" component={About} />
-        <Route path="/faq" component={FAQ} />
-        <Route path="/how-it-works" component={HowItWorks} />
-        <Route path="/support" component={SupportPage} />
-        <Route path="/report" component={ReportPage} />
-        <Route path="/verification" component={VerificationCenter} />
-
-        {/* Payment */}
-        <Route path="/payment/result" component={PaymentResult} />
-        <Route path="/membership/upgrade" component={MembershipUpgrade} />
-        <Route path="/billing" component={BillingDashboard} />
-
-        {/* Advanced */}
-        <Route path="/real-time-messaging" component={RealTimeMessaging} />
-        <Route path="/video-call" component={VideoCallPage} />
-        <Route path="/analytics-page" component={Analytics} />
-        <Route path="/reviews" component={Reviews} />
-
-        {/* 404 */}
         <Route component={NotFound} />
       </Switch>
     </Suspense>
@@ -201,21 +55,32 @@ export default function App() {
   return (
     <NotificationProvider>
       <TooltipProvider>
-        <div className="min-h-screen bg-background font-sans antialiased relative selection:bg-primary/30 text-white">
-          {/* Koşullu Arka Plan Yönetimi */}
-          {isHomePage ? <SpaceBackground /> : <StarryBackground />}
+        <div className="min-h-screen bg-[#010103] font-sans antialiased relative selection:bg-primary/30 text-foreground transition-colors duration-500 overflow-x-hidden">
           
-          <AdSpace position="left" />
-          <AdSpace position="right" />
-          <Header />
-          <main className="pb-20 md:pb-0 2xl:pl-[180px] 2xl:pr-[180px]">
-            <AppRouter />
-          </main>
-          <FloatingNavigation />
-          <NotificationCenter />
-          <NotificationToast />
-          <CookieConsent />
-          <Toaster position="top-right" />
+          {/* 3D EVREN KATMANI (Ana Sayfadaysak Arka Plan) */}
+          {isHomePage ? (
+            <div className="fixed inset-0 z-0">
+              <SpaceBackground />
+            </div>
+          ) : (
+            <div className="fixed inset-0 z-0 pointer-events-none">
+              <StarryBackground />
+            </div>
+          )}
+
+          {/* UI KATMANI */}
+          <div className="relative z-10 min-h-screen flex flex-col pointer-events-none">
+            <Header />
+            <main className="flex-grow">
+              <AppRouter />
+            </main>
+            <FloatingNavigation />
+            <NotificationCenter />
+            <NotificationToast />
+            <CookieConsent />
+            <Toaster position="top-right" />
+          </div>
+
         </div>
       </TooltipProvider>
     </NotificationProvider>
