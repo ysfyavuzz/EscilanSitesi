@@ -5,6 +5,8 @@ export interface PlanetTheme {
   rings?: boolean;
   ringColor?: string;
   textureUrl?: string;
+  materialType?: 'crystal' | 'gas' | 'lava' | 'ice' | 'metallic' | 'plasma' | 'bio';
+  rotationSpeed?: number;
 }
 
 export interface PlanetData {
@@ -18,18 +20,20 @@ export interface PlanetData {
 export const PLANETS: PlanetData[] = [
   {
     id: 0,
-    name: "ANA SAYFA",
+    name: "ZÜHRE PRIME",
     path: "/",
     description: "Kozmik Merkeze Hoş Geldiniz",
     theme: {
       color: "#4c1d95",
       emissive: "#2e1065",
       glow: "#7c3aed",
+      materialType: 'plasma',
+      rotationSpeed: 0.005
     }
   },
   {
     id: 1,
-    name: "KEŞFET",
+    name: "AETHERIA",
     path: "/escorts",
     description: "Galaksideki Tüm Yıldızlar",
     theme: {
@@ -37,56 +41,66 @@ export const PLANETS: PlanetData[] = [
       emissive: "#1e293b",
       glow: "#3b82f6",
       rings: true,
-      ringColor: "#60a5fa"
+      ringColor: "#60a5fa",
+      materialType: 'gas',
+      rotationSpeed: 0.008
     }
   },
   {
     id: 2,
-    name: "VIP",
+    name: "AURUM",
     path: "/vip",
     description: "En Parlak Yıldızlar",
     theme: {
       color: "#451a03",
       emissive: "#78350f",
       glow: "#f59e0b",
+      materialType: 'metallic',
+      rotationSpeed: 0.003
     }
   },
   {
     id: 3,
-    name: "MESAJLAR",
+    name: "NEBULA-X",
     path: "/messages",
     description: "Kozmik İletişim",
     theme: {
       color: "#064e3b",
       emissive: "#065f46",
       glow: "#10b981",
+      materialType: 'bio',
+      rotationSpeed: 0.006
     }
   },
   {
     id: 4,
-    name: "FAVORİLER",
+    name: "CRYSTALLIS",
     path: "/favorites",
     description: "Kaydedilen Takımyıldızlar",
     theme: {
       color: "#831843",
       emissive: "#9d174d",
       glow: "#ec4899",
+      materialType: 'crystal',
+      rotationSpeed: 0.004
     }
   },
   {
     id: 5,
-    name: "PROFİL",
+    name: "GLACIES",
     path: "/escort/dashboard",
     description: "Kişisel Yörüngeniz",
     theme: {
       color: "#1e1b4b",
       emissive: "#312e81",
       glow: "#6366f1",
+      materialType: 'ice',
+      rotationSpeed: 0.002
     }
   },
   {
     id: 6,
-    name: "İLAN VER",
+    name: "PYROS",
     path: "/register-escort",
     description: "Galaksiye Katılın",
     theme: {
@@ -94,7 +108,9 @@ export const PLANETS: PlanetData[] = [
       emissive: "#713f12",
       glow: "#eab308",
       rings: true,
-      ringColor: "#facc15"
+      ringColor: "#facc15",
+      materialType: 'lava',
+      rotationSpeed: 0.01
     }
   }
 ];
