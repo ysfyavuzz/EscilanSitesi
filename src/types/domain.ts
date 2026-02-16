@@ -62,6 +62,18 @@ export interface MediaItem {
 
 // İlan Profili (Escort/Agency)
 export interface ListingProfile extends BaseProfile {
+  slug?: string; // URL için benzersiz tanımlayıcı
+  stageName?: string; // Sahne adı
+  age?: number; // Yaş
+  city?: string; // Şehir
+  district?: string; // İlçe
+  bio?: string; // Kısa biyografi
+  biography?: string; // Uzun biyografi
+  slogan?: string; // Slogan
+  coverImage?: string; // Kapak görseli
+  thumbnailVideo?: string; // Önizleme videosu
+  gallery?: string; // Galeri (JSON string)
+  mediaPrivacySettings?: any; // Medya gizlilik ayarları
   services: string[]; // Sunulan hizmetler (tags)
   languages: string[]; // Konuşulan diller
 

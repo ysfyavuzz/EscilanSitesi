@@ -1,12 +1,12 @@
 import type { CreateExpressContextOptions } from '@trpc/server/adapters/express';
 import { db } from '@/drizzle/db';
-import type { Profile } from '@/drizzle/schema';
+import type { User } from '@/drizzle/schema';
 
 // Define the shape of the user object we'll have in the context
 interface UserContext {
   id: string;
   email: string;
-  role: Profile['role'];
+  role: User['role'];
 }
 
 /**

@@ -2,74 +2,37 @@
  * Cosmic Floating Navigator
  * 
  * Temaya uygun açılır/kapanır floating navigation bileşeni.
- * Kozmik tema ile uyumlu glass-morphism, glow efektleri ve smooth animasyonlar.
- * 
- * @module components/CosmicNav
- * @category Components - Navigation
  */
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, 
-  Search, 
-  Heart, 
-  MessageCircle, 
-  User, 
-  Menu, 
-  X,
-  Crown,
-  Settings,
-  LogOut,
-  Sparkles
+  Home, Search, Heart, MessageCircle, User, Menu, X, Crown, Settings, LogOut, Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface NavItem {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  requiresAuth?: boolean;
-}
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function CosmicNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  // Close menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, []);
-
-  const navItems: NavItem[] = [
-    { href: '/', icon: Home, label: 'Ana Sayfa' },
-    { href: '/escorts', icon: Search, label: 'Keşfet' },
-    { href: '/favorites', icon: Heart, label: 'Favoriler', requiresAuth: true },
-    { href: '/messages', icon: MessageCircle, label: 'Mesajlar', requiresAuth: true },
-  ];
-
-  const userItems: NavItem[] = user ? [
-    { href: '/escort/dashboard', icon: User, label: 'Profilim' },
-    { href: '/settings', icon: Settings, label: 'Ayarlar' },
-  ] : [
-    { href: '/login', icon: User, label: 'Giriş Yap' },
-    { href: '/escort/register', icon: Crown, label: 'Kayıt Ol' },
+  const navItems = [
+    { href: '/', icon: Home, label: 'ANA SAYFA' },
+    { href: '/escorts', icon: Search, label: 'KEŞFET' },
+    { href: '/favorites', icon: Heart, label: 'FAVORİLER', requiresAuth: true },
+    { href: '/messages', icon: MessageCircle, label: 'MESAJLAR', requiresAuth: true },
   ];
 
   return (
     <>
-      {/* Backdrop */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -82,169 +45,58 @@ export function CosmicNav() {
         )}
       </AnimatePresence>
 
-      {/* Floating Menu Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 md:hidden w-14 h-14 rounded-full 
-                   bg-gradient-to-br from-amber-500 to-amber-700 
-                   shadow-lg shadow-amber-500/30
-                   flex items-center justify-center
-                   border border-amber-400/50"
+        className="fixed bottom-8 right-8 z-50 md:hidden w-16 h-16 rounded-full bg-primary shadow-2xl flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        animate={{
-          boxShadow: isOpen 
-            ? '0 0 30px rgba(212, 175, 55, 0.5)' 
-            : '0 10px 40px rgba(212, 175, 55, 0.3)',
-        }}
+        whileTap={{ scale: 0.9 }}
       >
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {isOpen ? (
-            <X className="w-6 h-6 text-black" />
-          ) : (
-            <Menu className="w-6 h-6 text-black" />
-          )}
-        </motion.div>
-        
-        {/* Glow ring */}
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-amber-400"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.5, 0, 0.5],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
+        {isOpen ? <X className="w-8 h-8 text-white" /> : <Menu className="w-8 h-8 text-white" />}
       </motion.button>
 
-      {/* Floating Menu Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.nav
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-4 left-4 z-50 md:hidden
-                       glass-panel rounded-2xl p-4 
-                       border border-amber-500/20
-                       max-w-sm mx-auto"
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-28 right-8 left-8 z-50 md:hidden glass-panel p-6 border-none"
           >
-            {/* Sparkle decoration */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <Sparkles className="w-6 h-6 text-amber-400" />
-            </div>
-
-            {/* Main Nav Items */}
-            <div className="grid grid-cols-4 gap-2 mb-4 pb-4 border-b border-white/10">
-              {navItems.map((item, index) => {
-                const Icon = item.icon;
-                const isActive = location === item.href;
-                const isDisabled = item.requiresAuth && !user;
-
-                return (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link href={isDisabled ? '/login' : item.href}>
-                      <div className={`flex flex-col items-center p-3 rounded-xl transition-all
-                                      ${isActive 
-                                        ? 'bg-amber-500/20 text-amber-400' 
-                                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'}
-                                      ${isDisabled ? 'opacity-50' : ''}`}>
-                        <Icon className="w-5 h-5 mb-1" />
-                        <span className="text-[10px] font-medium">{item.label}</span>
-                        {isActive && (
-                          <motion.div
-                            layoutId="cosmicActiveIndicator"
-                            className="absolute -bottom-1 w-1 h-1 bg-amber-400 rounded-full"
-                          />
-                        )}
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* User Items */}
-            <div className="space-y-1">
-              {userItems.map((item, index) => {
-                const Icon = item.icon;
-                const isActive = location === item.href;
-
-                return (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + index * 0.05 }}
-                  >
-                    <Link href={item.href}>
-                      <div className={`flex items-center gap-3 p-3 rounded-xl transition-all
-                                      ${isActive 
-                                        ? 'bg-amber-500/20 text-amber-400' 
-                                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'}`}>
-                        <Icon className="w-5 h-5" />
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-
-              {/* Logout Button */}
-              {user && (
-                <motion.button
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  onClick={() => {
-                    logout();
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center gap-3 p-3 rounded-xl w-full
-                             text-red-400 hover:bg-red-500/10 transition-all"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span className="text-sm font-medium">Çıkış Yap</span>
-                </motion.button>
-              )}
-            </div>
-
-            {/* VIP Banner */}
-            {user?.membership !== 'vip' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className="mt-4 pt-4 border-t border-white/10"
-              >
-                <Link href="/vip">
-                  <div className="flex items-center gap-3 p-3 rounded-xl 
-                                  bg-gradient-to-r from-amber-500/20 to-purple-500/20
-                                  border border-amber-500/30
-                                  hover:from-amber-500/30 hover:to-purple-500/30 transition-all">
-                    <Crown className="w-5 h-5 text-amber-400" />
-                    <div className="flex-1">
-                      <div className="text-sm font-bold text-foreground">VIP Ol</div>
-                      <div className="text-[10px] text-muted-foreground">Özel ayrıcalıklar kazan</div>
-                    </div>
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+            <div className="grid grid-cols-2 gap-4">
+              {navItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <div className={`flex flex-col items-center gap-3 p-4 rounded-2xl transition-all
+                    ${location === item.href ? 'bg-primary text-white' : (isDark ? 'bg-white/5 text-white/60' : 'bg-orange-500/5 text-orange-950/60')}`}>
+                    <item.icon className="w-6 h-6" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
                   </div>
                 </Link>
-              </motion.div>
-            )}
+              ))}
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
+              {user ? (
+                <>
+                  <Link href="/escort/dashboard">
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white/60">
+                      <User className="w-5 h-5" />
+                      <span className="text-xs font-black uppercase tracking-widest">PROFİLİM</span>
+                    </div>
+                  </Link>
+                  <div onClick={logout} className="flex items-center gap-4 p-4 rounded-2xl bg-red-500/10 text-red-500">
+                    <LogOut className="w-5 h-5" />
+                    <span className="text-xs font-black uppercase tracking-widest">ÇIKIŞ YAP</span>
+                  </div>
+                </>
+              ) : (
+                <Link href="/login">
+                  <div className="flex items-center justify-center gap-3 p-5 rounded-2xl bg-primary text-white shadow-xl">
+                    <Sparkles className="w-5 h-5" />
+                    <span className="text-xs font-black uppercase tracking-widest italic">YÖRÜNGEYE GİR</span>
+                  </div>
+                </Link>
+              )}
+            </div>
           </motion.nav>
         )}
       </AnimatePresence>

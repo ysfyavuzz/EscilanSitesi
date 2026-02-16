@@ -2,28 +2,32 @@
  * Catalog Page
  *
  * Advanced escort catalog and discovery page with comprehensive filtering system.
- * Features advanced multi-criteria filtering with URL state persistence.
  */
 
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'wouter';
 import { Header } from '@/components/Header';
-import BottomNav from '@/components/BottomNav';
+import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { StandardCard } from '@/components/StandardCard';
 import { VipPremiumCard } from '@/components/VipPremiumCard';
 import { AdvancedFilterPanel } from '@/components/AdvancedFilterPanel';
 import { PremiumHeroBanner } from '@/components/PremiumHeroBanner';
+import { StarryBackground } from '@/components/StarryBackground';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { mockEscorts } from '@/data/mockData';
 import { Search, SlidersHorizontal, Grid3x3, List, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [filterOpen, setFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   // Active filters from URL
   const activeFilters = useMemo(() => {
@@ -37,19 +41,13 @@ export default function Catalog() {
   // Filtered escorts
   const filteredEscorts = useMemo(() => {
     return mockEscorts.filter(escort => {
-      // Search query filter
       if (searchQuery && !escort.displayName.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      
-      // City filter
       const city = searchParams.get('city');
       if (city && escort.city !== city) return false;
-      
-      // VIP filter
       const isVip = searchParams.get('isVip');
       if (isVip === 'true' && !escort.isVip) return false;
-
       return true;
     });
   }, [searchParams, searchQuery]);
@@ -74,98 +72,86 @@ export default function Catalog() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg text-white">
+    <div className="min-h-screen">
+      <StarryBackground />
       <Header />
       
       <PremiumHeroBanner 
-        title="Seçkin Katalog"
+        title="SEÇKİN KATALOG"
         subtitle="Türkiye'nin en seçkin ve doğrulanmış profillerini keşfedin."
       />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-16 content-layer">
         {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-text-secondary w-5 h-5" />
+        <div className="flex flex-col md:flex-row gap-6 mb-16 items-center justify-between">
+          <div className="relative w-full md:w-[400px]">
+            <Search className={`absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 ${isDark ? 'text-white/20' : 'text-orange-950/20'}`} />
             <input 
               type="text" 
-              placeholder="İsim ile ara..."
-              className="w-full bg-dark-card border border-dark-border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-gold-500"
+              placeholder="GALAKSİDE ARA..."
+              className={`w-full glass-panel border-none pl-14 pr-6 py-6 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-black uppercase tracking-widest text-[10px] italic
+                ${isDark ? 'text-white placeholder-white/20' : 'text-orange-950 placeholder-orange-900/40'}`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
-          <div className="flex gap-2 w-full md:w-auto">
+          <div className="flex gap-4 w-full md:w-auto">
             <Button 
-              variant="outline" 
-              className="flex-1 md:flex-none gap-2 border-dark-border"
+              className={`flex-1 md:flex-none gap-3 glass-panel border-none h-16 px-10 font-black uppercase tracking-[0.2em] text-[10px] italic transition-all
+                ${isDark ? 'text-white hover:bg-white/10' : 'text-orange-950 hover:bg-orange-500/10'}`}
               onClick={() => setFilterOpen(!filterOpen)}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filtrele
+              FİLTRELE
             </Button>
-            <div className="hidden md:flex border border-dark-border rounded-lg overflow-hidden">
-              <Button 
-                variant={viewMode === 'grid' ? 'default' : 'ghost'} 
-                size="icon"
-                onClick={() => setViewMode('grid')}
-                className="rounded-none"
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button 
-                variant={viewMode === 'list' ? 'default' : 'ghost'} 
-                size="icon"
-                onClick={() => setViewMode('list')}
-                className="rounded-none"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </div>
 
         {/* Active Filters Display */}
         {Object.keys(activeFilters).length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-3 mb-12">
             {Object.entries(activeFilters).map(([key, value]) => (
-              <Badge key={key} variant="secondary" className="bg-dark-card border-dark-border text-gold-500 gap-1 py-1 px-3">
+              <Badge key={key} className="glass-panel border-none text-primary gap-3 py-4 px-8 font-black uppercase tracking-widest text-[9px] italic">
                 {key}: {value}
-                <X className="w-3 h-3 cursor-pointer" onClick={() => removeFilter(key)} />
+                <X className="w-4 h-4 cursor-pointer hover:text-red-500 transition-colors" onClick={() => removeFilter(key)} />
               </Badge>
             ))}
-            <Button variant="ghost" size="sm" className="text-xs text-dark-text-secondary" onClick={() => setSearchParams(new URLSearchParams())}>
-              Tümünü Temizle
+            <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-primary transition-colors" onClick={() => setSearchParams(new URLSearchParams())}>
+              TÜMÜNÜ TEMİZLE
             </Button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Sidebar Filters */}
           <AnimatePresence>
             {filterOpen && (
               <motion.aside 
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="lg:col-span-1"
+                exit={{ opacity: 0, x: -30 }}
+                className="lg:col-span-3"
               >
-                <AdvancedFilterPanel onFilterChange={handleFilterChange} />
+                <div className="glass-panel border-none p-10 rounded-[2.5rem] sticky top-28 shadow-2xl">
+                  <AdvancedFilterPanel onFilterChange={handleFilterChange} />
+                </div>
               </motion.aside>
             )}
           </AnimatePresence>
 
           {/* Main Content */}
-          <div className={filterOpen ? "lg:col-span-3" : "lg:col-span-4"}>
+          <div className={filterOpen ? "lg:col-span-9" : "lg:col-span-12"}>
             {/* VIP Section */}
             {vipEscorts.length > 0 && (
-              <section className="mb-12">
-                <div className="flex items-center gap-2 mb-6">
-                  <h2 className="text-2xl font-bold text-gradient-gold">VIP Üyeler</h2>
-                  <div className="h-px flex-1 bg-gradient-to-r from-gold-500/50 to-transparent" />
+              <section className="mb-24">
+                <div className="flex items-center gap-6 mb-12">
+                  <h2 className={`text-4xl font-black italic uppercase tracking-tighter text-3d ${isDark ? 'text-white' : 'text-orange-950'}`}>
+                    VIP <span className="text-primary">YILDIZLAR</span>
+                  </h2>
+                  <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-orange-900/10'}`} />
                 </div>
-                <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+                <div className={`grid gap-10 ${viewMode === 'grid' ? (filterOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 md:grid-cols-3 xl:grid-cols-4') : 'grid-cols-1'}`}>
                   {vipEscorts.map(escort => (
                     <VipPremiumCard key={escort.id} escort={escort} />
                   ))}
@@ -175,21 +161,25 @@ export default function Catalog() {
 
             {/* Standard Section */}
             <section>
-              <div className="flex items-center gap-2 mb-6">
-                <h2 className="text-2xl font-bold text-white">Tüm İlanlar</h2>
-                <div className="h-px flex-1 bg-dark-border" />
+              <div className="flex items-center gap-6 mb-12">
+                <h2 className={`text-4xl font-black italic uppercase tracking-tighter text-3d ${isDark ? 'text-white' : 'text-orange-950'}`}>
+                  TÜM <span className="text-primary">İLANLAR</span>
+                </h2>
+                <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-orange-900/10'}`} />
               </div>
-              <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              <div className={`grid gap-10 ${viewMode === 'grid' ? (filterOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 md:grid-cols-3 xl:grid-cols-4') : 'grid-cols-1'}`}>
                 {standardEscorts.map(escort => (
-                  <StandardCard key={escort.id} escort={escort} />
+                  <StandardCard key={escort.id} profile={escort} />
                 ))}
               </div>
               
               {filteredEscorts.length === 0 && (
-                <div className="text-center py-20 bg-dark-card rounded-xl border border-dark-border">
-                  <p className="text-dark-text-secondary text-lg">Aradığınız kriterlere uygun sonuç bulunamadı.</p>
-                  <Button variant="link" className="text-gold-500 mt-2" onClick={() => setSearchParams(new URLSearchParams())}>
-                    Filtreleri Sıfırla
+                <div className="text-center py-40 glass-panel border-none rounded-[3rem] shadow-2xl">
+                  <p className={`text-xl font-black uppercase tracking-[0.2em] italic ${isDark ? 'text-white/30' : 'text-orange-900/40'}`}>
+                    ARADIĞINIZ KRİTERLERE UYGUN SONUÇ BULUNAMADI.
+                  </p>
+                  <Button variant="link" className="text-primary mt-6 font-black uppercase tracking-widest italic text-sm" onClick={() => setSearchParams(new URLSearchParams())}>
+                    YÖRÜNGEYİ SIFIRLA
                   </Button>
                 </div>
               )}
@@ -198,6 +188,7 @@ export default function Catalog() {
         </div>
       </main>
       
+      <Footer />
       <BottomNav />
     </div>
   );

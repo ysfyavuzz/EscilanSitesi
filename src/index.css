@@ -4,218 +4,127 @@
 
 @layer base {
   :root {
-    /* --- NEW: Ice Theme Variables (Migrated from Metallic Corona) --- */
-    --color-primary: 6 182 212; /* Cyan 500 */
-    --color-primary-light: 236 254 255; /* Cyan 50 */
-    --color-primary-dark: 8 145 178; /* Cyan 600 */
-    --color-accent: 255 255 255; /* White */
-    --color-secondary: 103 232 249; /* Cyan 300 */
+    /* --- Dinamik Kozmik Açık Tema (Gün Batımı) --- */
+    --primary: #f97316;
+    --primary-rgb: 249, 115, 22;
     
-    /* Mapping to Escilan System Variables - OVERRIDING FOR ICE THEME */
-    --primary: 6 182 212; /* Cyan 500 */
-    --primary-foreground: 0 0% 100%;
-    --background: 236 254 255; /* Very light cyan as background */
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --secondary: 103 232 249;
-    --secondary-foreground: 6 182 212;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 255 255 255;
-    --accent-foreground: 6 182 212;
+    --background: 255 247 237; /* Sunset Light Orange #fff7ed */
+    --foreground: 24 24 27; /* Zinc 950 #18181b */
+    --card: 255 255 255;
+    --card-foreground: 24 24 27;
+    --popover: 255 255 255;
+    --popover-foreground: 24 24 27;
+    --secondary: 251 191 36;
+    --secondary-foreground: 124 45 18; /* Daha koyu turuncu-kahve okunaklılık için */
+    --muted: 254 243 199;
+    --muted-foreground: 87 83 78; /* Daha koyu taş rengi okunaklılık için */
+    --accent: 251 191 36;
+    --accent-foreground: 124 45 18;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 6 182 212; /* Cyan border */
-    --input: 210 20% 90%;
-    --ring: 6 182 212;
-    --radius: 0.75rem;
+    --border: 251 191 36;
+    --input: 254 243 199;
+    --ring: 249 115 22;
+    --radius: 1.5rem;
     
-    /* Glass Effect Variables (Frosty) */
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.6);
-    --glass-shadow: rgba(6, 182, 212, 0.15); /* Cyan shadow */
+    /* Glass Effect (Açık Tema) - Daha opak okunaklılık için */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(249, 115, 22, 0.2);
+    --glass-shadow: rgba(249, 115, 22, 0.1);
   }
 
-  /* ... (Existing Dark Mode Vars - Keeping as is or adapting if requested, focusing on Light Mode Ice Theme for now) ... */
   .dark {
-    /* Cosmic (Dark Mode) -> Deep Blue & Cyan */
-    --color-primary: 56 189 248; /* Sky 400 */
-    --color-primary-light: 224 242 254; /* Sky 100 */
-    --color-primary-dark: 2 132 199; /* Sky 600 */
-    --color-accent: 240 249 255; /* Sky 50 */
-    --color-secondary: 129 140 248; /* Indigo 400 */
-    
-    /* Mapping to Escilan System Variables for Dark Mode */
-    --primary: 199 89% 48%; 
-    --primary-foreground: 0 0% 100%;
-    --background: 222 47% 11%; 
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    /* --- Dinamik Kozmik Koyu Tema (Derin Uzay) --- */
+    --background: 222 47% 4%; /* Deep Space Navy #020617 */
+    --foreground: 210 40% 98%; /* Slate 50 */
+    --card: 222 47% 6%; /* Daha koyu Slate 950 */
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 47% 6%;
     --popover-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
+    --secondary: 217.2 32.6% 12%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
+    --muted: 217.2 32.6% 12%;
+    --muted-foreground: 215 20.2% 75%; /* Daha parlak metin okunaklılık için */
+    --accent: 217.2 32.6% 12%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62% 30%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 212 100% 48%;
+    --border: 217.2 32.6% 15%;
+    --input: 217.2 32.6% 15%;
+    --ring: 224.3 76.3% 48%;
     
-    /* Glass Effect Variables (Dark Ice) */
-    --glass-bg: rgba(15, 23, 42, 0.7);
+    /* Glass Effect (Koyu Tema) - Daha opak okunaklılık için */
+    --glass-bg: rgba(0, 0, 0, 0.5);
     --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: rgba(14, 165, 233, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.6);
   }
 
   body {
-    @apply bg-background text-foreground antialiased font-sans transition-colors duration-300;
+    @apply bg-background text-foreground antialiased font-sans transition-colors duration-1000 overflow-x-hidden;
+    background-attachment: fixed;
   }
 }
 
-/* --- Utilities from Metallic Corona --- */
+/* --- COSMIC UI COMPONENTS --- */
+
+.content-layer {
+  position: relative;
+  z-index: 10;
+}
 
 .glass-panel {
-  @apply backdrop-blur-xl border shadow-2xl rounded-2xl;
+  @apply backdrop-blur-3xl border shadow-2xl rounded-[2.5rem];
   background-color: var(--glass-bg);
   border-color: var(--glass-border);
-  box-shadow: 0 4px 30px var(--glass-shadow);
+  box-shadow: 0 8px 32px 0 var(--glass-shadow);
+  transform-style: preserve-3d;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.bg-grid-pattern {
-  background-image: radial-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px);
-  background-size: 40px 40px;
+.glass-panel:hover {
+  @apply border-primary/40;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 48px 0 rgba(var(--primary-rgb), 0.3);
 }
 
-/* Animations */
-@keyframes twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes shooting-star {
-    0% { transform: translateX(0) scale(1); opacity: 1; }
-    70% { opacity: 1; }
-    100% { transform: translateX(200vh) scale(0.5); opacity: 0; }
-}
-
-.animate-shooting-star {
-    animation: shooting-star 2s linear forwards;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-.animate-twinkle {
-    animation: twinkle 3s infinite ease-in-out;
-}
-
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes pulse-slow {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
-}
-
-/* Ice/Nebula Animations */
-@keyframes nebula-float {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) rotate(0deg); }
-    30% { opacity: 0.6; }
-    70% { opacity: 0.6; }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
-}
-
-.animate-nebula-float {
-    animation: nebula-float 20s ease-in-out forwards;
-}
-
-/* 3D Text Effect (Ice Style) */
+/* Okunaklı Metin Gölgeleri */
 .text-3d {
-  text-shadow: 
-    0 1px 0 #e0f2fe,
-    0 2px 0 #bae6fd,
-    0 3px 0 #7dd3fc,
-    0 4px 0 #38bdf8,
-    0 5px 0 #0ea5e9,
-    0 6px 1px rgba(14, 165, 233, 0.1),
-    0 0 5px rgba(14, 165, 233, 0.1),
-    0 1px 3px rgba(14, 165, 233, 0.3),
-    0 3px 5px rgba(14, 165, 233, 0.2),
-    0 5px 10px rgba(14, 165, 233, 0.25),
-    0 10px 10px rgba(14, 165, 233, 0.2),
-    0 20px 20px rgba(14, 165, 233, 0.15);
+  transform-style: preserve-3d;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .dark .text-3d {
-  text-shadow: 
-    0 1px 0 #0c4a6e,
-    0 2px 0 #075985,
-    0 3px 0 #0369a1,
-    0 4px 0 #0284c7,
-    0 5px 0 #0ea5e9,
-    0 6px 1px rgba(0,0,0,.3),
-    0 0 5px rgba(0,0,0,.3),
-    0 1px 3px rgba(0,0,0,.5),
-    0 3px 5px rgba(0,0,0,.4),
-    0 5px 10px rgba(0,0,0,.45),
-    0 10px 10px rgba(0,0,0,.4),
-    0 20px 20px rgba(0,0,0,.35);
+  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(var(--primary-rgb), 0.3);
 }
 
-/* Neon Glow Effect (Ice) */
-.text-glow {
-  filter: drop-shadow(0 0 5px rgba(14, 165, 233, 0.7))
-          drop-shadow(0 0 10px rgba(14, 165, 233, 0.5));
+/* Başlıklar için Ekstra Kontrast */
+h1, h2, h3, h4, h5, h6 {
+  @apply tracking-tighter font-black italic uppercase;
+  color: hsl(var(--foreground));
 }
 
-/* Card Depth (Ice) */
-.card-depth {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.card-depth:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 
-    0 20px 40px rgba(14, 165, 233, 0.15),
-    0 0 20px rgba(14, 165, 233, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 5s ease infinite;
 }
 
 /* Custom Scrollbar */
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
+::-webkit-scrollbar {
+  width: 6px;
 }
-.scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-@supports (scrollbar-width: none) {
-    .scrollbar-hide {
-        scrollbar-width: none; /* Firefox */
-    }
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary-rgb), 0.3);
+  border-radius: 100px;
 }
-
-/* Global Gradient Text Helpers */
-.gradient-text {
-  background: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-rose-gold {
-  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #6366F1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--primary-rgb), 0.5);
 }

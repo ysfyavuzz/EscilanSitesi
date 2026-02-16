@@ -16,15 +16,15 @@ export const authRouter = router({
       z.object({
         email: z.string().email('Geçersiz e-posta adresi.'),
         password: z.string().min(8, 'Şifre en az 8 karakter olmalıdır.'),
-        role: schema.userRoleEnum.default('customer'),
+        role: z.enum(schema.userRoleEnum).default('customer'),
       })
     )
     .mutation(async ({ input }) => {
       const { email, password, role } = input;
 
       // Check if user already exists
-      const existingUser = await db.query.profiles.findFirst({
-        where: eq(schema.profiles.email, email),
+      const existingUser = await db.query.users.findFirst({
+        where: eq(schema.users.email, email),
       });
 
       if (existingUser) {
@@ -38,12 +38,11 @@ export const authRouter = router({
       const hashedPassword = await bcrypt.hash(password, 12);
 
       // Create new user
-      const newUser = await db.insert(schema.profiles).values({
-        id: crypto.randomUUID(),
+      const newUser = await db.insert(schema.users).values({
         email,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         role,
-      }).returning({ id: schema.profiles.id, email: schema.profiles.email });
+      }).returning({ id: schema.users.id, email: schema.users.email });
       
       return {
         status: 'success',
@@ -65,8 +64,8 @@ export const authRouter = router({
       const { email, password } = input;
 
       // Find user
-      const user = await db.query.profiles.findFirst({
-          where: eq(schema.profiles.email, email),
+      const user = await db.query.users.findFirst({
+          where: eq(schema.users.email, email),
       });
 
       if (!user) {
@@ -76,7 +75,7 @@ export const authRouter = router({
         });
       }
       
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
       
       if (!isPasswordValid) {
         throw new TRPCError({

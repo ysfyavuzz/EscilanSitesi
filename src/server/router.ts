@@ -31,11 +31,11 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: string; role: schema.Profile['role']; iat: number; exp: number };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: number; role: schema.User['role']; iat: number; exp: number };
 
     // Find the user in the database to ensure they still exist
-    const userProfile = await db.query.profiles.findFirst({
-        where: eq(schema.profiles.id, decoded.userId),
+    const userProfile = await db.query.users.findFirst({
+        where: eq(schema.users.id, decoded.userId),
     });
 
     if (!userProfile) {
@@ -46,7 +46,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
       ctx: {
         ...ctx,
         user: {
-          id: userProfile.id,
+          id: String(userProfile.id),
           email: userProfile.email,
           role: userProfile.role,
         },
@@ -87,7 +87,7 @@ export const appRouter = router({
   health: publicProcedure.query(async ({ ctx }) => {
     try {
       // Drizzle with a simple query to check DB connection
-      await ctx.db.select({ id: schema.profiles.id }).from(schema.profiles).limit(1);
+      await ctx.db.select({ id: schema.escortProfiles.id }).from(schema.escortProfiles).limit(1);
       return {
         status: "ok",
         timestamp: new Date().toISOString(),

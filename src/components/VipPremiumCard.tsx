@@ -2,49 +2,6 @@
  * VipPremiumCard Component
  * 
  * Premium animated card component for VIP escorts with enhanced visual effects.
- * Features gold gradient, parallax effects, and premium animations.
- * 
- * @module components/VipPremiumCard
- * @category Components - Cards
- * 
- * Features:
- * - Luxurious gold gradient design
- * - Parallax mouse-tracking effects
- * - 3D tilt animation on hover
- * - Sparkle/shine animations
- * - VIP crown badge
- * - Enhanced profile display
- * - Performance-optimized animations
- * - Mobile-friendly fallback
- * - Responsive layout
- * 
- * Visual Effects:
- * - Gradient background (gold theme)
- * - Mouse parallax movement
- * - Smooth spring animations
- * - Hover state transitions
- * - Shimmer effect overlay
- * - Premium badge placement
- * 
- * Performance:
- * - Low power mode detection
- * - Reduced animations on mobile
- * - Optimized re-renders
- * - Hardware acceleration
- * 
- * @example
- * ```tsx
- * <VipPremiumCard
- *   escort={{
- *     id: "vip-123",
- *     displayName: "Ayşe Y.",
- *     city: "Istanbul",
- *     isVip: true,
- *     rating: 4.9,
- *     // ... other escort properties
- *   }}
- * />
- * ```
  */
 
 import React from 'react';
@@ -52,41 +9,26 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
 import { Crown, CheckCircle2, Star, MapPin, Heart, ChevronRight, Sparkles } from "lucide-react";
-import { useState, useRef } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
-/**
- * usePerformance hook - Detects device performance capabilities
- */
-function usePerformance() {
-  // Basit bir mobil tespiti, ileride daha gelişmiş bir tespit eklenebilir
-  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  return { isLowPowerMode: false, isMobile };
-}
-
-/**
- * Props for VipPremiumCard component
- */
 interface VipPremiumCardProps {
   escort: any;
   onClick?: (escortId: string) => void;
 }
 
 export const VipPremiumCard = React.memo(function VipPremiumCard({ escort, onClick }: VipPremiumCardProps) {
-  const { isLowPowerMode, isMobile } = usePerformance();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // Mobilde veya düşük güç modunda daha yumuşak/az hesaplamalı yaylar
-  const springConfig = isLowPowerMode ? { stiffness: 50, damping: 20 } : { stiffness: 150, damping: 30 };
-  const mouseXSpring = useSpring(x, springConfig);
-  const mouseYSpring = useSpring(y, springConfig);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 30 });
 
-  // Düşük güç modunda rotasyonu azalt veya kapat
-  const rotateRange = isLowPowerMode ? ["2deg", "-2deg"] : ["10deg", "-10deg"];
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], rotateRange);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], rotateRange);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -114,79 +56,76 @@ export const VipPremiumCard = React.memo(function VipPremiumCard({ escort, onCli
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full max-w-[450px] aspect-[3/4.8] group cursor-pointer"
+      className="relative w-full aspect-[3/4.5] group cursor-pointer content-layer"
       onClick={() => onClick && onClick(escort.id)}
     >
-      <Card className="w-full h-full vip-premium-frame glass-panel overflow-hidden rounded-3xl bg-black border-0 shadow-2xl">
+      <Card className={`w-full h-full glass-panel overflow-hidden rounded-[2.5rem] border-none shadow-2xl transition-all duration-500
+        ${isDark ? 'bg-black/40' : 'bg-white/40'}`}>
           <CardContent className="p-0 h-full relative">
-            {/* 3D Glow Effect - Enhanced */}
-            <div className="vip-card-glow" />
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-transparent to-gold-500/20 pointer-events-none animate-pulse" />
+            {/* 3D Glow Effect */}
+            <div className={`absolute inset-0 opacity-20 pointer-events-none transition-colors duration-1000
+              ${isDark ? 'bg-gradient-to-br from-violet-500 via-transparent to-primary' : 'bg-gradient-to-br from-orange-500 via-transparent to-amber-500'}`} />
             
             {/* Image Section */}
             <div className="absolute inset-0 z-0">
-              {escort.profilePhoto ? (
-                <img
-                  src={escort.profilePhoto}
-                  alt={escort.displayName}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-900 via-black to-blue-900 flex items-center justify-center">
-                  <Crown className="w-20 h-20 text-white/10" />
-                </div>
-              )}
+              <img
+                src={escort.profilePhoto || escort.coverImage}
+                alt={escort.displayName}
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
               {/* Premium Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 via-transparent to-blue-500/10" />
+              <div className={`absolute inset-0 opacity-80 transition-colors duration-1000
+                ${isDark 
+                  ? 'bg-gradient-to-t from-[#020617] via-transparent to-black/30' 
+                  : 'bg-gradient-to-t from-orange-950/40 via-transparent to-white/20'}`} />
             </div>
 
             {/* Content - Floating in 3D */}
-            <div className="relative h-full flex flex-col justify-between p-8 z-10">
+            <div className="relative h-full flex flex-col justify-between p-8 z-10" style={{ transform: "translateZ(50px)" }}>
               {/* Top Badges */}
-              <div className="flex justify-between items-start vip-badge-3d">
-                <Badge className="bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 text-black border-0 shadow-2xl px-4 py-2 text-xs font-black uppercase tracking-[0.2em] animate-pulse">
+              <div className="flex justify-between items-start">
+                <Badge className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-2xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] animate-pulse italic">
                   <Crown className="w-4 h-4 mr-2" />
                   ULTRA VIP
                 </Badge>
-                <div className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-red-500 transition-colors">
+                <div className="p-3 rounded-full glass-panel border-none text-white hover:bg-red-500 transition-colors">
                   <Heart className="w-5 h-5" />
                 </div>
               </div>
 
               {/* Bottom Info */}
-              <div className="space-y-4 vip-text-3d">
+              <div className="space-y-6">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-500 text-white border-0 px-2 py-0.5 text-[10px] font-bold">
+                  <Badge className="bg-primary text-white border-0 px-3 py-1 text-[8px] font-black uppercase tracking-widest italic">
                     <CheckCircle2 className="w-3 h-3 mr-1" /> DOĞRULANMIŞ
                   </Badge>
-                  <Badge className="bg-white/10 backdrop-blur-md text-white border-0 px-2 py-0.5 text-[10px] font-bold">
+                  <Badge className="bg-white/20 backdrop-blur-xl text-white border-0 px-3 py-1 text-[8px] font-black uppercase tracking-widest italic">
                     <Sparkles className="w-3 h-3 mr-1 text-amber-400" /> POPÜLER
                   </Badge>
                 </div>
 
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter mb-1 drop-shadow-2xl">
+                  <h2 className="text-4xl font-black text-white tracking-tighter mb-2 italic uppercase drop-shadow-2xl">
                     {escort.displayName}
                   </h2>
-                  <div className="flex items-center text-white/80 font-medium">
+                  <div className="flex items-center text-white/70 font-black text-xs uppercase tracking-widest">
                     <MapPin className="w-4 h-4 mr-2 text-primary" />
                     {escort.city}, {escort.district}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between pt-6 border-t border-white/10">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-white/50 uppercase font-bold tracking-widest">Saatlik Ücret</span>
-                    <span className="text-2xl font-black text-white">₺{escort.hourlyRate}</span>
+                    <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">Saatlik Ücret</span>
+                    <span className="text-3xl font-black text-white">₺{escort.hourlyRate || escort.rates?.hourly}</span>
                   </div>
-                  <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                  <div className="flex items-center gap-1 glass-panel border-none px-4 py-2">
                     <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    <span className="text-sm font-black text-white">5.0</span>
+                    <span className="text-sm font-black text-white">{escort.rating || '5.0'}</span>
                   </div>
                 </div>
 
-                <Button className="w-full py-7 bg-white text-black hover:bg-primary hover:text-white font-black text-lg rounded-2xl transition-all group/btn">
+                <Button className="w-full py-8 bg-white text-black hover:bg-primary hover:text-white font-black text-xs uppercase tracking-[0.2em] italic rounded-2xl transition-all shadow-2xl group/btn">
                   PROFİLİ İNCELE
                   <ChevronRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-2 transition-transform" />
                 </Button>

@@ -47,7 +47,7 @@ export const appointmentRouter = router({
   list: protectedProcedure
     .input(
       z.object({
-        status: schema.appointmentStatusEnum.optional(),
+        status: z.enum(schema.appointmentStatusEnum).optional(),
         limit: z.number().default(20),
         page: z.number().default(1),
       })
@@ -69,12 +69,12 @@ export const appointmentRouter = router({
 
       const appointments = await db.query.appointments.findMany({
         where: and(...whereConditions),
-        orderBy: [desc(schema.appointments.scheduledAt)],
+        orderBy: [desc(schema.appointments.createdAt)],
         limit: limit,
         offset: (page - 1) * limit,
         with: {
-            customer: { columns: { name: true, avatar: true } },
-            escort: { columns: { name: true, avatar: true } }
+            customer: { columns: { fullName: true, email: true } },
+            escort: { columns: { stageName: true, displayName: true } }
         }
       });
       

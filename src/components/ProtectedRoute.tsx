@@ -355,7 +355,7 @@ export default function ProtectedRoute({
 
   // Check specific role requirements
   if (accessLevel === 'customer') {
-    const isCustomer = storedRole === 'customer' || user?.role === 'user' || user?.role === 'client';
+    const isCustomer = storedRole === 'customer' || user?.role === 'customer';
 
     if (!isCustomer) {
       if (fallback) {
@@ -474,7 +474,7 @@ export function useAccessLevel(requiredLevel: AccessLevel): {
 
   // Customer access
   if (requiredLevel === 'customer') {
-    const isCustomer = storedRole === 'customer' || user?.role === 'user' || user?.role === 'client';
+    const isCustomer = storedRole === 'customer' || user?.role === 'customer';
     return {
       hasAccess: isCustomer,
       isLoading: false,

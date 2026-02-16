@@ -288,7 +288,7 @@ export function useRoleBasedRoute() {
       if (requiredRole === 'any') return true;
       if (requiredRole === 'guest') return !isAuthenticated;
       if (requiredRole === 'customer') {
-        return isAuthenticated && (storedRole === 'customer' || user?.role === 'user' || user?.role === 'client');
+        return isAuthenticated && (storedRole === 'customer' || user?.role === 'customer');
       }
       if (requiredRole === 'escort') {
         return isAuthenticated && (storedRole === 'escort' || user?.role === 'escort');
