@@ -18,10 +18,11 @@ Bu proje, orijinal **Zuhre_Planet** projesinin tamamen yenilenmiş, hatalarında
 - **Akıllı Navigasyon:** Gezegenler arası geçişlerde "en kısa yol" algoritması ve sonsuz döngü mantığı uygulandı.
 - **Eksik Bileşenler:** Projede eksik olan UI bileşenleri (Switch, Slider vb.) sıfırdan oluşturuldu.
 
-### 3. Kullanıcı Deneyimi (UX)
-- **Duyarlı Tasarım (Responsive):** Mobil, Tablet ve PC ekranları için özel optimizasyonlar yapıldı.
-- **Okunaklılık:** Açık (Gün Batımı) ve Koyu (Derin Uzay) temalarda yazıların kontrast oranları optimize edildi.
-- **Cam Morfolojisi (Glassmorphism):** Tüm kartlar ve paneller modern, yarı saydam bir görünüme kavuşturuldu.
+### 3. Yeni Özellikler ve Otomasyon (V4.2)
+- **Otomatik GitHub Senkronizasyonu:** `scripts/sync_project.py` scripti sayesinde yerel değişiklikleriniz tek bir komutla GitHub'a yüklenebilir.
+- **Manus Skill Entegrasyonu:** Proje yönetimi için iki özel Manus Skill'i (`manus_skills/` dizininde) oluşturulmuştur.
+- **Zuhre Planet Manager:** Yeni özellik ekleme ve mimari standartlar rehberi.
+- **Zuhre Planet Sync:** Otomatik GitHub senkronizasyon yönetimi.
 
 ## 🛠️ Kurulum ve Çalıştırma
 
@@ -33,13 +34,17 @@ npm install
 
 # Geliştirme sunucusunu başlatın
 npm run dev
+
+# GitHub Senkronizasyonu için
+python3 scripts/sync_project.py
 ```
 
 ## 📦 Proje Yapısı
 - `src/components/SpaceBackground.tsx`: 3D Uzay ve Gezegen motoru.
 - `src/data/planets.ts`: Gezegen veri ve tema tanımlamaları.
 - `src/drizzle/schema.ts`: Veritabanı mimarisi.
-- `src/index.css`: Global kozmik stiller ve tema değişkenleri.
+- `scripts/sync_project.py`: Otomatik GitHub senkronizasyon scripti.
+- `manus_skills/`: Manus için özel yetenek dosyaları.
 
 ---
 *Bu proje Manus AI tarafından modernize edilmiştir.*
