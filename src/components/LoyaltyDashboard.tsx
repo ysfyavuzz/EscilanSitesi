@@ -49,7 +49,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Crown, Star, Gift, Users, Trophy, Zap,
   TrendingUp, Share2, CheckCircle2, Copy,
-  Eye, Award, Target, Flame, Sparkles
+  Eye, Award, Target, Flame, Sparkles,
+  Shield, ShoppingCart
 } from 'lucide-react';
 import {
   LOYALTY_LEVELS,
@@ -493,6 +494,3 @@ export function LoyaltyDashboard({
   );
 }
 
-// Import statement fix
-import { Shield } from 'lucide-react';
-import { ShoppingCart } from 'lucide-react';

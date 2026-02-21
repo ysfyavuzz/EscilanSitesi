@@ -80,15 +80,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Mock Login - SQLite/JWT logic will be called here via API
+    // ⚠️ DEMO ONLY - Gerçek login için trpc.auth.login.mutate kullanılmalı
+    // TODO: const result = await trpc.auth.login.mutateAsync({ email, password });
+    //       setUser(result.user); localStorage.setItem('auth_user', JSON.stringify(result));
     const mockUser: User = {
       id: "1",
       email,
       name: email.split('@')[0],
-      role: email.includes('admin') ? 'admin' : 'customer',
+      role: "customer",  // ✅ Güvenli: email bazlı rol belirleme kaldırıldı
       membership: "standard",
-      isSuperAdmin: email.includes('admin'),
-      permissions: email.includes('admin') ? SUPER_ADMIN_PERMISSIONS : undefined
+      isSuperAdmin: false,
     };
     setUser(mockUser);
     localStorage.setItem('auth_user', JSON.stringify(mockUser));
@@ -111,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const refreshToken = async () => {};
+  const refreshToken = async () => { };
 
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "admin";

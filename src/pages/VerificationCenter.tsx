@@ -44,7 +44,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { trpc } from '@/utils/trpc';
+import { trpc } from '@/lib/trpc';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

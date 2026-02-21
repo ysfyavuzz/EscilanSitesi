@@ -1,7 +1,6 @@
 # 🗺️ Zühre Planet — Proje Haritası ve Dokümantasyon Takibi
 
-> **Bu dosya `PROJECT_MAP.md` adıyla proje köküne yazılmıştır.**
-> Her geliştirici yaptığı değişikliği bu dosyada ilgili satırı işaretlemeli ve **JOURNAL.md** dosyasına kayıt eklemelidir.
+> **⚠️ ZORUNLU:** Her geliştirici (insan veya AI) yaptığı değişikliği bu dosyada işaretlemeli ve **JOURNAL.md** dosyasına kayıt eklemelidir. Detaylar için → [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
 
@@ -9,216 +8,117 @@
 
 | Sembol | Anlam |
 |--------|-------|
-| ✅ | JSDoc / TSDoc başlığı + açıklama mevcut |
+| ✅ | `docs/` klasöründe detaylı dökümanı mevcut |
 | 🔲 | Döküman yazılmadı (yapılacak) |
 | ⚠️ | Kısmi / eksik döküman |
-| 🔴 | Kritik — öncelikli dökümanlanmalı |
-| 🔵 | Yeni eklendi (bu ay) |
+| 🔴 | Kritik dosya — öncelikli dökümanlanmalı |
+| 🔵 | Bu ay yeni eklendi |
+| 🐛 | Bug tespit edildi |
 
 ---
 
 ## 📊 Genel İstatistik
 
-| Kategori | Toplam | ✅ Dökümanlandı | 🔲 Bekliyor |
-|----------|--------|----------------|------------|
-| `src/` Kök Dosyalar | 7 | 1 | 6 |
-| `components/` | 96 | 4 | 92 |
-| `pages/` | 59 | 2 | 57 |
-| `server/routers/` | 9 | 0 | 9 |
-| `lib/` | 37 | 2 | 35 |
-| `hooks/` | 15 | 0 | 15 |
-| `types/` | 14 | 0 | 14 |
-| `contexts/` | 6 | 0 | 6 |
-| **Toplam** | **243** | **9 (~3.7%)** | **234** |
+*Son güncelleme: 2026-02-21 10:19*
+
+| Katman | Toplam Dosya | ✅ Dökümanlandı | 🔲 Bekliyor |
+|--------|-------------|----------------|------------|
+| `src/lib/` | 6 | **6** | 0 |
+| `src/drizzle/` | 2 | **2** | 0 |
+| `src/server/routers/` | 9 | **5** | 4 |
+| `src/contexts/` | 5 | **2** | 3 |
+| `src/hooks/` | 15 | **4** | 11 |
+| `src/types/` | 13 | 0 | 13 |
+| `src/pages/` | ~54 | **5** | ~49 |
+| `src/components/` | ~86 | **10** | ~76 |
+| **TOPLAM** | **~190** | **34 (%18)** | **~156** |
 
 ---
 
-## 📁 src/ — Kök Dosyalar
+## 📁 src/lib/ ✅ TAMAM
 
-| # | Dosya | Durum | Açıklama |
-|---|-------|-------|----------|
-| 1 | `main.tsx` | ✅ | React entry point, tRPC / QueryClient kurulumu |
-| 2 | `routers.ts` | 🔲 | Uygulama route tanımları |
-| 3 | `mockData.ts` | 🔲 | Test/demo verileri |
-| 4 | `locations.ts` | 🔲 | Türkiye il/ilçe veritabanı |
-| 5 | `index.css` | 🔲 | Global CSS değişkenleri ve temel stiller |
-| 6 | `vite-env.d.ts` | 🔲 | Vite ortam değişkenleri tip tanımları |
-| 7 | `README.md` | ✅ | Proje genel tanıtımı |
-
----
-
-## 📁 src/drizzle/
-
-| # | Dosya | Durum | Açıklama |
-|---|-------|-------|----------|
-| 1 | `schema.ts` | 🔴 🔲 | **Kritik** — Tüm DB tablo tanımları |
-| 2 | `db.ts` | 🔲 | Drizzle ORM bağlantısı |
-| 3 | `migrations/` | 🔲 | DB migration dosyaları |
+| Dosya | Döküman | Açıklama |
+|-------|---------|----------|
+| `utils.ts` | [✅ docs/lib/utils.md](docs/lib/utils.md) | 20+ yardımcı fonksiyon, para/tarih formatlama |
+| `trpc.tsx` | [✅ docs/lib/trpc.md](docs/lib/trpc.md) | tRPC istemci, auth header, QueryClient |
+| `chatFilter.ts` | [✅ docs/lib/chatFilter.md](docs/lib/chatFilter.md) | BLOCKED/WARN AI kelime süzgeci |
+| `loyaltySystem.ts` | [✅ docs/lib/loyaltySystem.md](docs/lib/loyaltySystem.md) | 6 rütke, XP eşikleri, getRankByXP() |
+| `db.ts` | [✅ docs/lib/db.md](docs/lib/db.md) | ⚠️ ESKİ LibSQL stub — aktif DEĞİL |
+| `storage.ts` | [✅ docs/lib/storage.md](docs/lib/storage.md) | 🔴 Mock stub — gerçek storage yok |
 
 ---
 
-## 📁 src/server/
+## 📁 src/drizzle/ ✅ TAMAM
 
-| # | Dosya | Durum | Açıklama |
-|---|-------|-------|----------|
-| 1 | `router.ts` | 🔲 | tRPC root router, middleware tanımları |
-| 2 | `routers/auth.router.ts` | 🔵 🔲 | Kimlik doğrulama, kayıt, sosyal giriş |
-| 3 | `routers/escort.router.ts` | 🔲 | Escort profil CRUD, moderasyon |
-| 4 | `routers/admin.router.ts` | 🔲 | Admin yönetim operasyonları |
-| 5 | `routers/admin_actions.router.ts` | 🔵 🔲 | Shadow ban, audit log, profil onay |
-| 6 | `routers/appointment.router.ts` | 🔲 | Randevu sistemi |
-| 7 | `routers/chat.router.ts` | 🔵 🔲 | Mesajlaşma, disappearing messages |
-| 8 | `routers/forum.router.ts` | 🔲 | Forum CRUD |
-| 9 | `routers/media.router.ts` | 🔲 | Medya yükleme ve yönetimi |
-| 10 | `routers/verification.router.ts` | 🔵 🔲 | Doğrulama başvuru süreci |
+| Dosya | Döküman | Açıklama |
+|-------|---------|----------|
+| `db.ts` | [✅ docs/drizzle/db.md](docs/drizzle/db.md) | PostgreSQL bağlantısı (`drizzle-orm/postgres-js`) |
+| `schema.ts` | [✅ docs/drizzle/schema.md](docs/drizzle/schema.md) | 🔴 Kritik — Tüm DB tablo tanımları |
 
 ---
 
-## 📁 src/components/ — Ana Bileşenler
+## 📁 src/server/routers/
 
-### 🔲 Temel UI Bileşenleri
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `auth.router.ts` | [✅ docs/server/auth.router.md](docs/server/auth.router.md) | register, login, socialAuth, me |
+| `chat.router.ts` | [✅ docs/server/chat.router.md](docs/server/chat.router.md) | disappearing msgs, AI filtre |
+| `escort.router.ts` | [✅ docs/server/escort.router.md](docs/server/escort.router.md) | list, getBySlug, updateProfile (staging) |
+| `media.router.ts` | [✅ docs/server/media.router.md](docs/server/media.router.md) | 🐛 registerPhoto güvenlik açığı |
+| `admin_actions.router.ts` | [✅ docs/server/admin_actions.router.md](docs/server/admin_actions.router.md) | profil onay, audit log |
+| `admin.router.ts` | 🔲 | Admin yönetim endpointleri |
+| `appointment.router.ts` | 🔲 | Randevu sistemi |
+| `forum.router.ts` | 🔲 | Forum CRUD |
+| `verification.router.ts` | 🔲 | Kimlik doğrulama süreci |
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1 | `Header.tsx` | ✅ |
-| 2 | `Footer.tsx` | ✅ |
-| 3 | `BottomNav.tsx` | 🔲 |
-| 4 | `FloatingNavigation.tsx` | 🔲 |
-| 5 | `CosmicNav.tsx` | 🔲 |
-| 6 | `ThemeToggle.tsx` | 🔲 |
-| 7 | `CustomIcon.tsx` | 🔲 |
-| 8 | `ErrorBoundary.tsx` | 🔲 |
-| 9 | `ErrorDisplay.tsx` | 🔲 |
-| 10 | `LoadingStates.tsx` | 🔲 |
+---
 
-### 🔲 Escort / Kullanıcı Kart Bileşenleri
+## 📁 src/contexts/
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 11 | `EscUserProfileCard.tsx` | ⚠️ |
-| 12 | `StandardCard.tsx` | ⚠️ |
-| 13 | `VipPremiumCard.tsx` | 🔲 |
-| 14 | `PremiumCard.tsx` | 🔲 |
-| 15 | `VerifiedBadge.tsx` | 🔵 🔲 |
-| 16 | `OnlineStatusBadge.tsx` | 🔲 |
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `AuthContext.tsx` | [✅ docs/contexts/AuthContext.md](docs/contexts/AuthContext.md) | 🐛 login mock düzeltildi |
+| `ThemeContext.tsx` | [✅ docs/contexts/ThemeContext.md](docs/contexts/ThemeContext.md) | Planet bazlı CSS değişkenleri |
+| `WebSocketContext.tsx` | 🔲 | WS bağlantı sağlayıcısı |
+| `NotificationContext.tsx` | 🔲 | Bildirim state yönetimi |
+| `AnalyticsContext.tsx` | 🔲 | Analitik event takibi |
 
-### 🔲 Chat ve Mesajlaşma Bileşenleri
+---
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 17 | `ChatInterface.tsx` | 🔲 |
-| 18 | `ChatWindow.tsx` | ⚠️ |
-| 19 | `ChatInput.tsx` | 🔲 |
-| 20 | `ConversationList.tsx` | 🔲 |
-| 21 | `MessageBubble.tsx` | 🔲 |
-| 22 | `MessageInput.tsx` | 🔲 |
-| 23 | `MessagesPanel.tsx` | 🔲 |
-| 24 | `EnhancedMessageInput.tsx` | 🔲 |
-| 25 | `TypingIndicator.tsx` | 🔲 |
-| 26 | `ReadReceipt.tsx` | 🔲 |
-| 27 | `NotificationToast.tsx` | 🔲 |
-| 28 | `chat/ChatRulesModal.tsx` | 🔵 ✅ |
-| 29 | `chat/DisappearTimerSetting.tsx` | 🔵 ✅ |
+## 📁 src/hooks/
 
-### 🔲 Booking ve Ödeme Bileşenleri
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `useChat.ts` | [✅ docs/hooks/useChat.md](docs/hooks/useChat.md) | ⚠️ Mock veri |
+| `useWebSocket.ts` | [✅ docs/hooks/useWebSocket.md](docs/hooks/useWebSocket.md) | Exponential backoff, heartbeat |
+| `useNotifications.ts` | [✅ docs/hooks/useNotifications.md](docs/hooks/useNotifications.md) | Push API, VAPID |
+| `useOnlineStatus.ts` | [✅ docs/hooks/useOnlineStatus.md](docs/hooks/useOnlineStatus.md) | Idle detection, page visibility |
+| `useAdminActions.ts` | 🔲 | Admin aksiyonlar |
+| `useAdminData.ts` | 🔲 | Admin veri çekme |
+| `useAnalytics.ts` | 🔲 | Analitik hook |
+| `useGuestAccess.ts` | 🔲 | Misafir erişim kontrolü |
+| `useReviews.ts` | 🔲 | Yorum sistemi |
+| `api/` (6 dosya) | 🔲 | API katmanı |
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 30 | `BookingForm.tsx` | 🔲 |
-| 31 | `PaymentCheckout.tsx` | 🔲 |
-| 32 | `PaymentMethodForm.tsx` | 🔲 |
-| 33 | `PaymentSecurity.tsx` | 🔲 |
-| 34 | `SubscriptionPlanSelector.tsx` | 🔲 |
-| 35 | `InvoiceHistory.tsx` | 🔲 |
+---
 
-### 🔲 Form ve Filtre Bileşenleri
+## 📁 src/types/ — 🔲 TAMAMI BEKLIYOR
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 36 | `AdvancedFilter.tsx` | 🔲 |
-| 37 | `AdvancedFilterPanel.tsx` | 🔲 |
-| 38 | `PriceRangeSlider.tsx` | 🔲 |
-| 39 | `ServiceCheckboxGroup.tsx` | 🔲 |
-| 40 | `RoleSelector.tsx` | 🔲 |
-| 41 | `FileUpload.tsx` | 🔲 |
-
-### 🔲 Analitik ve Dashboard Bileşenleri
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 42 | `AnalyticsDashboard.tsx` | 🔲 |
-| 43 | `BarChart.tsx` | 🔲 |
-| 44 | `LineChart.tsx` | 🔲 |
-| 45 | `DoughnutChart.tsx` | 🔲 |
-| 46 | `KPICard.tsx` | 🔲 |
-| 47 | `RealtimeStats.tsx` | 🔲 |
-| 48 | `LoyaltyDashboard.tsx` | 🔲 |
-| 49 | `LoyaltyRankCard.tsx` | 🔵 ✅ |
-
-### 🔲 Admin Bileşenleri (`components/admin/`)
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 50 | `admin/PendingProfileUpdates.tsx` | 🔵 ✅ |
-| 51 | `admin/` (diğer 11 dosya) | 🔲 |
-
-### 🔲 Auth Bileşenleri (`components/auth/`)
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 52 | `auth/RegisterModal.tsx` | 🔵 ✅ |
-| 53 | `auth/ProfileCompleteModal.tsx` | 🔵 ✅ |
-
-### 🔲 Escort Bileşenleri (`components/escort/`)
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 54 | `escort/PendingUpdateBanner.tsx` | 🔵 ✅ |
-
-### 🔲 Medya Bileşenleri
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 55 | `media/FaceMaskOverlay.tsx` | 🔲 |
-| 56 | `media/` (1 diğer dosya) | 🔲 |
-| 57 | `PhotoGalleryEnhanced.tsx` | 🔲 |
-| 58 | `VideoUpload.tsx` | 🔲 |
-| 59 | `VideoCall.tsx` | 🔲 |
-
-### 🔲 Diğer Bileşenler
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 60 | `AgeVerification.tsx` | 🔴 🔲 |
-| 61 | `CookieConsent.tsx` | 🔲 |
-| 62 | `ContactLock.tsx` | 🔲 |
-| 63 | `DashboardAuthGuard.tsx` | 🔲 |
-| 64 | `DashboardRouter.tsx` | 🔲 |
-| 65 | `DashboardSelector.tsx` | 🔲 |
-| 66 | `ProtectedRoute.tsx` | 🔲 |
-| 67 | `NotificationCenter.tsx` | 🔲 |
-| 68 | `NotificationSettings.tsx` | 🔲 |
-| 69 | `PlatformBenefits.tsx` | 🔲 |
-| 70 | `ReviewCard.tsx` | 🔲 |
-| 71 | `ReviewForm.tsx` | 🔲 |
-| 72 | `ReviewsPanel.tsx` | 🔲 |
-| 73 | `PostBookingReview.tsx` | 🔲 |
-| 74 | `ReportEscortDialog.tsx` | 🔲 |
-| 75 | `ReportsPanel.tsx` | 🔲 |
-| 76 | `Rating.tsx` | 🔲 |
-| 77 | `AdBanner.tsx` | 🔲 |
-| 78 | `AdSpace.tsx` | 🔲 |
-| 79 | `SpaceBackground.tsx` | 🔲 |
-| 80 | `StarryBackground.tsx` | 🔲 |
-| 81 | `PremiumAnimations.tsx` | 🔲 |
-| 82 | `PremiumHeroBanner.tsx` | 🔲 |
-| 83 | `CustomerRatingForm.tsx` | 🔲 |
-
-### 🔲 3D Bileşenleri (`components/3d/`)
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 84-94 | `3d/` (11 dosya) | 🔲 |
+| Dosya | Durum | Öncelik |
+|-------|-------|---------|
+| `domain.ts` | 🔲 | Yüksek |
+| `loyalty.ts` | 🔲 | Yüksek |
+| `payment.ts` | 🔲 | Yüksek |
+| `message.ts` | 🔲 | Yüksek |
+| `websocket.ts` | 🔲 | Orta |
+| `notification.ts` | 🔲 | Orta |
+| `notifications.ts` | 🔲 | Orta |
+| `admin.ts` | 🔲 | Orta |
+| `reviews.ts` | 🔲 | Normal |
+| `reviewsExtended.ts` | 🔲 | Normal |
+| `filter.ts` | 🔲 | Normal |
+| `analytics.ts` | 🔲 | Normal |
+| `role.ts` | 🔲 | Normal |
 
 ---
 
@@ -226,137 +126,81 @@
 
 ### Admin Sayfaları
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1 | `AdminDashboard.tsx` | 🔴 🔲 |
-| 2 | `AdminAnalytics.tsx` | 🔲 |
-| 3 | `AdminApprovals.tsx` | 🔲 |
-| 4 | `AdminComplaints.tsx` | 🔲 |
-| 5 | `AdminFinancial.tsx` | 🔲 |
-| 6 | `AdminListings.tsx` | 🔲 |
-| 7 | `AdminMedia.tsx` | 🔲 |
-| 8 | `AdminMessages.tsx` | 🔲 |
-| 9 | `AdminNotifications.tsx` | 🔲 |
-| 10 | `AdminPanel.tsx` | 🔲 |
-| 11 | `AdminRealTimeMonitoring.tsx` | 🔲 |
-| 12 | `AdminReports.tsx` | 🔲 |
-| 13 | `AdminSecurity.tsx` | 🔲 |
-| 14 | `AdminSettings.tsx` | 🔲 |
-| 15 | `AdminUsers.tsx` | 🔲 |
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `AdminDashboard.tsx` | [✅ docs/pages/AdminDashboard.md](docs/pages/AdminDashboard.md) | Rol bazlı erişim |
+| `AdminApprovals.tsx` | 🔲 | |
+| `AdminComplaints.tsx` | 🔲 | |
+| `AdminRealTimeMonitoring.tsx` | 🔲 | |
+| `AdminReports.tsx` | 🔲 | |
+| `AdminMessages.tsx` | 🔲 | |
+| `AdminSecurity.tsx` | 🔲 | |
+| `AdminSettings.tsx` | 🔲 | |
+| Diğer Admin sayfaları (7) | 🔲 | |
 
 ### Escort Sayfaları
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 16 | `EscortDashboard.tsx` | 🔲 |
-| 17 | `EscortPrivateDashboard.tsx` | 🔲 |
-| 18 | `EscortAnalyticsDashboard.tsx` | 🔲 |
-| 19 | `EscortProfile.tsx` | 🔲 |
-| 20 | `EscortList.tsx` | 🔲 |
-| 21 | `EscortMarket.tsx` | 🔲 |
-| 22 | `EscortLogin.tsx` | 🔲 |
-| 23 | `EscortRegister.tsx` | 🔲 |
-| 24 | `VerificationCenter.tsx` | 🔵 🔲 |
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `EscortDashboard.tsx` | [✅ docs/pages/EscortDashboard.md](docs/pages/EscortDashboard.md) | Profil güncelleme staging |
+| `EscortProfile.tsx` | [✅ docs/pages/EscortProfile.md](docs/pages/EscortProfile.md) | 🐛 tRPC bağlanmamış |
+| `VerificationCenter.tsx` | [✅ docs/pages/VerificationCenter.md](docs/pages/VerificationCenter.md) | 🐛 import düzeltildi |
+| `EscortRegister.tsx` | 🔲 | |
+| `EscortAnalyticsDashboard.tsx` | 🔲 | |
+| Diğer Escort sayfaları (4) | 🔲 | |
 
-### Müşteri Sayfaları
+### Müşteri / Genel Sayfalar
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 25 | `ClientLogin.tsx` | 🔲 |
-| 26 | `ClientRegister.tsx` | 🔲 |
-| 27 | `GuestCatalog.tsx` | 🔲 |
-| 28 | `Catalog.tsx` | 🔲 |
-| 29 | `MyAppointments.tsx` | 🔲 |
-| 30 | `MyFavorites.tsx` | 🔲 |
-| 31 | `Messages.tsx` | 🔲 |
-| 32 | `BillingDashboard.tsx` | 🔲 |
-| 33 | `MembershipUpgrade.tsx` | 🔲 |
-
-### Genel Sayfalar
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 34 | `Home.tsx` | 🔲 |
-| 35 | `App.tsx` | 🔲 |
-| 36 | `Login.tsx` | 🔲 |
-| 37 | `Blog.tsx` | 🔲 |
-| 38 | `Contact.tsx` | 🔲 |
-| 39 | `Pricing.tsx` | 🔲 |
-| 40 | `Safety.tsx` | 🔲 |
-| 41 | `Reviews.tsx` | 🔲 |
-| 42 | `Report.tsx` | 🔲 |
-| 43 | `Settings.tsx` | 🔲 |
-| 44 | `NotFound.tsx` | 🔲 |
-| 45 | `SEO.tsx` | 🔲 |
-| 46 | `Analytics.tsx` | 🔲 |
-| 47 | `PaymentResult.tsx` | 🔲 |
-| 48 | `RealTimeMessaging.tsx` | 🔲 |
-| 49 | `VideoCallPage.tsx` | 🔲 |
-
-### Yasal Sayfalar
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 50 | `TermsOfService.tsx` | ✅ |
-| 51 | `PrivacyPolicy.tsx` | ✅ |
-| 52 | `KVKK.tsx` | ✅ |
-| 53 | `CookiePolicy.tsx` | ✅ |
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `MyAppointments.tsx` | [✅ docs/pages/MyAppointments.md](docs/pages/MyAppointments.md) | Randevu yönetimi |
+| `RealTimeMessaging.tsx` | 🔲 | |
+| `BillingDashboard.tsx` | 🔲 | |
+| `ClientRegister.tsx` | 🔲 | |
+| Diğer sayfalar (~45) | 🔲 | |
 
 ---
 
-## 📁 src/lib/
+## 📁 src/components/
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1 | `chatFilter.ts` | 🔵 ✅ |
-| 2 | `loyaltySystem.ts` | 🔵 ✅ |
-| 3-37 | Diğer dosyalar | 🔲 |
+### Dökümanlanmış
 
----
+| Dosya | Döküman | Durum |
+|-------|---------|-------|
+| `ChatWindow.tsx` | [✅ docs/components/ChatWindow.md](docs/components/ChatWindow.md) | Chat kapısı sistemi |
+| `DashboardRouter.tsx` | [✅ docs/components/DashboardRouter.md](docs/components/DashboardRouter.md) | Rol → panel yönlendirme |
+| `ProtectedRoute.tsx` | [✅ docs/components/ProtectedRoute.md](docs/components/ProtectedRoute.md) | Auth/rol guard |
+| `BookingForm.tsx` | [✅ docs/components/BookingForm.md](docs/components/BookingForm.md) | 2 adımlı randevu formu |
+| `LoyaltyDashboard.tsx` | [✅ docs/components/LoyaltyDashboard.md](docs/components/LoyaltyDashboard.md) | 🐛 import düzeltildi |
+| `VideoCall.tsx` | [✅ docs/components/VideoCall.md](docs/components/VideoCall.md) | WebRTC, PiP, heartbeat |
+| `PaymentCheckout.tsx` | [✅ docs/components/PaymentCheckout.md](docs/components/PaymentCheckout.md) | Checkout, KDV, indirim |
+| `admin/PendingProfileUpdates.tsx` | ✅ (kod içi) | Diff view, onay akışı |
+| `auth/RegisterModal.tsx` | ✅ (kod içi) | 3 adımlı kayıt |
+| `chat/DisappearTimerSetting.tsx` | ✅ (kod içi) | Kaybolan mesaj ayarı |
 
-## 📁 src/hooks/
+### Dökümanlanmamış (~76 dosya)
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1-15 | Tüm hook dosyaları | 🔲 |
-
----
-
-## 📁 src/types/
-
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1 | `domain.ts` | ⚠️ |
-| 2-14 | Diğer tip dosyaları | 🔲 |
+`ChatInterface`, `ConversationList`, `MessageBubble`, `CustomerRatingForm`, `PostBookingReview`, `ReviewForm`, `SubscriptionPlanSelector`, `PhotoGalleryEnhanced`, `AdvancedFilter`, `PaymentMethodForm`, `PaymentSecurity`, `VideoUpload`, `NotificationCenter`, `NotificationSettings` ve diğerleri...
 
 ---
 
-## 📁 src/contexts/
+## 🐛 Tespit Edilen Açık Bug'lar
 
-| # | Dosya | Durum |
-|---|-------|-------|
-| 1-6 | Tüm context dosyaları | 🔲 |
-
----
-
-## 📋 Geliştirici Kuralları
-
-1. **Yeni dosya eklendiğinde** bu haritaya satır eklenmelidir.
-2. **Döküman tamamlandığında** 🔲 → ✅ olarak güncellenmelidir.
-3. Her değişiklik **JOURNAL.md** dosyasına tarih/saat/isim ile kaydedilmelidir.
-4. JSDoc formatı kullanılmalıdır:
-   ```ts
-   /**
-    * @module ComponentName
-    * @description Ne yaptığını açıkla
-    * @param {Type} paramName - Açıklama
-    * @returns {Type} Açıklama
-    * @example
-    * <ComponentName prop="value" />
-    */
-   ```
-5. 🔴 ile işaretli kritik dosyalar öncelikli dökümanlanmalıdır.
+| # | Dosya | Sorun | Durum |
+|---|-------|-------|-------|
+| 1 | `media.router.ts` | `registerPhoto` sahiplik kontrolü eksik | 🔲 Bekliyor |
+| 2 | `EscortProfile.tsx` | tRPC bağlanmamış, mock servis kullanıyor | 🔲 Bekliyor |
+| 3 | `PaymentCheckout.tsx` | `window.location.href` → wouter kullanılmalı | 🔲 Bekliyor |
+| 4 | `LoyaltyDashboard` + `loyaltySystem.ts` | İki uyumsuz rütke sistemi | 🔲 Bekliyor |
+| 5 | `lib/storage.ts` | Mock stub — gerçek storage yok | 🔲 Bekliyor |
+| 6 | `lib/db.ts` | Eski LibSQL stub, aktif değil | 🔲 Bekliyor |
 
 ---
 
-*Son güncelleme: 2026-02-21 | Oluşturan: Antigravity AI*
+## 📋 Döküman Rehberi
+
+→ Tüm döküman dosyalarına hızlı erişim: **[docs/INDEX.md](docs/INDEX.md)**
+
+---
+
+*Son güncelleme: 2026-02-21 10:19 | Güncelleyen: Antigravity AI*

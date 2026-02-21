@@ -1,397 +1,140 @@
-# Katkıda Bulunma Rehberi (Contributing Guide)
+# 📋 Zühre Planet — Katkı ve Döküman Kuralları
 
-Escort Platform projesine katkıda bulunmak istediğiniz için teşekkür ederiz! Bu döküman, projeye nasıl katkıda bulunabileceğinizi açıklar.
-
-## 📋 İçindekiler
-
-- [Kod Standartları](#kod-standartları)
-- [Geliştirme Ortamı](#geliştirme-ortamı)
-- [Commit Mesajları](#commit-mesajları)
-- [Pull Request Süreci](#pull-request-süreci)
-- [Dökümantasyon](#dökümantasyon)
-- [Test Yazımı](#test-yazımı)
+> **Bu kurallar hem insan geliştiriciler hem de AI asistanlar için geçerlidir.**
+> Kural ihlali kabul edilmez — her commit/change bu kurallara uymalıdır.
 
 ---
 
-## 🎯 Kod Standartları
+## ⚠️ ZORUNLU KURALLAR
 
-### TypeScript
+### 1. Her Kod Değişikliğinde JOURNAL.md Güncellenmeli
 
-- **Strict mode** aktif tutulmalı
-- **ESLint** kurallarına uyulmalı
-- Tüm fonksiyonlar ve değişkenler **anlamlı isimler** almalı
-- **Type safety** her zaman tercih edilmeli (`any` kullanımından kaçının)
+`JOURNAL.md` dosyasına aşağıdaki formatta kayıt eklenmelidir:
 
-```typescript
-// ✅ İyi
-function calculateTotalPrice(rate: number, hours: number): number {
-  return rate * hours;
-}
-
-// ❌ Kötü
-function calc(a: any, b: any) {
-  return a * b;
-}
+```markdown
+| 2026-02-21 | 10:30 | [Adınız/AI Adı] | [KATEGORİ] | Ne yaptığınızın kısa açıklaması |
 ```
 
-### React Components
+**Kategori etiketleri:**
 
-- **Function components** kullanın (class components değil)
-- **Hooks** kullanımına özen gösterin
-- Props için **TypeScript interfaces** tanımlayın
-- **Default props** değerleri belirtin
-
-```typescript
-// ✅ İyi
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-}
-
-export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
-  // ...
-}
-```
-
-### Dosya Organizasyonu
-
-```
-src/
-├── components/      # Yeniden kullanılabilir UI bileşenleri
-├── pages/           # Sayfa bileşenleri (routing)
-├── lib/             # Kütüphane modülleri (API, utils)
-├── types/           # TypeScript tip tanımlamaları
-├── contexts/        # React contexts
-└── drizzle/         # Database schema
-```
-
-### Naming Conventions
-
-| Tip | Kural | Örnek |
-|-----|-------|-------|
-| **Bileşenler** | PascalCase | `EscortCard`, `BookingForm` |
-| **Fonksiyonlar** | camelCase | `calculatePrice`, `getUserProfile` |
-| **Sabitler** | UPPER_SNAKE_CASE | `API_URL`, `MAX_UPLOAD_SIZE` |
-| **Interfaces** | PascalCase + 'Props'/'Interface' | `ButtonProps`, `UserInterface` |
-| **Types** | PascalCase | `PaymentMethod`, `BookingStatus` |
+| Etiket | Kullanım |
+|--------|----------|
+| `[FEAT]` | Yeni özellik eklendi |
+| `[FIX]` | Bug/hata düzeltildi |
+| `[DOC]` | Döküman oluşturuldu/güncellendi |
+| `[SCHEMA]` | Veritabanı şeması değişti |
+| `[SEC]` | Güvenlik iyileştirmesi |
+| `[REFACTOR]` | Kod yeniden düzenlendi |
+| `[STYLE]` | Sadece UI/CSS değişikliği |
+| `[PERF]` | Performans iyileştirmesi |
+| `[TEST]` | Test eklendi/güncellendi |
+| `[DEL]` | Dosya/kod silindi |
+| `[BUG]` | Bug tespit edildi (henüz düzeltilmedi) |
 
 ---
 
-## 💻 Geliştirme Ortamı
+### 2. Yeni Dosya Eklendiğinde PROJECT_MAP.md Güncellenmeli
 
-### Gereksinimler
+`PROJECT_MAP.md` dosyasındaki ilgili katmana satır eklenmeli:
 
-- Node.js 18+
-- npm veya pnpm
-- Git
-
-### Kurulum
-
-```bash
-# Repoyu forklayın ve klonlayın
-git clone https://github.com/YOUR_USERNAME/EscilanSitesi.git
-cd EscilanSitesi
-
-# Bağımlılıkları yükleyin
-npm install
-
-# Environment variables
-cp .env.example .env
-# .env dosyasını düzenleyin
-
-# Geliştirme sunucusunu başlatın
-npm run dev
+```markdown
+| `YeniDosya.tsx` | 🔵 🔲 | Dosyanın ne yaptığının kısa açıklaması |
 ```
 
-### Çalıştırma Komutları
+**Durum güncellemesi:**
+- Dosya oluşturulduğunda: `🔵 🔲` (yeni + döküman bekliyor)
+- Döküman yazıldığında: `[✅ docs/katman/dosya.md]`
 
-```bash
-npm run dev        # Geliştirme sunucusu (localhost:3005)
-npm run build      # Production build
-npm run preview    # Build önizleme
-npm run lint       # ESLint kontrolü
+---
+
+### 3. Döküman Klasörü Yapısı
+
+Her kaynak dosya için döküman şu yolda oluşturulmalı:
+
+```
+src/lib/utils.ts          → docs/lib/utils.md
+src/server/routers/x.ts  → docs/server/x.router.md
+src/pages/Foo.tsx        → docs/pages/Foo.md
+src/components/Bar.tsx   → docs/components/Bar.md
+src/hooks/useX.ts        → docs/hooks/useX.md
+src/contexts/XContext.tsx → docs/contexts/XContext.md
+src/types/x.ts           → docs/types/x.md
 ```
 
 ---
 
-## 📝 Commit Mesajları
+### 4. Döküman Formatı (Zorunlu Bölümler)
 
-### Format
+Her `docs/` dosyası şu bölümleri içermelidir:
 
-```
-<type>(<scope>): <subject>
+```markdown
+# `dosya/yolu.ts` — Kısa Başlık
 
-<body>
+## 📄 Dosya Hakkında
+Tablo: Dosya, Dil, Teknoloji, Kullanıldığı Yer, Durum
 
-<footer>
-```
+## 🎯 Ne İşe Yarar?
+Kısa açıklama paragrafı.
 
-### Types
+## 📦 Props / Parametreler / Prosedürler
+Detaylı liste veya kod bloğu.
 
-- `feat`: Yeni özellik
-- `fix`: Bug düzeltme
-- `docs`: Dökümantasyon
-- `style`: Kod formatı (logic değişikliği yok)
-- `refactor`: Refactoring
-- `test`: Test ekleme/düzeltme
-- `chore`: Build/konfigürasyon değişiklikleri
+## ⚠️ Dikkat Edilmesi Gerekenler (varsa)
+Bilinen sorunlar, limitler.
 
-### Örnekler
+## 💡 AI Öneri (varsa)
+İyileştirme önerileri.
 
-```bash
-# Yeni özellik
-feat(booking): add calendar date picker
-
-# Bug fix
-fix(auth): resolve login token expiration issue
-
-# Dökümantasyon
-docs(readme): update installation instructions
-
-# Refactoring
-refactor(components): simplify BookingForm validation logic
+*Döküman tarihi: YYYY-MM-DD | Oluşturan: [İsim]*
 ```
 
 ---
 
-## 🔄 Pull Request Süreci
+### 5. Kod İçi JSDoc Standardı
 
-### 1. Branch Oluşturma
+Tüm exported fonksiyon ve bileşenler JSDoc ile belgelenmeli:
 
-```bash
-# Önce main'i güncelleyin
-git checkout main
-git pull origin main
-
-# Yeni branch oluşturun
-git checkout -b feature/your-feature-name
-# veya
-git checkout -b fix/bug-description
-```
-
-### 2. Değişiklik Yapma
-
-- **Küçük, focused commits** yapın
-- Her commit **tek bir mantıksal değişiklik** içermeli
-- Commit öncesi **lint** çalıştırın
-
-```bash
-# Kod yazın
-# ...
-
-# Lint kontrolü
-npm run lint
-
-# Commit
-git add .
-git commit -m "feat(component): add new feature"
-```
-
-### 3. Pull Request Açma
-
-1. Forkunuza push edin:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-2. GitHub'da Pull Request açın
-
-3. PR açıklamasında:
-   - ✅ Ne yaptığınızı açıklayın
-   - ✅ Hangi issue'yu çözdüğünüzü belirtin (#123)
-   - ✅ Ekran görüntüleri ekleyin (UI değişiklikleri için)
-   - ✅ Test adımlarını yazın
-
-### 4. Code Review
-
-- Geri bildirimlere **nazikçe** yanıt verin
-- İstenen değişiklikleri yapın
-- **Tartışmaya** açık olun
-
----
-
-## 📚 Dökümantasyon
-
-### JSDoc Standartları
-
-**Tüm yeni dosyalar ve fonksiyonlar JSDoc ile dökümante edilmelidir.**
-
-#### Dosya Başlığı (Her dosyanın başına)
-
-```typescript
+```ts
 /**
- * ComponentName Component
- * 
- * Detailed description of what this component does.
- * Multiple lines are encouraged for clarity.
- * 
- * @module components/ComponentName
- * @category Components - [Category]
- * 
- * Features:
- * - Feature 1
- * - Feature 2
- * - Feature 3
- * 
+ * @description Fonksiyonun ne yaptığı
+ * @param {string} paramName - Parametrenin açıklaması
+ * @returns {SomeType} Döndürdüğü değerin açıklaması
  * @example
- * ```tsx
- * <ComponentName prop="value" />
- * ```
+ * const result = myFunction('input');
  */
-```
-
-#### Fonksiyon Dökümantasyonu
-
-```typescript
-/**
- * Calculates the total booking price with commission.
- * 
- * @param hourlyRate - The escort's hourly rate in TRY
- * @param hours - Number of hours booked
- * @param isVip - Whether the escort is VIP (gets commission discount)
- * @returns Total price including platform commission
- * 
- * @example
- * ```typescript
- * const total = calculateBookingTotal(500, 2, true);
- * // Returns: 1000 + commission
- * ```
- */
-function calculateBookingTotal(
-  hourlyRate: number,
-  hours: number,
-  isVip: boolean = false
-): number {
-  // Implementation
-}
-```
-
-#### Interface Dökümantasyonu
-
-```typescript
-/**
- * Props for the BookingForm component
- */
-interface BookingFormProps {
-  /** Unique ID of the escort */
-  escortId: string;
-  
-  /** Display name of the escort */
-  escortName: string;
-  
-  /** Hourly rate in TRY */
-  hourlyRate: number;
-  
-  /** Optional callback when booking is submitted */
-  onSubmit?: (data: BookingData) => void;
-}
+export function myFunction(paramName: string): SomeType { ... }
 ```
 
 ---
 
-## 🧪 Test Yazımı
+### 6. Bug Tespiti Zorunluluğu
 
-### Unit Tests (Planlı - Vitest)
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { calculatePlatformFee } from '@/types/payment';
-
-describe('calculatePlatformFee', () => {
-  it('should calculate 15% fee for standard escorts', () => {
-    const fee = calculatePlatformFee(1000, false);
-    expect(fee).toBe(150);
-  });
-
-  it('should calculate 10% fee for VIP escorts', () => {
-    const fee = calculatePlatformFee(1000, true);
-    expect(fee).toBe(100);
-  });
-});
-```
-
-### Component Tests (Planlı - React Testing Library)
-
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Button } from '@/components/ui/button';
-
-describe('Button Component', () => {
-  it('renders button with label', () => {
-    render(<Button>Click Me</Button>);
-    expect(screen.getByText('Click Me')).toBeInTheDocument();
-  });
-
-  it('calls onClick when clicked', () => {
-    const handleClick = vi.fn();
-    render(<Button onClick={handleClick}>Click</Button>);
-    
-    fireEvent.click(screen.getByText('Click'));
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-});
-```
+Bir bug veya güvenlik açığı tespit edildiğinde:
+1. `PROJECT_MAP.md` → `🐛 Tespit Edilen Açık Bug'lar` tablosuna eklenmeli
+2. `JOURNAL.md`'ye `[BUG]` kategorisiyle kayıt eklenmeli
+3. `docs/` dökümanında `⚠️ Dikkat Edilmesi Gerekenler` bölümünde belgelenmeli
 
 ---
 
-## 🔒 Güvenlik
+## 🤖 AI Asistanları İçin Ek Kurallar
 
-### Hassas Bilgiler
+Bu projeye çalışan tüm AI asistanları (Antigravity, Copilot, Claude vb.):
 
-- ❌ **Asla** API keys, passwords, tokens commit etmeyin
-- ✅ `.env` dosyalarını kullanın
-- ✅ `.env.example` ile template sağlayın
-- ✅ Secrets için environment variables kullanın
-
-### Input Validation
-
-```typescript
-// ✅ Her zaman input'ları validate edin
-import { z } from 'zod';
-
-const BookingSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  hours: z.number().min(1).max(24),
-  customerName: z.string().min(2).max(100),
-  customerEmail: z.string().email(),
-});
-
-// Kullanım
-const validatedData = BookingSchema.parse(formData);
-```
-
-### XSS Prevention
-
-```typescript
-// ✅ Message sanitization kullanın
-import { sanitizeMessage } from '@/types/notifications';
-
-const userInput = req.body.message;
-const { clean, violations } = sanitizeMessage(userInput);
-
-if (violations.length > 0) {
-  // Handle violations
-}
-```
+1. **Her oturum başında** `PROJECT_MAP.md` ve `JOURNAL.md`'yi okuyun
+2. **Oturum sonunda** değiştirdiğiniz/dökümanladığınız dosyaları işaretleyin
+3. **Bug tespitinde** hemen belgelleyin, fırsatçı düzeltin
+4. **Döküman oluştururken** AI Öneri bölümünü doldurun
+5. **Asla** döküman güncellemeyi atlayıp "ileride yapılır" demeyin
 
 ---
 
-## 📞 İletişim
+## 📊 Döküman Tamamlama Öncelik Sırası
 
-- **Issues:** GitHub Issues kullanın
-- **Discussions:** GitHub Discussions
-- **Email:** support@escortplatform.com
-
----
-
-## 📜 Lisans
-
-Bu projeye katkıda bulunarak, katkılarınızın proje lisansı altında yayınlanmasını kabul edersiniz.
+1. 🔴 **Kritik** (`storage.ts`, güvenlik açıkları) — hemen
+2. 🟠 **Yüksek** (aktif kullanılan router'lar, büyük sayfalar)
+3. 🟡 **Orta** (hook'lar, types)
+4. 🟢 **Normal** (UI bileşenler, statik sayfalar)
 
 ---
 
-## ⭐ Teşekkürler
-
-Katkılarınız için teşekkür ederiz! Her katkı, projeyi daha iyi hale getirir. 🚀
-
+*Oluşturulma tarihi: 2026-02-21 | Antigravity AI*

@@ -19,26 +19,44 @@
 
 | Tarih | Saat | Kaynak | Kategori | Değişiklik |
 |-------|------|--------|----------|------------|
-| 2026-02-21 | 09:10 | Antigravity AI | [SCHEMA] | `escort_profiles` tablosuna `pendingData`, `hasPendingUpdate` kolonları eklendi (profil moderasyon staging) |
-| 2026-02-21 | 09:12 | Antigravity AI | [FEAT] | `escort.router.ts` — `updateProfile` mutasyonu staging mantığına geçirildi (direkt kayıt yerine `pendingData`) |
-| 2026-02-21 | 09:21 | Antigravity AI | [SCHEMA] | `users` tablosuna `phoneNumber` (UNIQUE), `provider`, `providerId`, `hasAcceptedTerms`, `termsAcceptedAt`, `hasAcceptedChatRules`, `chatRulesAcceptedAt`, `isProfileComplete` alanları eklendi |
-| 2026-02-21 | 09:22 | Antigravity AI | [SEC] | `auth.router.ts` — 50+ sahte/geçici mail domain engeli (mailinator, guerrillamail vb.), telefon tekiliği kontrolü, KVKK zorunlu onay eklendi |
-| 2026-02-21 | 09:23 | Antigravity AI | [FEAT] | `auth.router.ts` — `socialAuth`, `completeProfile`, `acceptChatRules`, `me` mutasyonları eklendi |
-| 2026-02-21 | 09:24 | Antigravity AI | [FEAT] | `components/auth/RegisterModal.tsx` — 3 adımlı kayıt akışı (üyelik tipi → bilgiler → KVKK) oluşturuldu |
-| 2026-02-21 | 09:25 | Antigravity AI | [FEAT] | `components/auth/ProfileCompleteModal.tsx` — Sosyal giriş sonrası eksik bilgi formu oluşturuldu |
-| 2026-02-21 | 09:26 | Antigravity AI | [FEAT] | `components/chat/ChatRulesModal.tsx` — İlk chat öncesi platform kuralları onay modalı oluşturuldu |
-| 2026-02-21 | 09:27 | Antigravity AI | [FEAT] | `components/ChatWindow.tsx` — `hasAcceptedChatRules` prop ile chat kapı sistemi entegre edildi |
-| 2026-02-21 | 09:34 | Antigravity AI | [FEAT] | `admin_actions.router.ts` — `getPendingProfileUpdates`, `approveProfileUpdate`, `rejectProfileUpdate` mutasyonları eklendi |
-| 2026-02-21 | 09:35 | Antigravity AI | [FEAT] | `components/admin/PendingProfileUpdates.tsx` — Admin için diff görünümlü profil güncelleme onay arayüzü oluşturuldu |
-| 2026-02-21 | 09:36 | Antigravity AI | [FEAT] | `components/escort/PendingUpdateBanner.tsx` — Escort için "onay bekliyor" uyarı banner bileşeni oluşturuldu |
-| 2026-02-21 | 09:37 | Antigravity AI | [FEAT] | `src/lib/loyaltySystem.ts` — 6 rütbe (Bronz→Galaktik), XP eşikleri, indirim sistemi, `getRankByXP()` fonksiyonu oluşturuldu |
-| 2026-02-21 | 09:38 | Antigravity AI | [FEAT] | `components/LoyaltyRankCard.tsx` — Animasyonlu XP ilerleme çubuğu, rütbe rozeti, puan bakiyesi bileşeni oluşturuldu |
-| 2026-02-21 | 09:39 | Antigravity AI | [SEC] | `src/lib/chatFilter.ts` — AI kelime süzgeci (BLOCKED/WARN), Türkçe normalizasyon ile yazım hilesi koruması oluşturuldu |
-| 2026-02-21 | 09:40 | Antigravity AI | [SCHEMA] | `schema.ts` — `chatConversations` (TTL) ve `chatMessages` (expiresAt, AI flag, okundu) tabloları eklendi |
-| 2026-02-21 | 09:41 | Antigravity AI | [FEAT] | `server/routers/chat.router.ts` — Tam yeniden yazıldı: `getOrCreateConversation`, `getMessages`, `sendMessage` (AI filtre + disappearing), `setDisappearTimer`, `markAsRead`, `deleteMessage`, `getConversations` |
-| 2026-02-21 | 09:42 | Antigravity AI | [FEAT] | `components/chat/DisappearTimerSetting.tsx` — Kaybolan mesaj süre ayar bileşeni (Kapalı/1 Saat/24 Saat/7 Gün) oluşturuldu |
-| 2026-02-21 | 09:46 | Antigravity AI | [DOC] | `PROJECT_MAP.md` — Proje haritası ve dökümanlanma takip dosyası oluşturuldu |
-| 2026-02-21 | 09:46 | Antigravity AI | [DOC] | `JOURNAL.md` — Geliştirici değişiklik günlüğü oluşturuldu |
+| 2026-02-21 | 09:10 | Antigravity AI | [SCHEMA] | `escort_profiles` tablosuna `pendingData`, `hasPendingUpdate` kolonları eklendi |
+| 2026-02-21 | 09:12 | Antigravity AI | [FEAT] | `escort.router.ts` — `updateProfile` mutasyonu staging mantığına geçirildi |
+| 2026-02-21 | 09:21 | Antigravity AI | [SCHEMA] | `users` tablosuna telefon, sosyal giriş ve onay alanları eklendi |
+| 2026-02-21 | 09:22 | Antigravity AI | [SEC] | `auth.router.ts` — 50+ sahte mail engeli, telefon tekiliği, KVKK zorunlu onay |
+| 2026-02-21 | 09:23 | Antigravity AI | [FEAT] | `auth.router.ts` — `socialAuth`, `completeProfile`, `acceptChatRules`, `me` mutasyonları |
+| 2026-02-21 | 09:24 | Antigravity AI | [FEAT] | `components/auth/RegisterModal.tsx` — 3 adımlı kayıt akışı oluşturuldu |
+| 2026-02-21 | 09:25 | Antigravity AI | [FEAT] | `components/auth/ProfileCompleteModal.tsx` — Sosyal giriş sonrası eksik bilgi formu |
+| 2026-02-21 | 09:26 | Antigravity AI | [FEAT] | `components/chat/ChatRulesModal.tsx` — İlk chat kuralları onay modalı |
+| 2026-02-21 | 09:27 | Antigravity AI | [FEAT] | `components/ChatWindow.tsx` — Chat kuralı kapı sistemi entegrasyonu |
+| 2026-02-21 | 09:34 | Antigravity AI | [FEAT] | `admin_actions.router.ts` — Profil güncelleme onay/red mutasyonları |
+| 2026-02-21 | 09:35 | Antigravity AI | [FEAT] | `components/admin/PendingProfileUpdates.tsx` — Admin diff view bileşeni |
+| 2026-02-21 | 09:36 | Antigravity AI | [FEAT] | `components/escort/PendingUpdateBanner.tsx` — Escort "onay bekliyor" banner |
+| 2026-02-21 | 09:37 | Antigravity AI | [FEAT] | `src/lib/loyaltySystem.ts` — 6 rütbe, XP eşikleri, indirim sistemi |
+| 2026-02-21 | 09:38 | Antigravity AI | [FEAT] | `components/LoyaltyRankCard.tsx` — Animasyonlu XP kart bileşeni |
+| 2026-02-21 | 09:39 | Antigravity AI | [SEC] | `src/lib/chatFilter.ts` — BLOCKED/WARN AI kelime süzgeci |
+| 2026-02-21 | 09:40 | Antigravity AI | [SCHEMA] | `chatConversations` ve `chatMessages` tabloları eklendi |
+| 2026-02-21 | 09:41 | Antigravity AI | [FEAT] | `chat.router.ts` — Tam yeniden yazıldı: disappearing messages dahil tüm operasyonlar |
+| 2026-02-21 | 09:42 | Antigravity AI | [FEAT] | `components/chat/DisappearTimerSetting.tsx` — Kaybolan mesaj ayar bileşeni |
+| 2026-02-21 | 09:46 | Antigravity AI | [DOC] | `PROJECT_MAP.md` ve `JOURNAL.md` proje köküne oluşturuldu |
+| 2026-02-21 | 09:57 | Antigravity AI | [DOC] | `docs/lib/` — utils, trpc, db, storage, chatFilter, loyaltySystem dökümanları |
+| 2026-02-21 | 10:00 | Antigravity AI | [DOC] | `docs/drizzle/` — schema.md, db.md dökümanları (kritik tablo yapısı) |
+| 2026-02-21 | 10:02 | Antigravity AI | [DOC] | `docs/server/` — auth, chat, escort, media, admin_actions router dökümanları |
+| 2026-02-21 | 10:05 | Antigravity AI | [DOC] | `docs/pages/` — EscortProfile, AdminDashboard, EscortDashboard, MyAppointments |
+| 2026-02-21 | 10:06 | Antigravity AI | [DOC] | `docs/components/` — ChatWindow, DashboardRouter, ProtectedRoute dökümanları |
+| 2026-02-21 | 10:06 | Antigravity AI | [BUG] | `media.router.ts` güvenlik açığı tespit edildi: `registerPhoto`'da profileId sahiplik kontrolü eksik |
+| 2026-02-21 | 10:06 | Antigravity AI | [BUG] | `EscortProfile.tsx` tRPC entegrasyonu eksik — hâlâ mock `listingService` kullanıyor |
+| 2026-02-21 | 10:10 | Antigravity AI | [DOC] | `docs/components/` — BookingForm, LoyaltyDashboard, VideoCall, PaymentCheckout dökümanları |
+| 2026-02-21 | 10:11 | Antigravity AI | [FIX] | `components/LoyaltyDashboard.tsx` — duplike `Shield`/`ShoppingCart` import satırları kaldırıldı |
+| 2026-02-21 | 10:11 | Antigravity AI | [DOC] | `docs/pages/VerificationCenter.md` — 4 adımlı kimlik doğrulama akışı dökümanlandı |
+| 2026-02-21 | 10:11 | Antigravity AI | [FIX] | `pages/VerificationCenter.tsx` — `@/utils/trpc` → `@/lib/trpc` yanlış import yolu düzeltildi |
+| 2026-02-21 | 10:12 | Antigravity AI | [DOC] | `docs/INDEX.md` — tüm döküman dosyalarına hızlı erişim rehberi oluşturuldu |
+| 2026-02-21 | 10:15 | Antigravity AI | [DOC] | `docs/hooks/` — useChat, useWebSocket, useNotifications, useOnlineStatus dökümanları |
+| 2026-02-21 | 10:17 | Antigravity AI | [DOC] | `docs/contexts/` — AuthContext, ThemeContext dökümanları |
+| 2026-02-21 | 10:17 | Antigravity AI | [BUG] | `contexts/AuthContext.tsx` — email bazlı rol belirleme güvenlik açığı tespit edildi |
+| 2026-02-21 | 10:18 | Antigravity AI | [SEC] | `contexts/AuthContext.tsx` — `email.includes('admin')` rol açığı kapatıldı; her zaman `customer` atanır |
+| 2026-02-21 | 10:19 | Antigravity AI | [DOC] | `PROJECT_MAP.md` — 34 dosyanın döküman durumu güncellendi, istatistikler yenilendi |
+| 2026-02-21 | 10:19 | Antigravity AI | [DOC] | `CONTRIBUTING.md` — Geliştirici ve AI asistan için zorunlu döküman kuralları oluşturuldu |
+
 
 ---
 
