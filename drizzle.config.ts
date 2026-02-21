@@ -1,13 +1,17 @@
 import type { Config } from 'drizzle-kit';
+import * as dotenv from 'dotenv';
+
+// Use dotenv to load variables for drizzle-kit
+dotenv.config();
 
 /**
- * Drizzle Kit Configuration - SQLite / LibSQL
+ * Drizzle Kit Configuration - PostgreSQL (Docker/VPS) Support
  */
 export default {
   schema: './src/drizzle/schema.ts',
   out: './drizzle/migrations',
-  dialect: 'sqlite',
+  dialect: 'postgresql', // VPS Self-Hosted DB
   dbCredentials: {
-    url: 'file:local.db',
+    url: process.env.DATABASE_URL || 'postgres://nexus_admin:nexus_pass_123@localhost:5432/zuhre_prod',
   },
 } satisfies Config;

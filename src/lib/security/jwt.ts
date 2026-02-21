@@ -46,8 +46,20 @@ import jwt, { SignOptions, VerifyOptions, JwtPayload } from 'jsonwebtoken';
  * JWT configuration
  * @internal
  */
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-production';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-super-refresh-secret-key-change-in-production';
+const getSecret = (envVar: string, defaultSecret: string): string => {
+  const secret = process.env[envVar];
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`CRITICAL SECURITY ERROR: ${envVar} environment variable is not defined in production.`);
+    }
+    console.warn(`[WARNING] ${envVar} is missing. Using insecure fallback. DO NOT USE IN PRODUCTION.`);
+    return defaultSecret;
+  }
+  return secret;
+};
+
+const JWT_SECRET = getSecret('JWT_SECRET', 'dev-secret-key-change-in-production-12345');
+const JWT_REFRESH_SECRET = getSecret('JWT_REFRESH_SECRET', 'dev-refresh-secret-key-change-in-production-67890');
 const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || '15m';
 const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || '7d';
 

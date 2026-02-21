@@ -742,21 +742,20 @@ export function formatValidationErrors(error: z.ZodError): Record<string, string
   return errors;
 }
 
-/**
- * Sanitizes user input by removing/escaping potentially dangerous characters
- *
- * @param {string} input - The input to sanitize
- * @returns {string} Sanitized input
- *
- * @example
- * ```typescript
- * const safe = sanitizeInput('<script>alert("xss")</script>');
- * // Result: 'scriptalert("xss")/script'
- * ```
- */
 export function sanitizeInput(input: string): string {
+  if (typeof input !== 'string') return input;
+
+  // Basic HTML Entity Encoding for XSS Prevention
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;'
+  };
+
   return input
-    .replace(/[<>]/g, '') // Remove < and >
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .trim();
+    .trim()
+    .replace(/[&<>"'/]/g, (char) => htmlEntities[char] || char);
 }

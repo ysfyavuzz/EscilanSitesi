@@ -1,10 +1,18 @@
 /**
- * Drizzle Schema - SQLite Compatible (local.db)
+ * Drizzle Schema - PostgreSQL Compatible (Docker/VPS)
  *
  * Updated database schema for Escilan Platform
  */
 
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  text,
+  integer,
+  real,
+  boolean,
+  serial,
+  timestamp
+} from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
 // ============================================
@@ -19,17 +27,17 @@ export const appointmentStatusEnum = ["pending", "confirmed", "completed", "canc
 // TABLES
 // ============================================
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   fullName: text("full_name"),
   role: text("role", { enum: ["customer", "escort", "admin"] }).default("customer"),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const escortProfiles = sqliteTable("escort_profiles", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const escortProfiles = pgTable("escort_profiles", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   stageName: text("stage_name").notNull(),
   displayName: text("display_name"),
@@ -44,61 +52,61 @@ export const escortProfiles = sqliteTable("escort_profiles", {
   thumbnailVideo: text("thumbnail_video"),
   gallery: text("gallery"),
   mediaPrivacySettings: text("media_privacy_settings"),
-  isVerifiedByAdmin: integer("is_verified_by_admin", { mode: 'boolean' }).default(false),
+  isVerifiedByAdmin: boolean("is_verified_by_admin").default(false),
   viewCount: integer("view_count").default(0),
-  isVip: integer("is_vip", { mode: 'boolean' }).default(false),
-  isBoosted: integer("is_boosted", { mode: 'boolean' }).default(false),
-  tier: text("tier", { enum: subscriptionTierEnum }).default("free"),
-  lastActive: text("last_active").default(sql`CURRENT_TIMESTAMP`),
+  isVip: boolean("is_vip").default(false),
+  isBoosted: boolean("is_boosted").default(false),
+  tier: text("tier", { enum: ["free", "basic", "premium", "vip"] }).default("free"),
+  lastActive: timestamp("last_active").defaultNow(),
 });
 
 // Profiles tablosu (alias olarak escortProfiles'ı kullan)
 export const profiles = escortProfiles;
 
-export const customerProfiles = sqliteTable("customer_profiles", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const customerProfiles = pgTable("customer_profiles", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   phoneNumber: text("phone_number"),
   balance: real("balance").default(0),
 });
 
-export const escortPhotos = sqliteTable("escort_photos", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const escortPhotos = pgTable("escort_photos", {
+  id: serial("id").primaryKey(),
   profileId: integer("profile_id").references(() => escortProfiles.id),
   url: text("url").notNull(),
-  isPrimary: integer("is_primary", { mode: 'boolean' }).default(false),
+  isPrimary: boolean("is_primary").default(false),
 });
 
-export const appointments = sqliteTable("appointments", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
   customerId: integer("customer_id").references(() => users.id),
   escortId: integer("escort_id").references(() => escortProfiles.id),
   date: text("date").notNull(),
   time: text("time").notNull(),
   duration: integer("duration").notNull(),
-  status: text("status", { enum: appointmentStatusEnum }).default("pending"),
+  status: text("status", { enum: ["pending", "confirmed", "completed", "cancelled"] }).default("pending"),
   price: real("price").notNull(),
   notes: text("notes"),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const reviews = sqliteTable("reviews", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const reviews = pgTable("reviews", {
+  id: serial("id").primaryKey(),
   appointmentId: integer("appointment_id").references(() => appointments.id),
   customerId: integer("customer_id").references(() => users.id),
   escortId: integer("escort_id").references(() => escortProfiles.id),
   rating: integer("rating").notNull(),
   comment: text("comment"),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const media = sqliteTable("media", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const media = pgTable("media", {
+  id: serial("id").primaryKey(),
   escortId: integer("escort_id").references(() => escortProfiles.id),
   type: text("type", { enum: ["image", "video"] }).notNull(),
   url: text("url").notNull(),
-  isApproved: integer("is_approved", { mode: 'boolean' }).default(false),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  isApproved: boolean("is_approved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ============================================

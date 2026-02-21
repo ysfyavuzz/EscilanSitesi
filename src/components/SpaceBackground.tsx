@@ -11,7 +11,7 @@ const useResponsive = () => {
   const { size } = useThree();
   const isMobile = size.width < 768;
   const isTablet = size.width >= 768 && size.width < 1024;
-  
+
   return {
     isMobile,
     isTablet,
@@ -26,21 +26,21 @@ const useResponsive = () => {
 const CosmicVortex = () => {
   const pointsRef = useRef<THREE.Points>(null);
   const count = 3000;
-  
+
   const [positions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const cols = new Float32Array(count * 3);
     const color = new THREE.Color();
-    
+
     for (let i = 0; i < count; i++) {
       const radius = Math.random() * 100 + 20;
       const angle = Math.random() * Math.PI * 2;
       const spiral = radius * 0.2;
-      
+
       pos[i * 3] = Math.cos(angle + spiral) * radius;
       pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
       pos[i * 3 + 2] = Math.sin(angle + spiral) * radius;
-      
+
       color.setHSL(0.7 + Math.random() * 0.1, 0.8, 0.5);
       cols[i * 3] = color.r;
       cols[i * 3 + 1] = color.g;
@@ -109,16 +109,16 @@ const Comet = () => {
 };
 
 // --- REALISTIC PLANET COMPONENT ---
-const Planet = ({ 
-  data, 
-  isActive, 
-  onClick, 
-  position 
-}: { 
-  data: PlanetData; 
-  isActive: boolean; 
-  onClick: () => void; 
-  position: [number, number, number]; 
+const Planet = ({
+  data,
+  isActive,
+  onClick,
+  position
+}: {
+  data: PlanetData;
+  isActive: boolean;
+  onClick: () => void;
+  position: [number, number, number];
 }) => {
   const { planetSize, htmlScale } = useResponsive();
   const groupRef = useRef<THREE.Group>(null);
@@ -137,7 +137,7 @@ const Planet = ({
         <group ref={groupRef} onClick={(e) => { e.stopPropagation(); onClick(); }}>
           <mesh castShadow receiveShadow>
             <sphereGeometry args={[planetSize, 64, 64]} />
-            <meshStandardMaterial 
+            <meshStandardMaterial
               color={data.theme.color}
               emissive={data.theme.emissive}
               emissiveIntensity={isActive ? 4 : 0.6}
@@ -145,14 +145,14 @@ const Planet = ({
               metalness={0.9}
             />
           </mesh>
-          
+
           <mesh scale={1.1}>
             <sphereGeometry args={[planetSize, 32, 32]} />
-            <meshBasicMaterial 
-              color={data.theme.glow} 
-              transparent 
-              opacity={isActive ? 0.3 : 0.05} 
-              side={THREE.BackSide} 
+            <meshBasicMaterial
+              color={data.theme.glow}
+              transparent
+              opacity={isActive ? 0.3 : 0.05}
+              side={THREE.BackSide}
             />
           </mesh>
 
@@ -172,7 +172,7 @@ const Planet = ({
       </Float>
 
       <Html position={[0, planetSize + 7, 0]} center distanceFactor={15}>
-        <div 
+        <div
           style={{ transform: `scale(${htmlScale})` }}
           className={`transition-all duration-700 flex flex-col items-center pointer-events-none ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
@@ -227,12 +227,12 @@ const Carousel = () => {
         const x = Math.sin(angle) * carouselRadius;
         const z = Math.cos(angle) * carouselRadius;
         return (
-          <Planet 
-            key={planet.id} 
-            data={planet} 
-            position={[x, 0, z]} 
-            isActive={index === activeIndex} 
-            onClick={() => handlePlanetClick(index)} 
+          <Planet
+            key={planet.id}
+            data={planet}
+            position={[x, 0, z]}
+            isActive={index === activeIndex}
+            onClick={() => handlePlanetClick(index)}
           />
         );
       })}
@@ -254,14 +254,14 @@ const Scene = () => {
     <>
       <OrbitControls enablePan={false} enableZoom={true} minDistance={50} maxDistance={180} makeDefault />
       <Suspense fallback={null}>
-        <ambientLight intensity={0.2} /> 
+        <ambientLight intensity={0.2} />
         <pointLight position={[100, 100, 100]} intensity={15} color="#ffffff" />
         <pointLight position={[-100, -100, -100]} intensity={5} color="#4f46e5" />
-        
+
         <CosmicVortex />
         <Comet />
         <Carousel />
-        
+
         <Stars radius={400} depth={150} count={25000} factor={10} fade speed={2} />
         <Stars radius={200} depth={80} count={5000} factor={15} fade speed={1} />
       </Suspense>
@@ -272,14 +272,19 @@ const Scene = () => {
 export const SpaceBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 z-0 bg-black">
-      <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
+      <Canvas
+        shadows
+        dpr={typeof window !== 'undefined' && window.innerWidth < 768 ? [1, 1.5] : [1, 2]}
+        gl={{ antialias: true, powerPreference: "high-performance" }}
+        frameloop="demand"
+      >
         <Scene />
       </Canvas>
 
       {/* Deep Space Gradient Overlay */}
-      <div className="absolute inset-0 pointer-events-none" 
-           style={{ background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 80%, #000000 100%)' }} />
-      
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 80%, #000000 100%)' }} />
+
       <div className="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none w-full px-8 text-center">
         <div className="text-[12px] uppercase font-black tracking-[1em] animate-pulse italic text-white/20">
           DERİN UZAY YÖRÜNGESİ AKTİF

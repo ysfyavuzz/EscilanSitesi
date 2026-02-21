@@ -3,8 +3,20 @@ import { createClient } from '@libsql/client';
 import * as schema from '../drizzle/schema';
 import { eq, desc, and, sql } from 'drizzle-orm';
 
-const client = createClient({ 
-  url: 'file:local.db' 
+/**
+ * Turso/LibSQL Veritabanı İstemcisi
+ * Environment nesnesi tanımlı değilse "file:local.db" Fallback yapar.
+ */
+const dbUrl = process.env.DATABASE_URL || 'file:local.db';
+const dbAuthToken = process.env.DATABASE_AUTH_TOKEN;
+
+if (!process.env.DATABASE_URL) {
+  console.warn("⚠️ DATABASE_URL dotenv üzerinden algılanamadı! Yerel (local.db) SQLite kullanılıyor.");
+}
+
+const client = createClient({
+  url: dbUrl,
+  ...(dbAuthToken ? { authToken: dbAuthToken } : {})
 });
 
 export const db = drizzle(client, { schema });
