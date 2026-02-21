@@ -97,3 +97,24 @@ otification.ts ve ole.ts dökümanları oluşturuldu. |
 
 | 2026-02-21 | 11:55 | Gemini CLI | [DOC] | WebSocketContext, NotificationContext ve AnalyticsContext dökümanları oluşturuldu. |
 | 2026-02-21 | 12:05 | Gemini CLI | [DOC] | Ana altyapı (Docker, Drizzle, Vite) dökümanları oluşturuldu. |
+| 2026-02-21 | 12:15 | Gemini CLI | [DOC] | Security servisleri (JWT, RateLimit, CSRF, Password) dökümante edildi. |
+| 2026-02-21 | 12:25 | Gemini CLI | [DOC] | Payment servisleri (iyzico, webhooks, utils) dökümante edildi. |
+| 2026-02-21 | 12:45 | Gemini CLI | [DOC] | Security dökümanları 'Akıllı Gruplandırma' sistemine göre birleştirildi. |
+| 2026-02-21 | 12:50 | Gemini CLI | [DOC] | Payment dökümanları birleştirildi. |
+| 2026-02-21 | 12:55 | Gemini CLI | [DOC] | İletişim (Email/Push) dökümanları oluşturuldu. |
+| 2026-02-21 | 12:58 | Gemini CLI | [DOC] | Analitik dökümanları oluşturuldu. |
+| 2026-02-21 | 13:05 | Gemini CLI | [DOC] | Core Utils dökümanları oluşturuldu. 'src/lib' dökümantasyonu tamamlandı. |
+| 2026-02-21 | 13:15 | Gemini CLI | [DOC] | API hook dökümanları (auth, escorts, appointments, messages, payments) birleştirildi. |
+| 2026-02-21 | 13:25 | Gemini CLI | [DOC] | UI & Sistem hook dökümanları (online, chat, admin, guest access vb.) birleştirildi. |
+| 2026-02-21 | 13:40 | Gemini CLI | [DOC] | Escort akışı sayfaları (Kayıt, Panel, Medya, Takvim vb.) dökümante edildi. |
+| 2026-02-21 | 13:45 | Gemini CLI | [DOC] | Müşteri akışı sayfaları (Katalog, Profil, Randevu, Cüzdan vb.) dökümante edildi. |
+| 2026-02-21 | 13:50 | Gemini CLI | [DOC] | Admin akışı sayfaları (Dashboard, Onaylar, Güvenlik vb.) dökümante edildi. |
+| 2026-02-21 | 13:55 | Gemini CLI | [DOC] | Genel ve Statik sayfalar dökümante edildi. 'src/pages' dökümantasyonu tamamlandı. |
+| 2026-02-21 | 14:05 | Gemini CLI | [DOC] | UI Kit (Radix) bileşenleri dökümante edildi. |
+| 2026-02-21 | 14:10 | Gemini CLI | [DOC] | Görsel ve 3D bileşenler (Cards, 3D, Gallery) dökümante edildi. |
+| 2026-02-21 | 14:15 | Gemini CLI | [DOC] | İnteraktif bileşenler (Chat, Auth, Verification) dökümante edildi. |
+| 2026-02-21 | 14:20 | Gemini CLI | [DOC] | Dashboard ve Admin bileşenleri (Grafikler, Tablolar, Widgetlar) dökümante edildi. |
+| 2026-02-21 | 14:25 | Gemini CLI | [DOC] | Yerleşim ve Navigasyon bileşenleri dökümante edildi. 'src/components' dökümantasyonu tamamlandı. |
+| 2026-02-21 | 14:40 | Gemini CLI | [FEAT] | 3 adet Manus AI uyumlu uzmanlık skill'i (Backend, UI, Security) oluşturuldu. |
+| 2026-02-21 | 14:55 | Gemini CLI | [FEAT] | manus_skills klasörüne 3 yeni uzmanlık skill'i (Backend, UI, Security) eklendi. |
+| 2026-02-21 | 15:05 | Gemini CLI | [FEAT] | 'zuhre-planet-logger' yeteneği tüm platformlara eklendi. Jurnal tutma zorunlu hale getirildi. |
