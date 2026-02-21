@@ -8,10 +8,11 @@
  * @category Components - Messaging
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import ChatRulesModal from './chat/ChatRulesModal';
 import {
   Phone,
   Video,
@@ -25,6 +26,7 @@ import {
   Image,
   FileImage,
   File,
+  Shield,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Message, Conversation, OnlineStatus } from '@/types/message';
@@ -46,6 +48,10 @@ interface ChatWindowProps {
   isMobile?: boolean;
   onBack?: () => void;
   className?: string;
+  /** Whether the user has accepted chat rules. If false, rule modal is shown first. */
+  hasAcceptedChatRules?: boolean;
+  /** Called when user accepts chat rules — should trigger trpc.auth.acceptChatRules mutation */
+  onAcceptChatRules?: () => Promise<void>;
 }
 
 const statusLabels: Record<OnlineStatus, string> = {
@@ -69,9 +75,22 @@ export function ChatWindow({
   isMobile = false,
   onBack,
   className = '',
+  hasAcceptedChatRules = true,
+  onAcceptChatRules,
 }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [showRulesModal, setShowRulesModal] = useState(!hasAcceptedChatRules);
+
+  // Keep modal in sync with prop
+  useEffect(() => {
+    if (!hasAcceptedChatRules) setShowRulesModal(true);
+  }, [hasAcceptedChatRules]);
+
+  const handleAcceptRules = async () => {
+    if (onAcceptChatRules) await onAcceptChatRules();
+    setShowRulesModal(false);
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -265,6 +284,13 @@ export function ChatWindow({
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/10"
       >
+        {/* End-To-End Encryption Notice */}
+        <div className="flex justify-center mb-6 mt-2">
+          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs px-4 py-2 rounded-xl flex items-center gap-2 max-w-sm text-center">
+            <Shield className="w-4 h-4 shrink-0" />
+            <span className="leading-tight">Bu sohbetteki mesajlar uçtan uca şifreleme ile korunmaktadır. Zühre Planet dahil olmak üzere üçüncü şahıslar bu mesajları okuyamaz.</span>
+          </div>
+        </div>
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-muted-foreground">
@@ -301,11 +327,10 @@ export function ChatWindow({
 
                     {/* Message bubble */}
                     <div
-                      className={`rounded-2xl px-4 py-2 ${
-                        isOwn
-                          ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
-                          : 'bg-muted'
-                      }`}
+                      className={`rounded-2xl px-4 py-2 ${isOwn
+                        ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
+                        : 'bg-muted'
+                        }`}
                     >
                       {renderMessageContent(message)}
 

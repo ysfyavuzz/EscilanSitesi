@@ -31,7 +31,30 @@ interface AdvancedFilterPanelProps {
   className?: string;
 }
 
+import { TURKEY_LOCATIONS, getDistrictsByCity } from '@/data/locations';
+import { mockEscorts } from '@/data/mockData';
+
+// Sistemde aktif ilanı bulunan benzersiz şehir ve ilçeleri ayıklar (küçük harfe çevirerek)
+const activeCityNames = Array.from(new Set(mockEscorts.map(e => e.city?.toLowerCase()).filter(Boolean)));
+const activeDistrictNames = Array.from(new Set(mockEscorts.map(e => e.district?.toLowerCase()).filter(Boolean)));
+
 const defaultFilters: FilterSection[] = [
+  {
+    id: 'city',
+    title: 'Şehir Seçimi',
+    type: 'select',
+    // Sadece aktif ilanı bulunan şehirleri dropdown'a aktarır
+    options: TURKEY_LOCATIONS
+      .filter(c => activeCityNames.includes(c.name.toLowerCase()) || activeCityNames.includes(c.slug))
+      .map(c => ({ id: c.slug, label: c.name, value: c.slug }))
+  },
+  {
+    id: 'district',
+    title: 'İlçe',
+    type: 'select',
+    // İlk renderda options boş olabilir, onChange ile dinamik dolacak veya özel render edilecek
+    options: []
+  },
   { id: 'age', title: 'Yaş', type: 'range', min: 18, max: 60, step: 1 },
   { id: 'height', title: 'Boy (cm)', type: 'range', min: 140, max: 190, step: 1 },
   { id: 'weight', title: 'Kilo (kg)', type: 'range', min: 40, max: 100, step: 1 },
@@ -70,7 +93,7 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
   const isDark = theme === 'dark';
 
   const toggleSection = (id: string) => {
-    setExpandedSections(prev => 
+    setExpandedSections(prev =>
       prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
     );
   };
@@ -80,7 +103,7 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v: string) => v !== value)
       : [...currentValues, value];
-    
+
     const newFilters = { ...activeFilters, [sectionId]: newValues };
     setActiveFilters(newFilters);
     onFilterChange?.(newFilters);
@@ -103,7 +126,7 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
         <h3 className={`text-xs font-black uppercase tracking-[0.3em] ${isDark ? 'text-white' : 'text-orange-950'}`}>
           Filtreler
         </h3>
-        <button 
+        <button
           onClick={handleReset}
           className="text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-70 transition-opacity"
         >
@@ -122,10 +145,9 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
                 ${expandedSections.includes(section.id) ? 'text-primary' : (isDark ? 'text-white/60' : 'text-orange-950/60')}`}>
                 {section.title}
               </span>
-              <ChevronDown 
-                className={`w-4 h-4 transition-transform duration-300 ${
-                  expandedSections.includes(section.id) ? 'rotate-180 text-primary' : 'text-white/20'
-                }`} 
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${expandedSections.includes(section.id) ? 'rotate-180 text-primary' : 'text-white/20'
+                  }`}
               />
             </button>
 
@@ -138,6 +160,48 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
+                  {section.type === 'select' && (
+                    <div className="pt-2 px-1">
+                      <select
+                        value={activeFilters[section.id] || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const newFilters = { ...activeFilters, [section.id]: val };
+
+                          // Eğer şehir değişiyorsa ilçeyi sıfırla
+                          if (section.id === 'city') {
+                            newFilters['district'] = '';
+                          }
+
+                          setActiveFilters(newFilters);
+                          onFilterChange?.(newFilters);
+                        }}
+                        className={`w-full p-3 rounded-xl border outline-none cursor-pointer transition-all font-black uppercase tracking-widest text-[10px] appearance-none
+                          ${isDark ? 'bg-white/5 border-white/10 text-white hover:border-white/20' : 'bg-black/5 border-black/10 text-orange-950 hover:border-black/20'}`}
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
+                      >
+                        <option value="" className={isDark ? "bg-[#0f172a] text-white" : "text-black"}>Tümü</option>
+
+                        {/* District için özel logic, city üzerinden ilçeleri bul */}
+                        {section.id === 'district' ? (
+                          (activeFilters['city'] ? getDistrictsByCity(activeFilters['city']) : [])
+                            .filter(dist => activeDistrictNames.includes(dist.name.toLowerCase()) || activeDistrictNames.includes(dist.slug))
+                            .map(dist => (
+                              <option key={dist.slug} value={dist.slug} className={isDark ? "bg-[#0f172a] text-white" : "text-black"}>
+                                {dist.name}
+                              </option>
+                            ))
+                        ) : (
+                          section.options?.map(opt => (
+                            <option key={opt.id} value={opt.value} className={isDark ? "bg-[#0f172a] text-white" : "text-black"}>
+                              {opt.label}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+                  )}
+
                   {section.type === 'checkbox' && section.options && (
                     <div className="grid grid-cols-2 gap-3 pt-2">
                       {section.options.map((option) => (
@@ -147,7 +211,7 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
                             ${(activeFilters[section.id] || []).includes(option.value)
                               ? 'bg-primary/10 border-primary text-primary'
                               : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
-                          }`}
+                            }`}
                         >
                           <input
                             type="checkbox"
@@ -155,11 +219,10 @@ export const AdvancedFilterPanel: React.FC<AdvancedFilterPanelProps> = ({
                             checked={(activeFilters[section.id] || []).includes(option.value)}
                             onChange={() => handleCheckboxChange(section.id, option.value)}
                           />
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                            (activeFilters[section.id] || []).includes(option.value)
-                              ? 'bg-primary border-primary'
-                              : 'bg-white/10 border-white/20'
-                          }`}>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${(activeFilters[section.id] || []).includes(option.value)
+                            ? 'bg-primary border-primary'
+                            : 'bg-white/10 border-white/20'
+                            }`}>
                             {(activeFilters[section.id] || []).includes(option.value) && (
                               <Check className="w-3 h-3 text-white" />
                             )}

@@ -60,9 +60,9 @@ import { tr } from 'date-fns/locale';
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'completed' | 'cancelled';
 
-const statusConfig: Record<AppointmentStatus, { 
-  label: string; 
-  color: string; 
+const statusConfig: Record<AppointmentStatus, {
+  label: string;
+  color: string;
   icon: any;
   bgColor: string;
 }> = {
@@ -112,8 +112,8 @@ function AppointmentCard({ appointment, onCancel }: { appointment: any; onCancel
             {/* Escort Avatar */}
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center font-bold text-xl overflow-hidden">
               {appointment.escort?.profilePhoto ? (
-                <img 
-                  src={appointment.escort.profilePhoto} 
+                <img
+                  src={appointment.escort.profilePhoto}
                   alt={appointment.escort.displayName}
                   className="w-full h-full object-cover"
                 />
@@ -131,7 +131,7 @@ function AppointmentCard({ appointment, onCancel }: { appointment: any; onCancel
                   <CheckCircle2 className="w-4 h-4 text-blue-500" />
                 )}
               </div>
-              
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" />
@@ -213,7 +213,7 @@ function AppointmentCard({ appointment, onCancel }: { appointment: any; onCancel
               Profili Görüntüle
             </Button>
           </Link>
-          
+
           <Link href="/messages">
             <Button variant="outline" className="flex-1">
               <MessageCircle className="w-4 h-4 mr-2" />
@@ -222,8 +222,8 @@ function AppointmentCard({ appointment, onCancel }: { appointment: any; onCancel
           </Link>
 
           {canCancel && (
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => onCancel(appointment.id)}
               className="flex-1"
             >
@@ -241,8 +241,8 @@ export default function MyAppointments() {
   const [activeTab, setActiveTab] = useState('upcoming');
 
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: appointments = [], refetch } = trpc.appointments.getUserAppointments.useQuery(
-    undefined,
+  const { data: appointments = [], refetch } = trpc.appointment.list.useQuery(
+    { limit: 50, page: 1 },
     { enabled: !!user }
   );
 
@@ -279,145 +279,145 @@ export default function MyAppointments() {
   return (
     <ProtectedRoute accessLevel="customer">
       <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Randevularım
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Tüm randevularınızı buradan yönetin
-                </p>
+        {/* Header */}
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b">
+          <div className="container py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Link href="/">
+                  <Button variant="ghost" size="icon">
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Randevularım
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Tüm randevularınızı buradan yönetin
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="container py-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="card-premium">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Yaklaşan</p>
-                    <p className="text-3xl font-bold">{upcomingAppointments.length}</p>
+        <div className="container py-8">
+          <div className="max-w-5xl mx-auto">
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="card-premium">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Yaklaşan</p>
+                      <p className="text-3xl font-bold">{upcomingAppointments.length}</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-sky-500/10">
+                      <AlertCircle className="w-6 h-6 text-sky-600" />
+                    </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-sky-500/10">
-                    <AlertCircle className="w-6 h-6 text-sky-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="card-premium">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Tamamlanan</p>
-                    <p className="text-3xl font-bold">
-                      {appointments.filter(a => a.status === 'completed').length}
-                    </p>
+              <Card className="card-premium">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Tamamlanan</p>
+                      <p className="text-3xl font-bold">
+                        {appointments.filter(a => a.status === 'completed').length}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-green-500/10">
+                      <CheckCircle2 className="w-6 h-6 text-green-600" />
+                    </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-green-500/10">
-                    <CheckCircle2 className="w-6 h-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
+              <Card className="card-premium">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Toplam</p>
+                      <p className="text-3xl font-bold">{appointments.length}</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Calendar className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Appointments List */}
             <Card className="card-premium">
+              <CardHeader>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upcoming">
+                      Yaklaşan ({upcomingAppointments.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="past">
+                      Geçmiş ({pastAppointments.length})
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </CardHeader>
+
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Toplam</p>
-                    <p className="text-3xl font-bold">{appointments.length}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-primary/10">
-                    <Calendar className="w-6 h-6 text-primary" />
-                  </div>
-                </div>
+                <Tabs value={activeTab} className="w-full">
+                  <TabsContent value="upcoming" className="space-y-4 mt-0">
+                    {upcomingAppointments.length > 0 ? (
+                      upcomingAppointments.map((appointment) => (
+                        <AppointmentCard
+                          key={appointment.id}
+                          appointment={appointment}
+                          onCancel={handleCancel}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-center py-12">
+                        <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                        <h3 className="text-xl font-bold mb-2">Yaklaşan Randevu Yok</h3>
+                        <p className="text-muted-foreground mb-6">
+                          Henüz yaklaşan randevunuz bulunmuyor.
+                        </p>
+                        <Link href="/escorts">
+                          <Button className="bg-gradient-to-r from-primary to-accent">
+                            Escort Ara
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="past" className="space-y-4 mt-0">
+                    {pastAppointments.length > 0 ? (
+                      pastAppointments.map((appointment) => (
+                        <AppointmentCard
+                          key={appointment.id}
+                          appointment={appointment}
+                          onCancel={handleCancel}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-center py-12">
+                        <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                        <h3 className="text-xl font-bold mb-2">Geçmiş Randevu Yok</h3>
+                        <p className="text-muted-foreground">
+                          Henüz tamamlanmış randevunuz bulunmuyor.
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
-
-          {/* Appointments List */}
-          <Card className="card-premium">
-            <CardHeader>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="upcoming">
-                    Yaklaşan ({upcomingAppointments.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="past">
-                    Geçmiş ({pastAppointments.length})
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </CardHeader>
-
-            <CardContent className="p-6">
-              <Tabs value={activeTab} className="w-full">
-                <TabsContent value="upcoming" className="space-y-4 mt-0">
-                  {upcomingAppointments.length > 0 ? (
-                    upcomingAppointments.map((appointment) => (
-                      <AppointmentCard
-                        key={appointment.id}
-                        appointment={appointment}
-                        onCancel={handleCancel}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-                      <h3 className="text-xl font-bold mb-2">Yaklaşan Randevu Yok</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Henüz yaklaşan randevunuz bulunmuyor.
-                      </p>
-                      <Link href="/escorts">
-                        <Button className="bg-gradient-to-r from-primary to-accent">
-                          Escort Ara
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="past" className="space-y-4 mt-0">
-                  {pastAppointments.length > 0 ? (
-                    pastAppointments.map((appointment) => (
-                      <AppointmentCard
-                        key={appointment.id}
-                        appointment={appointment}
-                        onCancel={handleCancel}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-                      <h3 className="text-xl font-bold mb-2">Geçmiş Randevu Yok</h3>
-                      <p className="text-muted-foreground">
-                        Henüz tamamlanmış randevunuz bulunmuyor.
-                      </p>
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
         </div>
       </div>
-    </div>
     </ProtectedRoute>
   );
 }

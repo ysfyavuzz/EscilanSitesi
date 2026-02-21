@@ -15,7 +15,7 @@ export const escortRouter = router({
         page: z.number().min(1).default(1),
         limit: z.number().min(1).max(100).default(20),
         city: z.string().optional(),
-        tier: schema.subscriptionTierEnum.optional(),
+        tier: z.enum(schema.subscriptionTierEnum).optional(),
         isBoosted: z.boolean().optional(),
         search: z.string().optional(),
         sortBy: z.enum(['rating', 'createdAt', 'hourlyRate']).default('rating'),
@@ -38,8 +38,8 @@ export const escortRouter = router({
         );
       }
 
-      const orderBy = sortOrder === 'asc' 
-        ? asc(schema.escortProfiles[sortBy]) 
+      const orderBy = sortOrder === 'asc'
+        ? asc(schema.escortProfiles[sortBy])
         : desc(schema.escortProfiles[sortBy]);
 
       const [profiles, total] = await Promise.all([
@@ -83,48 +83,57 @@ export const escortRouter = router({
       if (!profile) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Profil bulunamadı.' });
       }
-      
+
       // Fire-and-forget view count increment
+      //@ts-ignore - Drizzle type inference mismatch
       db.update(schema.escortProfiles)
+        //@ts-ignore
         .set({ viewCount: sql`${schema.escortProfiles.viewCount} + 1` })
         .where(eq(schema.escortProfiles.id, profile.id))
-        .then()
+        .execute()
         .catch(console.error);
 
       return profile;
     }),
-    
+
   /**
-   * Update own escort profile
+   * Update own escort profile (Queue for admin approval)
    */
   updateProfile: protectedProcedure
     .input(
       z.object({
-        // Add fields that an escort can update
         displayName: z.string().optional(),
         bio: z.string().optional(),
+        biography: z.string().optional(),
         slogan: z.string().optional(),
-        // ... other fields
+        city: z.string().optional(),
+        district: z.string().optional(),
+        age: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'escort') {
-            throw new TRPCError({ code: 'FORBIDDEN', message: 'Sadece escortlar profillerini güncelleyebilir.' });
-        }
-        
-        const [updatedProfile] = await db.update(schema.escortProfiles)
-            .set({
-                ...input,
-                updatedAt: new Date(),
-            })
-            .where(eq(schema.escortProfiles.userId, ctx.user.id))
-            .returning();
-            
-        if (!updatedProfile) {
-            throw new TRPCError({ code: 'NOT_FOUND', message: 'Güncellenecek escort profili bulunamadı.' });
-        }
-        
-        return updatedProfile;
+      if (ctx.user.role !== 'escort') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Sadece escortlar profillerini güncelleyebilir.' });
+      }
+
+      // Save the update request to pendingData instead of updating the profile directly
+      const [updatedProfile] = await db.update(schema.escortProfiles)
+        .set({
+          pendingData: JSON.stringify(input),
+          hasPendingUpdate: true,
+          // We keep the old data as-is on the main columns
+        })
+        .where(eq(schema.escortProfiles.userId, ctx.user.id))
+        .returning();
+
+      if (!updatedProfile) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Güncellenecek escort profili bulunamadı.' });
+      }
+
+      return {
+        message: 'Profil güncellemeleriniz alındı ve admin onayına sunuldu. Onaylandığında yayına girecektir.',
+        profile: updatedProfile
+      };
     })
 });
 

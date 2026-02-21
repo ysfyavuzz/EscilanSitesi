@@ -86,6 +86,7 @@ export interface ListingProfile extends BaseProfile {
   // Sistem Durumları
   tier: SubscriptionTier;
   verificationStatus: VerificationStatus;
+  hasVerifiedBadge: boolean; // Yeni alan
   isBoosted: boolean; // Öne çıkarılmış mı?
   gridSpan: GridSpan; // Grid'deki boyutu
 

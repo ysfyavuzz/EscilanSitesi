@@ -7,9 +7,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MapPin, Star, Heart, CheckCircle2, MessageCircle, 
-  Phone, ArrowLeft, Share2, Shield, Clock, Ruler, 
+import {
+  MapPin, Star, Heart, CheckCircle2, MessageCircle,
+  Phone, ArrowLeft, Share2, Shield, Clock, Ruler,
   Weight, Palette, Eye, Info, Crown, Play, X,
   ExternalLink, Calendar, Languages, Sparkles
 } from 'lucide-react';
@@ -19,13 +19,17 @@ import { listingService } from '@/services/listingService';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { BookingForm } from '@/components/BookingForm';
 import { useTheme } from '@/contexts/ThemeContext';
+import { SEO } from '@/pages/SEO';
 
 export default function EscortProfile() {
   const { id } = useParams<{ id: string }>();
   const [profile, setProfile] = useState<ListingProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -69,8 +73,49 @@ export default function EscortProfile() {
     );
   }
 
+  // Dinamik SEO Schema (Person & Offer)
+  const profileSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile.displayName,
+    "description": profile.biography || `${profile.city} ${profile.district} VIP Escort`,
+    "image": profile.coverImage,
+    "gender": "Female",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": profile.district,
+      "addressRegion": profile.city,
+      "addressCountry": "TR"
+    },
+    // Hizmet Fiyatını (Offer) Arama Sonuçlarında Göstermek İçin
+    "offers": {
+      "@type": "Offer",
+      "price": profile.hourlyRate || profile.rates?.hourly || 0,
+      "priceCurrency": "TRY",
+      "availability": "https://schema.org/InStock"
+    },
+    // Yıldıza (Rating) Göre AggregateRating Eklenebilir
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": profile.rating || 5,
+      "reviewCount": profile.reviewCount || 1,
+      "bestRating": 5,
+      "worstRating": 1
+    }
+  };
+
+  const seoTitle = `${profile.displayName} - ${profile.city} ${profile.hairColor || 'VIP'} Escort | Doğrulanmış Profil - Zühre Planet`;
+  const seoDesc = `Zühre Planet güvencesiyle ${profile.city} ${profile.district} konumunda hizmet veren ${profile.age} yaşındaki ${profile.displayName} (${profile.hairColor || 'Sarışın'}) için hemen randevu detaylarını inceleyin.`;
+
   return (
     <div className="min-h-screen bg-transparent pb-32">
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        keywords={`${profile.city} escort, ${profile.district} escort, ${profile.displayName} escort, vip escort bayan, ${profile.hairColor || 'sarışın'} escort`}
+        ogImage={profile.coverImage}
+        schemaData={profileSchema}
+      />
       {/* --- HERO SECTION --- */}
       <div className="relative h-[60vh] md:h-[75vh] w-full overflow-hidden content-layer">
         <div className="absolute inset-0 z-0">
@@ -88,7 +133,7 @@ export default function EscortProfile() {
           <div className="flex flex-col md:flex-row gap-10 items-center md:items-end text-center md:text-left">
             {/* Main Profile Photo with Glass Frame */}
             <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="relative group cursor-pointer" onClick={() => profile.thumbnailVideo && setShowVideo(true)}>
-              <div className={`w-56 h-72 md:w-72 md:h-96 rounded-[3rem] overflow-hidden border-none shadow-2xl relative glass-panel`}>     
+              <div className={`w-56 h-72 md:w-72 md:h-96 rounded-[3rem] overflow-hidden border-none shadow-2xl relative glass-panel`}>
                 <img src={profile.coverImage} className="w-full h-full object-cover" alt={profile.displayName} />
                 {profile.thumbnailVideo && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -99,7 +144,7 @@ export default function EscortProfile() {
                 )}
               </div>
               {profile.verificationStatus === 'verified' && (
-                <div className="absolute -bottom-3 -right-3 bg-primary text-white p-4 rounded-3xl shadow-2xl border-none animate-bounce-subtle"> 
+                <div className="absolute -bottom-3 -right-3 bg-primary text-white p-4 rounded-3xl shadow-2xl border-none animate-bounce-subtle">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
               )}
@@ -167,7 +212,7 @@ export default function EscortProfile() {
 
             {/* Details Tabs */}
             <Tabs defaultValue="about" className="w-full">
-              <TabsList className="bg-white/5 border-none p-2 rounded-3xl w-full flex overflow-x-auto no-scrollbar gap-2">       
+              <TabsList className="bg-white/5 border-none p-2 rounded-3xl w-full flex overflow-x-auto no-scrollbar gap-2">
                 <TabsTrigger value="about" className="flex-1 rounded-2xl py-4 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all italic">HİKAYE</TabsTrigger>
                 <TabsTrigger value="services" className="flex-1 rounded-2xl py-4 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all italic">DENEYİMLER</TabsTrigger>
                 <TabsTrigger value="details" className="flex-1 rounded-2xl py-4 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all italic">PARAMETRELER</TabsTrigger>
@@ -178,7 +223,7 @@ export default function EscortProfile() {
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
                   <h3 className={`text-3xl font-black mb-8 uppercase italic tracking-tighter ${isDark ? 'text-white' : 'text-orange-950'}`}>BİYOGRAFİ</h3>
                   <p className={`leading-relaxed text-xl md:text-2xl font-medium ${isDark ? 'text-white/60' : 'text-orange-900/60'}`}>
-                    {profile.biography || "Bu yıldız henüz hikayesini paylaşmadı. Galaksinin derinliklerinde keşfedilmeyi bekliyor."}      
+                    {profile.biography || "Bu yıldız henüz hikayesini paylaşmadı. Galaksinin derinliklerinde keşfedilmeyi bekliyor."}
                   </p>
                 </div>
               </TabsContent>
@@ -221,20 +266,50 @@ export default function EscortProfile() {
               <div className="glass-panel border-none rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
                 <h3 className={`text-2xl font-black mb-8 uppercase italic tracking-tighter ${isDark ? 'text-white' : 'text-orange-950'}`}>İLETİŞİM VE ÜCRET</h3>
-                
+
                 <div className="space-y-8 mb-10">
                   <div className="flex justify-between items-end border-b border-white/10 pb-6">
                     <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-orange-900/30'}`}>Saatlik Ücret</span>
                     <span className={`text-4xl font-black italic ${isDark ? 'text-white' : 'text-orange-950'}`}>₺{profile.hourlyRate || profile.rates?.hourly}</span>
                   </div>
-                  
+
                   <div className="space-y-4">
+                    <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full py-8 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] italic shadow-2xl shadow-pink-500/20 transition-all flex items-center justify-center gap-3">
+                          <Calendar className="w-5 h-5" /> HEMEN RANDEVU AL
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-2xl border-white/10 p-0 rounded-3xl">
+                        <div className="p-2 md:p-6 lg:p-10 pt-16 md:pt-10">
+                          <BookingForm
+                            escortId={profile.id.toString()}
+                            escortName={profile.displayName}
+                            escortAvatar={profile.coverImage}
+                            hourlyRate={profile.hourlyRate || profile.rates?.hourly || 0}
+                            location={`${profile.city} ${profile.district}`}
+                            onSubmit={(data) => {
+                              console.log('Randevu Talebi Gönderildi:', data);
+                              // API çağrısı buraya eklenecektir
+                            }}
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                     <Button className="w-full py-8 bg-primary hover:bg-primary-dark text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] italic shadow-2xl shadow-primary/20 transition-all flex items-center justify-center gap-3">
                       <Phone className="w-5 h-5" /> ŞİMDİ ARA
                     </Button>
-                    <Button className="w-full py-8 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] italic shadow-2xl shadow-green-500/20 transition-all flex items-center justify-center gap-3">
-                      <MessageCircle className="w-5 h-5" /> WHATSAPP
-                    </Button>
+                    <div className="flex gap-4">
+                      <Link href="/messages" className="flex-1 w-full">
+                        <Button className="w-full py-8 bg-purple-500 hover:bg-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] italic shadow-2xl shadow-purple-500/20 transition-all flex items-center justify-center gap-2">
+                          <MessageCircle className="w-5 h-5" /> MESAJ GÖNDER
+                        </Button>
+                      </Link>
+                      <Button className="flex-1 w-full py-8 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] italic shadow-2xl shadow-green-500/20 transition-all flex items-center justify-center gap-2 text-center break-words">
+                        WHATSAPP
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

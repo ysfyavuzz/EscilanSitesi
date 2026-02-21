@@ -16,6 +16,7 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
 import * as adminApi from '@/services/adminApi';
 import type {
   AdminUser,
@@ -88,14 +89,23 @@ function useAction<T = unknown, Args extends any[] = any[]>(
  * Use ban user action
  */
 export function useBanUser() {
-  return useAction(
-    (id: string, reason: string, permanent?: boolean, until?: string) =>
-      adminApi.banUser(id, reason, permanent, until),
-    {
-      successMessage: 'Kullanıcı başarıyla engellendi',
-      errorMessage: 'Kullanıcı engellenirken hata oluştu',
-    }
-  );
+  const mutation = trpc.admin.banUser.useMutation({
+    onSuccess: () => toast.success('Kullanıcı başarıyla engellendi'),
+    onError: (err) => toast.error(err.message || 'Kullanıcı engellenirken hata oluştu')
+  });
+
+  return {
+    execute: async (id: string, reason: string) => {
+      try {
+        const result = await mutation.mutateAsync({ id, reason });
+        return { success: true, data: result };
+      } catch (err) {
+        return { success: false, error: err };
+      }
+    },
+    isLoading: mutation.isPending,
+    error: mutation.error?.message || null
+  };
 }
 
 /**
@@ -300,26 +310,46 @@ export function useBulkDeleteUsers() {
  * Use approve listing action
  */
 export function useApproveListing() {
-  return useAction(
-    (id: string) => adminApi.approveListing(id),
-    {
-      successMessage: 'İlan onaylandı',
-      errorMessage: 'İlan onaylanırken hata oluştu',
-    }
-  );
+  const mutation = trpc.admin.approveListing.useMutation({
+    onSuccess: () => toast.success('İlan onaylandı'),
+    onError: (err) => toast.error(err.message || 'İlan onaylanırken hata oluştu')
+  });
+
+  return {
+    execute: async (id: string) => {
+      try {
+        const result = await mutation.mutateAsync({ id });
+        return { success: true, data: result };
+      } catch (err) {
+        return { success: false, error: err };
+      }
+    },
+    isLoading: mutation.isPending,
+    error: mutation.error?.message || null
+  };
 }
 
 /**
  * Use reject listing action
  */
 export function useRejectListing() {
-  return useAction(
-    (id: string, reason: string) => adminApi.rejectListing(id, reason),
-    {
-      successMessage: 'İlan reddedildi',
-      errorMessage: 'İlan reddedilirken hata oluştu',
-    }
-  );
+  const mutation = trpc.admin.rejectListing.useMutation({
+    onSuccess: () => toast.success('İlan reddedildi'),
+    onError: (err) => toast.error(err.message || 'İlan reddedilirken hata oluştu')
+  });
+
+  return {
+    execute: async (id: string, reason: string) => {
+      try {
+        const result = await mutation.mutateAsync({ id, reason });
+        return { success: true, data: result };
+      } catch (err) {
+        return { success: false, error: err };
+      }
+    },
+    isLoading: mutation.isPending,
+    error: mutation.error?.message || null
+  };
 }
 
 /**

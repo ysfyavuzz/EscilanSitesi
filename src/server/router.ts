@@ -35,7 +35,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
     // Find the user in the database to ensure they still exist
     const userProfile = await db.query.users.findFirst({
-        where: eq(schema.users.id, decoded.userId),
+      where: eq(schema.users.id, decoded.userId),
     });
 
     if (!userProfile) {
@@ -77,12 +77,24 @@ export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
 import { authRouter } from './routers/auth.router';
 import { escortRouter } from './routers/escort.router';
 import { appointmentRouter } from './routers/appointment.router';
+import { adminRouter } from './routers/admin.router';
+import { adminActionsRouter } from './routers/admin_actions.router';
+import { forumRouter } from './routers/forum.router';
+import { chatRouter } from './routers/chat.router';
+import { mediaRouter } from './routers/media.router';
+import { verificationRouter } from './routers/verification.router';
 
 // 5. Main Application Router
 export const appRouter = router({
   auth: authRouter,
   escort: escortRouter,
   appointment: appointmentRouter,
+  admin: adminRouter,
+  adminActions: adminActionsRouter,
+  forum: forumRouter,
+  chat: chatRouter,
+  media: mediaRouter,
+  verification: verificationRouter,
   // Example: Health check using Drizzle
   health: publicProcedure.query(async ({ ctx }) => {
     try {

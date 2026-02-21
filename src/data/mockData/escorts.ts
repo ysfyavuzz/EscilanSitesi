@@ -25,6 +25,7 @@ export interface EscortProfile {
   hourlyRate: number;
   isVip: boolean;
   isVerifiedByAdmin: boolean;
+  hasVerifiedBadge?: boolean;
   profilePhoto: string;
   photos: string[];
   videos?: string[];
@@ -87,6 +88,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1500,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: true,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ayse',
     photos: [
       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
@@ -149,6 +151,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 2000,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: true,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zeynep',
     photos: [
       'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
@@ -211,6 +214,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1200,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elif',
     photos: [
       'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400',
@@ -271,6 +275,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1800,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: true,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Selin',
     photos: [
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
@@ -333,6 +338,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1600,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Derya',
     photos: [
       'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400',
@@ -393,6 +399,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1300,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Melis',
     photos: [
       'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
@@ -452,6 +459,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1400,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nazli',
     photos: [
       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
@@ -512,6 +520,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1700,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ece',
     photos: [
       'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400',
@@ -574,6 +583,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 2500,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ceren',
     photos: [
       'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400',
@@ -636,6 +646,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1900,
     isVip: true,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Deniz',
     photos: [
       'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400',
@@ -698,6 +709,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1100,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Melis',
     photos: [
       'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400',
@@ -758,6 +770,7 @@ export const mockEscorts: EscortProfile[] = [
     hourlyRate: 1300,
     isVip: false,
     isVerifiedByAdmin: true,
+    hasVerifiedBadge: false,
     profilePhoto: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ece',
     photos: [
       'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400',

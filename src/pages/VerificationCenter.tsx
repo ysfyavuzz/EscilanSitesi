@@ -43,16 +43,17 @@
  * ```
  */
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { trpc } from '@/utils/trpc';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  fadeInUp, 
-  staggerContainer, 
-  staggerItem, 
+import {
+  fadeInUp,
+  staggerContainer,
+  staggerItem,
   pageTransition,
 } from '@/lib/animations';
 import {
@@ -150,6 +151,19 @@ export default function VerificationCenter() {
     }
   };
 
+  const submitMutation = trpc.verification.submitVerification.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      // Reset form
+      removeFile('document');
+      removeFile('selfie');
+      setCurrentStep(1);
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Başvuru gönderilemedi.');
+    }
+  });
+
   // Handle form submission
   const handleSubmit = async () => {
     if (!documentFile || !selfieFile) {
@@ -160,18 +174,15 @@ export default function VerificationCenter() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Replace with actual API endpoint for verification submission
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // In a real app, we would upload the files to a storage service (S3/Cloudinary) first
+      // and get a URL. For now, we'll use the preview URL or a mock URL.
+      // Since we want to test the tRPC flow, we'll send a mock URL.
 
-      toast.success('Doğrulama başvurunuz alındı! 24 saat içinde incelenecektir.');
-      
-      // Reset form
-      removeFile('document');
-      removeFile('selfie');
-      setCurrentStep(1);
+      await submitMutation.mutateAsync({
+        photoUrl: selfieFile.preview, // Realistically this would be the uploaded S3 URL
+      });
     } catch (error) {
-      toast.error('Başvuru gönderilemedi. Lütfen tekrar deneyin.');
+      // Error handled in onError
     } finally {
       setIsSubmitting(false);
     }
@@ -191,6 +202,48 @@ export default function VerificationCenter() {
     { value: 'license', label: 'Ehliyet' },
   ];
 
+  // Camera handling
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setShowCamera(true);
+      }
+    } catch (err) {
+      toast.error('Kameraya erişilemedi. Lütfen izinleri kontrol edin.');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(videoRef.current, 0, 0);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "live-selfie.jpg", { type: "image/jpeg" });
+          handleFileSelect(file, 'selfie');
+          stopCamera();
+        }
+      }, 'image/jpeg');
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      setShowCamera(false);
+    }
+  };
+
   // Upload zone component
   const UploadZone = ({ type }: { type: 'document' | 'selfie' }) => {
     const file = type === 'document' ? documentFile : selfieFile;
@@ -198,68 +251,92 @@ export default function VerificationCenter() {
     const title = type === 'document' ? 'Kimlik Belgesi' : 'Selfie Fotoğrafı';
 
     return (
-      <div>
-        <label htmlFor={`${type}-upload`}>
-          <div
-            className={`relative border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer ${
-              isDragging
-                ? 'border-primary bg-primary/5'
-                : 'border-border hover:border-primary hover:bg-primary/5'
-            }`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={(e) => handleDrop(e, type)}
-          >
-            {file ? (
-              <div className="space-y-4">
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-                  <img
-                    src={file.preview}
-                    alt={title}
-                    className="w-full h-full object-contain"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      removeFile(type);
-                    }}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex items-center justify-center gap-2 text-sm text-green-500">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-medium">{file.file.name}</span>
-                </div>
+      <div className="space-y-4">
+        {type === 'selfie' && showCamera ? (
+          <div className="relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+            <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+              <Button onClick={capturePhoto} className="rounded-full w-12 h-12 p-0 bg-white hover:bg-white/90">
+                <div className="w-8 h-8 rounded-full border-4 border-primary" />
+              </Button>
+              <Button onClick={stopCamera} variant="destructive" className="rounded-full w-12 h-12 p-0">
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="relative">
+            <label htmlFor={`${type}-upload`}>
+              <div
+                className={`relative border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer ${isDragging
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:border-primary hover:bg-primary/5'
+                  }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => handleDrop(e, type)}
+              >
+                {file ? (
+                  <div className="space-y-4">
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={file.preview}
+                        alt={title}
+                        className="w-full h-full object-contain"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          removeFile(type);
+                        }}
+                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-sm text-green-500">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="font-medium">{file.file.name}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Icon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-lg font-medium mb-2">{title}</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Dosyayı sürükleyip bırakın veya tıklayın
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      JPG, PNG (Max 5MB)
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center">
-                <Icon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-lg font-medium mb-2">{title}</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Dosyayı sürükleyip bırakın veya tıklayın
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  JPG, PNG (Max 5MB)
-                </p>
+            </label>
+            <input
+              id={`${type}-upload`}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileSelect(file, type);
+              }}
+            />
+
+            {type === 'selfie' && !file && (
+              <div className="flex justify-center mt-4">
+                <Button onClick={startCamera} variant="outline" className="gap-2">
+                  <Camera className="w-4 h-4" />
+                  Kamerayı Kullan
+                </Button>
               </div>
             )}
           </div>
-        </label>
-        <input
-          id={`${type}-upload`}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileSelect(file, type);
-          }}
-        />
+        )}
       </div>
     );
   };
@@ -300,11 +377,10 @@ export default function VerificationCenter() {
               <div key={step.number} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
-                      currentStep >= step.number
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${currentStep >= step.number
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     <step.icon className="w-5 h-5" />
                   </div>
@@ -312,9 +388,8 @@ export default function VerificationCenter() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`h-0.5 flex-1 mx-2 transition-all ${
-                      currentStep > step.number ? 'bg-primary' : 'bg-muted'
-                    }`}
+                    className={`h-0.5 flex-1 mx-2 transition-all ${currentStep > step.number ? 'bg-primary' : 'bg-muted'
+                      }`}
                   />
                 )}
               </div>
@@ -371,11 +446,10 @@ export default function VerificationCenter() {
                         <button
                           key={type.value}
                           onClick={() => setDocumentType(type.value)}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            documentType === type.value
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:border-primary/50'
-                          }`}
+                          className={`p-3 rounded-lg border-2 transition-all ${documentType === type.value
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
+                            }`}
                         >
                           <span className="text-sm font-medium">{type.label}</span>
                         </button>

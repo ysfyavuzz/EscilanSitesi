@@ -6,9 +6,9 @@
  */
 
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { 
-  Eye, Heart, MousePointerClick, TrendingUp, 
-  AlertCircle, ChevronRight 
+import {
+  Eye, Heart, MousePointerClick, TrendingUp,
+  AlertCircle, ChevronRight
 } from 'lucide-react';
 import { Link } from 'wouter';
 
@@ -18,7 +18,7 @@ export default function EscortDashboard() {
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* --- HOŞ GELDİNİZ MESAJI --- */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -33,8 +33,8 @@ export default function EscortDashboard() {
         </div>
 
         {/* --- GAMIFICATION WIDGET --- */}
-        <ProfileHealthWidget 
-          score={65} 
+        <ProfileHealthWidget
+          score={65}
           missingItems={[
             { label: 'Tanıtım Videosu Ekle (+20 Puan)', href: '/dashboard/gallery' },
             { label: 'Biyografini Genişlet (+15 Puan)', href: '/dashboard/profile' }
@@ -66,41 +66,106 @@ export default function EscortDashboard() {
 
         {/* --- BİLDİRİMLER & DURUM --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Sol: Bekleyen Onaylar */}
-          <div className="lg:col-span-2 bg-[#0a0a0f] border border-white/10 rounded-2xl p-6">
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-500" />
-              Sistem Durumu
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
-                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <div className="flex-1">
-                  <h4 className="text-white font-medium">Biyografi Güncellemesi</h4>
-                  <p className="text-sm text-gray-400">Admin onayı bekleniyor. Tahmini süre: 2 saat.</p>
-                </div>
-                <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20">
-                  Bekliyor
+
+          {/* Sol: Bekleyen Onaylar ve Randevular */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* YENİ: Gelen Randevu Talepleri */}
+            <div className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
+              <div className="flex justify-between items-center mb-6 relative z-10">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-pink-500 fill-pink-500/20" />
+                  Gelen Randevu Talepleri
+                </h3>
+                <span className="px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 text-xs font-bold border border-pink-500/20">
+                  2 Yeni
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-green-500/5 border border-green-500/20 opacity-60">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <div className="flex-1">
-                  <h4 className="text-white font-medium">Yeni Fotoğraf Yüklemesi</h4>
-                  <p className="text-sm text-gray-400">3 adet fotoğraf onaylandı ve yayına alındı.</p>
+              <div className="space-y-4 relative z-10">
+                {/* Mock Booking Item 1 */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-pink-500/30 transition-colors">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-pink-500/20 flex flex-col items-center justify-center border border-pink-500/30">
+                      <span className="text-[10px] text-pink-300 font-bold uppercase">25 Mar</span>
+                      <span className="text-sm text-pink-400 font-black">14:00</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-sm">Burak Özkan</h4>
+                      <p className="text-xs text-gray-400 mt-1">Rahatlama Masajı • 1 Saat • İstanbul / Kadıköy</p>
+                      <p className="text-xs font-medium text-pink-400 mt-1">₺1,300</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button className="flex-1 sm:flex-none px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold transition-colors">
+                      Onayla
+                    </button>
+                    <button className="flex-1 sm:flex-none px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors">
+                      Reddet
+                    </button>
+                  </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20">
-                  Onaylandı
-                </span>
+
+                {/* Mock Booking Item 2 */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-pink-500/30 transition-colors">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-pink-500/20 flex flex-col items-center justify-center border border-pink-500/30">
+                      <span className="text-[10px] text-pink-300 font-bold uppercase">26 Mar</span>
+                      <span className="text-sm text-pink-400 font-black">19:00</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-sm">Gizli Müşteri</h4>
+                      <p className="text-xs text-gray-400 mt-1">VIP Hizmet • 2 Saat • İstanbul / Beşiktaş</p>
+                      <p className="text-xs font-medium text-pink-400 mt-1">₺3,000</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button className="flex-1 sm:flex-none px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-bold transition-colors">
+                      Onayla
+                    </button>
+                    <button className="flex-1 sm:flex-none px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors">
+                      Reddet
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-6">
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-500" />
+                Sistem Durumu
+              </h3>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                  <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <div className="flex-1">
+                    <h4 className="text-white font-medium">Biyografi Güncellemesi</h4>
+                    <p className="text-sm text-gray-400">Admin onayı bekleniyor. Tahmini süre: 2 saat.</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20">
+                    Bekliyor
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-green-500/5 border border-green-500/20 opacity-60">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <div className="flex-1">
+                    <h4 className="text-white font-medium">Yeni Fotoğraf Yüklemesi</h4>
+                    <p className="text-sm text-gray-400">3 adet fotoğraf onaylandı ve yayına alındı.</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20">
+                    Onaylandı
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sağ: İpuçları */}
-          <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-white/10 rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-white/10 rounded-2xl p-6 h-fit">
             <h3 className="text-lg font-bold mb-4">Profil İpuçları 🚀</h3>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
               Profil doluluk oranınız %85. Daha fazla görüntülenme almak için bir tanıtım videosu eklemeyi düşünün.

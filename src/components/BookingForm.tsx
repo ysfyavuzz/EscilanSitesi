@@ -208,11 +208,10 @@ export function BookingForm({
                 {BOOKING_REMINDERS.beforeBooking.messages.map((msg, i) => (
                   <div
                     key={i}
-                    className={`p-4 rounded-lg ${
-                      msg.variant === 'warning'
+                    className={`p-4 rounded-lg ${msg.variant === 'warning'
                         ? 'bg-amber-500/10 border border-amber-500/20'
                         : 'bg-blue-500/10 border border-blue-500/20'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 mt-0.5 shrink-0" />
@@ -301,25 +300,42 @@ export function BookingForm({
 
                   {/* Time Selection */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold mb-2">
-                      <Clock className="w-4 h-4 text-primary" />
-                      Saat
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold">
+                        <Clock className="w-4 h-4 text-primary" />
+                        Saat
+                      </label>
+                      <div className="flex gap-3 text-xs">
+                        <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary"></div> Seçili</span>
+                        <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full border border-white/20"></div> Müsait</span>
+                        <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-white/5 border border-white/10"></div> Dolu</span>
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                      {availableHours.map((hour) => (
-                        <button
-                          key={hour}
-                          type="button"
-                          onClick={() => setBookingData({ ...bookingData, time: hour })}
-                          className={`p-2 rounded-lg text-sm font-medium transition-all ${
-                            bookingData.time === hour
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted hover:bg-muted/70'
-                          }`}
-                        >
-                          {hour}
-                        </button>
-                      ))}
+                      {availableHours.map((hour) => {
+                        // Basit Çakışma Simülasyonu (Gerçek senaryoda API'den 'bookedHours' gelecek)
+                        // Örn: Rastgele 14:00 ve 19:00 saatlerinin seçili günde dolu görünmesi testi.
+                        const dateNum = new Date(bookingData.date).getDate() || 0;
+                        const isBooked = (dateNum % 2 === 0 && hour === '14:00') || (dateNum % 3 === 0 && hour === '19:00') || (dateNum % 5 === 0 && hour === '11:00');
+
+                        return (
+                          <button
+                            key={hour}
+                            type="button"
+                            disabled={isBooked}
+                            onClick={() => setBookingData({ ...bookingData, time: hour })}
+                            className={`p-2 rounded-lg text-sm font-medium transition-all flex justify-center items-center ${isBooked
+                                ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed line-through'
+                                : bookingData.time === hour
+                                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 border border-primary'
+                                  : 'bg-muted/50 hover:bg-muted border border-transparent'
+                              }`}
+                          >
+                            {hour}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -335,11 +351,10 @@ export function BookingForm({
                           key={dur}
                           type="button"
                           onClick={() => setBookingData({ ...bookingData, duration: dur })}
-                          className={`p-3 rounded-lg text-center transition-all ${
-                            bookingData.duration === dur
+                          className={`p-3 rounded-lg text-center transition-all ${bookingData.duration === dur
                               ? 'bg-primary text-primary-foreground'
                               : 'bg-muted hover:bg-muted/70'
-                          }`}
+                            }`}
                         >
                           <div className="text-lg font-bold">{dur}</div>
                           <div className="text-xs">saat</div>

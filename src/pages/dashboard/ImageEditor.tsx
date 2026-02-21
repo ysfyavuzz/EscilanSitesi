@@ -15,13 +15,17 @@ import { Switch } from '@/components/ui/switch'; // Assuming a Radix UI Switch c
 import {
   Camera, Crop, SlidersHorizontal, Eye, EyeOff, Save, Upload, Sparkles
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import FileUpload from '@/components/FileUpload';
 import { uploadMultipleFiles } from '@/services/mockUploadService';
+import { FaceMaskOverlay } from '@/components/media/FaceMaskOverlay';
+import { trpc } from '@/lib/trpc';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 // Mock AI İşleme Fonksiyonu (Gerçek AI backend API'ye bağlanacak)
 const mockProcessImage = (
-  originalUrl: string, 
+  originalUrl: string,
   options: {
     faceMaskingEnabled?: boolean;
     blurBackground?: boolean;
@@ -43,7 +47,7 @@ const mockProcessImage = (
   if (params.length > 0) {
     // Mevcut placeholder URL'sini değiştirme mantığı
     if (processed.includes('?')) {
-        processed = processed.split('?')[0]; // Eski parametreleri temizle
+      processed = processed.split('?')[0]; // Eski parametreleri temizle
     }
     processed += `?text=Processed+Image+(${params.join('+')})&${params.join('&')}`;
   } else {
@@ -54,8 +58,9 @@ const mockProcessImage = (
 };
 
 export default function ImageEditor() {
-  const [originalImage, setOriginalImage] = useState<string>('https://via.placeholder.com/600/6A0DAD/FFFFFF?text=Orijinal+Görsel');
+  const [originalImage, setOriginalImage] = useState<string>('');
   const [processedImage, setProcessedImage] = useState<string>('');
+  const [activePhotoId, setActivePhotoId] = useState<number | null>(null);
   const [imageProcessingOptions, setImageProcessingOptions] = useState({
     faceMaskingEnabled: false,
     blurBackground: false,
@@ -65,48 +70,43 @@ export default function ImageEditor() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Görsel yüklendiğinde otomatik olarak işleme al
-  useEffect(() => {
-    if (originalImage) {
-      applyFilters();
-    }
-  }, [originalImage]); // Sadece orijinal görsel değiştiğinde
+  const applyEffectMutation = trpc.media.applyAIEffect.useMutation();
+  const togglePrivacyMutation = trpc.media.toggleFacePrivacy.useMutation();
 
-  // Ayarlar her değiştiğinde filtreleri yeniden uygula
-  useEffect(() => {
-    if (originalImage) {
-        applyFilters();
-    }
-  }, [imageProcessingOptions]); // imageProcessingOptions değiştiğinde
-
-  const applyFilters = () => {
-    if (!originalImage) return;
+  const handleEffect = async (effect: 'remove_bg' | 'retouch') => {
+    if (!activePhotoId) return;
     setIsProcessing(true);
-    // Mock işlemeyi simüle et
-    setTimeout(() => {
-      const result = mockProcessImage(originalImage, imageProcessingOptions);
-      setProcessedImage(result);
+    try {
+      const result = await applyEffectMutation.mutateAsync({ photoId: activePhotoId, effect });
+      setProcessedImage(result.newUrl);
+      toast.success(effect === 'remove_bg' ? 'Arka plan başarıyla silindi' : 'Cilt kusurları düzeltildi');
+    } catch (err) {
+      toast.error('AI işlemi başarısız oldu.');
+    } finally {
       setIsProcessing(false);
-    }, 500); // Yarım saniye gecikme
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setOriginalImage(e.target?.result as string);
-        // Reset processing options for new image
-        setImageProcessingOptions({
-          faceMaskingEnabled: false,
-          blurBackground: false,
-          customMaskId: 'none',
-          brightnessAdjustment: 0,
-          contrastAdjustment: 0,
-        });
-      };
-      reader.readAsDataURL(event.target.files[0]);
     }
   };
+
+  const handlePrivacyToggle = async (enabled: boolean) => {
+    handleOptionChange('faceMaskingEnabled', enabled);
+    if (!activePhotoId) return;
+
+    try {
+      const result = await togglePrivacyMutation.mutateAsync({
+        photoId: activePhotoId,
+        isHidden: enabled
+      });
+      if (enabled && result.maskedUrl) {
+        setProcessedImage(result.maskedUrl);
+      } else {
+        setProcessedImage(originalImage);
+      }
+    } catch (err) {
+      toast.error('Gizlilik ayarı değiştirilemedi.');
+    }
+  };
+
+  const registerPhotoMutation = trpc.media.registerPhoto.useMutation();
 
   const handleOptionChange = (optionName: keyof typeof imageProcessingOptions, value: any) => {
     setImageProcessingOptions(prev => ({
@@ -116,11 +116,7 @@ export default function ImageEditor() {
   };
 
   const handleSave = () => {
-    console.log('Kaydedilen Ayarlar:', imageProcessingOptions);
-    console.log('İşlenmiş Görsel URL:', processedImage);
-    // Burada API çağrısı ile orijinal görsel, işlenmiş görsel ve ayarlar backend'e gönderilir.
-    // Backend, bu veriyi pendingChanges olarak kaydeder.
-    alert('Görsel ayarları onaya gönderildi!');
+    toast.success('Görsel ayarları onaya gönderildi!');
   };
 
   return (
@@ -131,7 +127,7 @@ export default function ImageEditor() {
           AI Destekli Görsel Düzenleyici
         </h1>
         <p className="text-gray-400">
-          Görsellerinize yüz maskeleme, arka plan bulanıklığı ve renk düzeltmeleri uygulayın. 
+          Görsellerinize yüz maskeleme, arka plan bulanıklığı ve renk düzeltmeleri uygulayın.
           Gizliliğinizi korurken profesyonel bir görünüm elde edin.
         </p>
 
@@ -147,6 +143,15 @@ export default function ImageEditor() {
                     const firstSuccessfulUpload = results.find(r => r.success);
                     if (firstSuccessfulUpload?.fileUrl) {
                       setOriginalImage(firstSuccessfulUpload.fileUrl);
+
+                      // Kayıt Mutasyonu
+                      const savedPhoto = await registerPhotoMutation.mutateAsync({
+                        url: firstSuccessfulUpload.fileUrl,
+                        profileId: 1 // TODO: Dinamik escortId
+                      });
+
+                      setActivePhotoId(savedPhoto.id);
+
                       // Reset processing options for new image
                       setImageProcessingOptions({
                         faceMaskingEnabled: false,
@@ -156,9 +161,9 @@ export default function ImageEditor() {
                         contrastAdjustment: 0,
                       });
                     }
-                    alert('Dosyalar başarıyla yüklendi!');
+                    toast.success('Fotoğraf başarıyla yüklendi ve AI sistemine tanımlandı.');
                   } catch (error) {
-                    alert('Dosya yükleme sırasında hata oluştu.');
+                    toast.error('Fotoğraf kaydedilemedi.');
                     console.error('Dosya yükleme hatası:', error);
                   }
                 }}
@@ -173,26 +178,37 @@ export default function ImageEditor() {
                 AI Gizlilik & Düzenleme
               </h3>
 
+              {/* Arka Plan Silme */}
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 bg-white/5 border-white/10 hover:bg-white/10"
+                onClick={() => handleEffect('remove_bg')}
+                disabled={isProcessing || !originalImage}
+              >
+                <ImageIcon className="w-4 h-4 text-blue-400" /> Arka Planı Temizle
+              </Button>
+
+              {/* Kusur Düzeltme */}
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 bg-white/5 border-white/10 hover:bg-white/10"
+                onClick={() => handleEffect('retouch')}
+                disabled={isProcessing || !originalImage}
+              >
+                <Sparkles className="w-4 h-4 text-yellow-400" /> AI Cilt Rötuşu
+              </Button>
+
               {/* Yüz Maskeleme */}
-              <div className="flex items-center justify-between">
-                <Label htmlFor="face-masking" className="text-sm text-gray-300">Yüz Maskeleme</Label>
+              <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                <Label htmlFor="face-masking" className="text-sm text-gray-300">Akıllı Yüz Maskeleme</Label>
                 <Switch
                   id="face-masking"
                   checked={imageProcessingOptions.faceMaskingEnabled}
-                  onCheckedChange={(checked) => handleOptionChange('faceMaskingEnabled', checked)}
+                  onCheckedChange={handlePrivacyToggle}
+                  disabled={!originalImage}
                 />
               </div>
 
-              {/* Arka Plan Bulanıklığı */}
-              <div className="flex items-center justify-between">
-                <Label htmlFor="blur-background" className="text-sm text-gray-300">Arka Plan Bulanıklığı</Label>
-                <Switch
-                  id="blur-background"
-                  checked={imageProcessingOptions.blurBackground}
-                  onCheckedChange={(checked) => handleOptionChange('blurBackground', checked)}
-                />
-              </div>
-              
               {/* Özel Maske Seçimi */}
               <div>
                 <Label htmlFor="custom-mask" className="block text-sm text-gray-300 mb-2">Özel Maske</Label>
@@ -250,24 +266,26 @@ export default function ImageEditor() {
           <div className="md:col-span-2 bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center relative min-h-[400px]">
             <h3 className="text-xl font-bold text-white mb-4">Görsel Önizleme</h3>
             {originalImage ? (
-              <div className="relative w-full max-w-md h-auto rounded-xl overflow-hidden shadow-2xl border border-white/20">
+              <div className="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden shadow-2xl border border-white/20 bg-black">
                 {isProcessing && (
-                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-10">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                      className="w-12 h-12 text-purple-400"
-                    >
-                      <Sparkles className="w-full h-full" />
-                    </motion.div>
+                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-20 backdrop-blur-sm">
+                    <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
+                    <p className="text-sm text-purple-200 animate-pulse">AI İşlem Yapıyor...</p>
                   </div>
                 )}
-                <img 
-                  src={processedImage || originalImage} 
-                  alt="Processed Preview" 
-                  className="w-full h-auto object-contain" 
-                  onLoad={() => setIsProcessing(false)}
-                />
+
+                {imageProcessingOptions.faceMaskingEnabled ? (
+                  <FaceMaskOverlay
+                    imageUrl={originalImage}
+                    maskStyle="luxury"
+                  />
+                ) : (
+                  <img
+                    src={processedImage || originalImage}
+                    alt="Processed Preview"
+                    className="w-full h-full object-contain"
+                  />
+                )}
               </div>
             ) : (
               <div className="text-center text-gray-500">

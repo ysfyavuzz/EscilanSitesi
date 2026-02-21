@@ -47,32 +47,33 @@ interface SEOProps {
   keywords?: string;
   canonical?: string;
   ogImage?: string;
+  schemaData?: Record<string, any>; // Dinamik Schema objesi (Opsiyonel)
 }
 
-export function SEO({ title, description, keywords, canonical, ogImage }: SEOProps) {
+export function SEO({ title, description, keywords, canonical, ogImage, schemaData }: SEOProps) {
   useEffect(() => {
-    document.title = `${title} | Escort Platform - Marmara'nın En Seçkin İlanları`;
+    // Escort ilanları ve SEO dinamizmi
+    const isBrandInTitle = title.includes('Zühre Planet') || title.includes('Escort Platform');
+    document.title = isBrandInTitle ? title : `${title} | Zühre Planet VIP Escort İlanları`;
 
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', description);
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = description;
-      document.head.appendChild(meta);
+    // Description Meta
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
     }
+    metaDescription.setAttribute('content', description);
 
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    const defaultKeywords = "istanbul escort, bursa escort, kocaeli escort, marmara escort ilanları, vip escort istanbul, onaylı escort profilleri";
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', keywords || defaultKeywords);
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'keywords';
-      meta.content = keywords || defaultKeywords;
-      document.head.appendChild(meta);
+    // Keywords Meta
+    const defaultKeywords = "istanbul escort, ankara escort, izmir escort, vip escort bay, onaylı profiller, zühre planet";
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.setAttribute('name', 'keywords');
+      document.head.appendChild(metaKeywords);
     }
+    metaKeywords.setAttribute('content', keywords || defaultKeywords);
 
     // Canonical Link
     let linkCanonical = document.querySelector('link[rel="canonical"]');
@@ -99,36 +100,53 @@ export function SEO({ title, description, keywords, canonical, ogImage }: SEOPro
       let meta = document.querySelector(`meta[property="${property}"]`) || document.querySelector(`meta[name="${property}"]`);
       if (!meta) {
         meta = document.createElement('meta');
-        if (property.startsWith('og:')) meta.setAttribute('property', property);
-        else meta.setAttribute('name', property);
+        if (property.startsWith('og:')) {
+          meta.setAttribute('property', property);
+        } else {
+          meta.setAttribute('name', property);
+        }
         document.head.appendChild(meta);
       }
-      meta.setAttribute('content', content);
+      // Content güncellenirken varsa hata fırlatmasını önler
+      if (meta instanceof Element) {
+        meta.setAttribute('content', content);
+      }
     });
 
-    // JSON-LD Schema for Local Business / Directory
-    const schemaData = {
+    // JSON-LD Schema (Varsayılan veya Prop üzerinden Gelen Özel Schema)
+    const jsonLdData = schemaData || {
       "@context": "https://schema.org",
       "@type": "DirectoryWebSite",
-      "name": "Escort Platform",
+      "name": "Zühre Planet",
       "url": window.location.origin,
       "description": description,
       "potentialAction": {
         "@type": "SearchAction",
-        "target": `${window.location.origin}/escorts?q={search_term_string}`,
+        "target": `${window.location.origin}/search?q={search_term_string}`,
         "query-input": "required name=search_term_string"
       }
     };
 
+    // Temizle ve Ekle
+    const existingScript = document.querySelector('script[data-type="seo-schema"]');
+    if (existingScript) existingScript.remove();
+
     const script = document.createElement('script');
+    script.setAttribute('data-type', 'seo-schema');
     script.type = 'application/ld+json';
-    script.text = JSON.stringify(schemaData);
+    script.text = JSON.stringify(jsonLdData);
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      // Temizlik işlemi (Özellikle Next/SPA yönlendirmelerinde)
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+      if (document.head.contains(linkCanonical as Element)) {
+        document.head.removeChild(linkCanonical as Element);
+      }
     };
-  }, [title, description, keywords]);
+  }, [title, description, keywords, canonical, ogImage, schemaData]);
 
   return null;
 }

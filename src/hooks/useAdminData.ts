@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
+import { trpc } from '@/lib/trpc';
 import type {
   AdminUser,
   AdminListing,
@@ -262,10 +263,16 @@ export function usePaginatedData<T>(
  * Use platform stats hook
  */
 export function usePlatformStats(refetchInterval?: number) {
-  return useFetchData<PlatformStats>(
-    () => adminApi.getPlatformStats(),
-    { refetchInterval }
-  );
+  const query = trpc.admin.getPlatformStats.useQuery(undefined, {
+    refetchInterval: refetchInterval || false
+  });
+
+  return {
+    data: query.data || null,
+    isLoading: query.isLoading,
+    error: query.error?.message || null,
+    refetch: async () => { await query.refetch(); }
+  };
 }
 
 /**
@@ -308,11 +315,30 @@ export function useChartData(
  * Use users list hook
  */
 export function useUsers(filters: UserFilters = {}) {
-  return usePaginatedData(
-    (f) => adminApi.getUsers(f as UserFilters),
-    filters,
-    { showToastOnError: true }
-  );
+  const [page, setPage] = useState(filters.page || 1);
+  const limit = filters.limit || 20;
+
+  const query = trpc.admin.getUsers.useQuery({
+    page,
+    limit,
+    search: filters.search
+  });
+
+  return {
+    data: query.data?.items || [],
+    items: query.data?.items || [],
+    isLoading: query.isLoading,
+    error: query.error?.message || null,
+    total: query.data?.total || 0,
+    page,
+    limit,
+    hasMore: query.data?.hasMore || false,
+    totalPages: query.data?.totalPages || 0,
+    refetch: async () => { await query.refetch(); },
+    nextPage: () => setPage(p => p + 1),
+    prevPage: () => setPage(p => Math.max(1, p - 1)),
+    goToPage: (p: number) => setPage(p),
+  };
 }
 
 /**
@@ -333,11 +359,30 @@ export function useUser(id: string) {
  * Use listings hook
  */
 export function useListings(filters: ListingFilters = {}) {
-  return usePaginatedData(
-    (f) => adminApi.getListings(f as ListingFilters),
-    filters,
-    { showToastOnError: true }
-  );
+  const [page, setPage] = useState(filters.page || 1);
+  const limit = filters.limit || 20;
+
+  const query = trpc.admin.getListings.useQuery({
+    page,
+    limit,
+    status: filters.status !== 'all' ? filters.status : undefined
+  });
+
+  return {
+    data: query.data?.items || [],
+    items: query.data?.items || [],
+    isLoading: query.isLoading,
+    error: query.error?.message || null,
+    total: query.data?.total || 0,
+    page,
+    limit,
+    hasMore: query.data?.hasMore || false,
+    totalPages: query.data?.totalPages || 0,
+    refetch: async () => { await query.refetch(); },
+    nextPage: () => setPage(p => p + 1),
+    prevPage: () => setPage(p => Math.max(1, p - 1)),
+    goToPage: (p: number) => setPage(p),
+  };
 }
 
 /**

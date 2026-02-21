@@ -20,6 +20,7 @@ import { mockEscorts } from '@/data/mockData';
 import { Search, SlidersHorizontal, Grid3x3, List, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/contexts/ThemeContext';
+import { SEO } from '@/pages/SEO';
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -71,12 +72,31 @@ export default function Catalog() {
     setSearchParams(params);
   };
 
+  const currentCity = searchParams.get('city');
+  const isVipFilter = searchParams.get('isVip') === 'true';
+
+  // Dinamik Olarak Title, Description (Bölge ve Statüye göre Long-Tail Kurgusu)
+  const seoTitle = currentCity
+    ? `${currentCity} ${isVipFilter ? 'VIP ' : ''}Escort İlanları - Zühre Planet`
+    : searchQuery
+      ? `"${searchQuery}" Escort Araması - Zühre Planet`
+      : `Türkiye VIP Escort İlanları ve Elit Katalog - Zühre Planet`;
+
+  const seoDesc = currentCity
+    ? `En güncel ve %100 onaylı ${currentCity} escort bayan ilanları. ${currentCity} profillerini inceleyin ve iletişime geçin.`
+    : `Zühre planet escort platformu üzerinde yer alan tüm onaylı vip escort bayan, elit ilanlar ve ajans profillerini inceleyin.`;
+
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        keywords={`${currentCity ? currentCity + ' escort, ' : ''}vip escort, escort ilanları, onaylı escort, elit escort`}
+      />
       <StarryBackground />
       <Header />
-      
-      <PremiumHeroBanner 
+
+      <PremiumHeroBanner
         title="SEÇKİN KATALOG"
         subtitle="Türkiye'nin en seçkin ve doğrulanmış profillerini keşfedin."
       />
@@ -86,8 +106,8 @@ export default function Catalog() {
         <div className="flex flex-col md:flex-row gap-6 mb-16 items-center justify-between">
           <div className="relative w-full md:w-[400px]">
             <Search className={`absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 ${isDark ? 'text-white/20' : 'text-orange-950/20'}`} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="GALAKSİDE ARA..."
               className={`w-full glass-panel border-none pl-14 pr-6 py-6 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-black uppercase tracking-widest text-[10px] italic
                 ${isDark ? 'text-white placeholder-white/20' : 'text-orange-950 placeholder-orange-900/40'}`}
@@ -95,9 +115,9 @@ export default function Catalog() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="flex gap-4 w-full md:w-auto">
-            <Button 
+            <Button
               className={`flex-1 md:flex-none gap-3 glass-panel border-none h-16 px-10 font-black uppercase tracking-[0.2em] text-[10px] italic transition-all
                 ${isDark ? 'text-white hover:bg-white/10' : 'text-orange-950 hover:bg-orange-500/10'}`}
               onClick={() => setFilterOpen(!filterOpen)}
@@ -127,7 +147,7 @@ export default function Catalog() {
           {/* Sidebar Filters */}
           <AnimatePresence>
             {filterOpen && (
-              <motion.aside 
+              <motion.aside
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }}
@@ -172,7 +192,7 @@ export default function Catalog() {
                   <StandardCard key={escort.id} profile={escort} />
                 ))}
               </div>
-              
+
               {filteredEscorts.length === 0 && (
                 <div className="text-center py-40 glass-panel border-none rounded-[3rem] shadow-2xl">
                   <p className={`text-xl font-black uppercase tracking-[0.2em] italic ${isDark ? 'text-white/30' : 'text-orange-900/40'}`}>
@@ -187,7 +207,7 @@ export default function Catalog() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
       <BottomNav />
     </div>

@@ -40,6 +40,7 @@ import {
   AlertCircle, ChevronRight, ExternalLink
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { VerifiedBadge } from './VerifiedBadge';
 
 /**
  * Profile statistics interface
@@ -74,6 +75,7 @@ interface EscUserProfileCardProps {
     profilePhoto?: string;
     isVip: boolean;
     isVerifiedByAdmin: boolean;
+    hasVerifiedBadge?: boolean;
     photos?: string[];
     videos?: string[];
     hourlyRate?: number;
@@ -223,9 +225,9 @@ export default function EscUserProfileCard({
                 className="w-full h-full object-cover"
               />
             </div>
-            {profile.isVerifiedByAdmin && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-background">
-                <Shield className="w-3.5 h-3.5 text-white" />
+            {profile.hasVerifiedBadge && (
+              <div className="absolute -bottom-1 -right-1">
+                <VerifiedBadge size="sm" showText={false} />
               </div>
             )}
           </div>
@@ -419,9 +421,9 @@ export function EscUserProfileCardCompact({
                 className="w-full h-full object-cover"
               />
             </div>
-            {profile.isVerifiedByAdmin && (
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-background">
-                <Shield className="w-2.5 h-2.5 text-white" />
+            {profile.hasVerifiedBadge && (
+              <div className="absolute -bottom-1 -right-1">
+                <VerifiedBadge size="sm" showText={false} />
               </div>
             )}
           </div>

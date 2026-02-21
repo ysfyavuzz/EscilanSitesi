@@ -4,11 +4,13 @@
  * Kozmik temaya uygun, okunaklılığı artırılmış profil kartı.
  */
 
-import React from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { trpc } from '@/utils/trpc';
 import { Star, MapPin, ShieldCheck, Clock, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ListingProfile } from '@/types/domain';
+import { VerifiedBadge } from './VerifiedBadge';
 
 interface StandardCardProps {
   profile: ListingProfile;
@@ -27,23 +29,21 @@ export const StandardCard: React.FC<StandardCardProps> = ({ profile }) => {
       {/* Image Section */}
       <div className="relative aspect-[3/4] overflow-hidden">
         <img
-          src={profile.avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2'}
-          alt={profile.name}
+          src={profile.avatarUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2'}
+          alt={profile.displayName}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        
+
         {/* Status Badges */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
           <div className="flex flex-col gap-2">
-            {profile.isVip && (
+            {profile.tier === 'vip' && (
               <span className="bg-primary text-white text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg italic">
                 VIP
               </span>
             )}
-            {profile.isVerified && (
-              <span className="bg-blue-500 text-white text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg italic">
-                ONAYLI
-              </span>
+            {profile.hasVerifiedBadge && (
+              <VerifiedBadge size="sm" showText={false} />
             )}
           </div>
           <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-xl border border-white/10 shadow-lg
@@ -57,17 +57,17 @@ export const StandardCard: React.FC<StandardCardProps> = ({ profile }) => {
 
         {/* Info Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-        
+
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <div className="flex justify-between items-end mb-2">
             <div>
               <h3 className="text-2xl font-black italic uppercase tracking-tighter drop-shadow-lg">
-                {profile.name}
+                {profile.displayName}
               </h3>
               <div className="flex items-center gap-1 text-white/70">
                 <MapPin className="w-3 h-3 text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-widest italic">
-                  {profile.location || 'İstanbul'}
+                  {profile.city || 'İstanbul'}
                 </span>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const StandardCard: React.FC<StandardCardProps> = ({ profile }) => {
             </span>
           </div>
           <span className="text-xl font-black italic text-primary">
-            ₺{profile.hourlyRate || '5000'}
+            ₺{profile.rates?.hourly || '5000'}
           </span>
         </div>
 
